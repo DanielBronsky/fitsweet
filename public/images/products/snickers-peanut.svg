@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <rect width="600" height="600" fill="#F7F5F0"/>
+  <ellipse cx="300" cy="452" rx="215" ry="30" fill="#2D3526" opacity="0.07"/>
+  
+  <g transform="translate(86 322) rotate(-5)">
+    <rect width="250" height="96" rx="26.880000000000003" fill="#5A3A26"/>
+    <rect width="250" height="40.32" rx="19.200000000000003" fill="#fff" opacity="0.07"/>
+    <circle cx="140.09984086240578" cy="53.36256030627495" r="5.711680012089801" fill="#D9A566" opacity="0.9"/><circle cx="95.24111904644356" cy="31.525770059340125" r="4.849701449710794" fill="#D9A566" opacity="0.9"/><circle cx="55.63869611623148" cy="74.04720468725641" r="6.528179132391701" fill="#D9A566" opacity="0.9"/><circle cx="28.28753172250216" cy="14.81263234780982" r="4.189972329518809" fill="#D9A566" opacity="0.9"/><circle cx="18.01865076673266" cy="85.22782682948014" r="6.9695194801110585" fill="#D9A566" opacity="0.9"/><circle cx="26.64584146259778" cy="10.208797112278427" r="4.008241991274148" fill="#D9A566" opacity="0.9"/>
+  </g>
+  
+  <g transform="translate(268 224) rotate(10)">
+    <rect width="250" height="96" rx="26.880000000000003" fill="#5A3A26"/>
+    <rect width="250" height="40.32" rx="19.200000000000003" fill="#fff" opacity="0.07"/>
+    <circle cx="140.09984086240578" cy="53.36256030627495" r="5.711680012089801" fill="#D9A566" opacity="0.9"/><circle cx="95.24111904644356" cy="31.525770059340125" r="4.849701449710794" fill="#D9A566" opacity="0.9"/><circle cx="55.63869611623148" cy="74.04720468725641" r="6.528179132391701" fill="#D9A566" opacity="0.9"/><circle cx="28.28753172250216" cy="14.81263234780982" r="4.189972329518809" fill="#D9A566" opacity="0.9"/><circle cx="18.01865076673266" cy="85.22782682948014" r="6.9695194801110585" fill="#D9A566" opacity="0.9"/><circle cx="26.64584146259778" cy="10.208797112278427" r="4.008241991274148" fill="#D9A566" opacity="0.9"/>
+  </g>
+  <text x="300" y="566" text-anchor="middle" font-family="Inter, sans-serif" font-size="15"
+        letter-spacing="2.6" fill="#7C7A70" opacity="0.45">ФОТО СКОРО</text>
+</svg>

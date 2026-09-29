@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FitSweet
 
-## Getting Started
+Лендинг ПП-десертов FitSweet — Next.js 15 (App Router) + TypeScript + Tailwind CSS v4.
+Двуязычный: русский (`/ru`) и румынский (`/ro`).
 
-First, run the development server:
+## Требования
+
+- **Node.js ≥ 22.13** (в репозитории есть `.nvmrc`)
+- **pnpm 11** (зафиксирован в `packageManager`, подтягивается через corepack)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use          # переключит на Node 22 по .nvmrc
+corepack enable  # если pnpm ещё не активирован
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Команды
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install   # установка зависимостей
+pnpm dev       # дев-сервер (http://localhost:3000)
+pnpm build     # production-сборка
+pnpm start     # запуск собранного приложения
+pnpm lint      # ESLint
+pnpm exec tsc --noEmit   # проверка типов
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Структура
 
-## Learn More
+```
+app/
+  layout.tsx            # корневой каркас (разметку задаёт [locale])
+  page.tsx              # / → редирект на /ru
+  globals.css           # дизайн-токены (@theme), утилиты, стили карты
+  [locale]/
+    layout.tsx          # <html lang>, шрифты, метаданные, hreflang, I18nProvider
+    page.tsx            # сборка секций + JSON-LD на нужном языке
+  api/order/route.ts    # приём заказа (пока пишет в консоль)
+components/
+  layout/               # Header, Footer, CartDrawer, Logo, LocaleSwitch
+  sections/             # Hero, Catalog, Moods, WhereToBuy, Delivery,
+                        # BoxBuilder, Reviews, InstagramFeed, OrderForm, FinalCta
+  ui/                   # Button, Chip, SectionTitle, ProductCard, Icons,
+                        # Stamp, LeafletMap
+lib/
+  i18n/
+    config.ts           # список локалей, коды hreflang
+    ru.ts               # русский словарь + тип Dictionary
+    ro.ts               # румынский словарь (типизирован по Dictionary)
+    context.tsx         # I18nProvider / useI18n для клиентских компонентов
+    index.ts            # getDictionary
+  products.ts           # каталог (цены и составы — реальные, RU + RO)
+  moods.ts              # группировка по настроениям
+  locations.ts          # точки продаж + координаты (заглушка)
+  delivery.ts           # константы доставки; тексты — в словарях
+  reviews.ts            # отзывы (заглушка)
+  cart.ts               # корзина: zustand + persist(localStorage)
+  filter.ts             # связь «настроение → каталог»
+scripts/
+  gen-placeholders.mjs  # генератор SVG-заглушек под фото
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Языки
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Локали заданы в `lib/i18n/config.ts`. Каждая получает свой URL (`/ru`, `/ro`),
+свой `<html lang>`, canonical и `hreflang` — обе страницы пререндерятся статически.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Как добавить язык:**
 
-## Deploy on Vercel
+1. Добавить код в `locales` и `localeTags` (`lib/i18n/config.ts`).
+2. Создать `lib/i18n/<код>.ts` по образцу `ro.ts` — тип `Dictionary` заставит
+   заполнить все ключи, пропуск не соберётся.
+3. Зарегистрировать словарь в `dictionaries` (`lib/i18n/index.ts`).
+4. Дописать перевод в поля `I18nString` у данных: `products.ts`, `moods.ts`,
+   `locations.ts`, `reviews.ts`, `site.ts` (`city`, `taglineByLocale`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Плюрализация живёт в `common.desserts` каждого словаря — у русского три формы,
+у румынского своя схема с предлогом «de» от 20.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Карта
+
+Leaflet + тайлы CARTO Positron (бесплатно, без API-ключа). Компонент
+`components/ui/LeafletMap.tsx` грузится динамически с `ssr: false`.
+Цвета тайлов приглушены под палитру CSS-фильтром в `globals.css`.
+Координаты точек — в `lib/locations.ts`, поле `coords: [lat, lng]`.
+
+## Что ещё заглушка
+
+Всё помечено в коде комментариями `TODO(...)`:
+
+| Что | Где | Чем заменить |
+|---|---|---|
+| Фото товаров и секций | `public/images/**` | Реальные снимки (пути прописаны в `lib/products.ts`) |
+| КБЖУ и вес — 7 из 8 SKU | `lib/products.ts` | Лабораторные значения. Реальные есть только у «Миндаль-клюква» |
+| Точки продаж | `lib/locations.ts` | Реальные адреса, часы, координаты |
+| Координаты точек | `lib/locations.ts` | Реальные `[lat, lng]` (карта уже настоящая) |
+| Отзывы | `lib/reviews.ts` | Реальные отзывы (или снести вместе с пунктом меню) |
+| Приём заказов | `app/api/order/route.ts` | Telegram-бот / почта / CRM |
+| Цена коробки | `components/sections/BoxBuilder.tsx` | Сейчас — сумма выбранных вкусов |
+| Румынский перевод | `lib/i18n/ro.ts` + поля `ro` в данных | Вычитка носителем языка |
+
+Подробный разбор макета и план — в [PLAN.md](PLAN.md).
+
+## Замена фото
+
+1. Положить файлы в `public/images/products/` под теми же именами, что в `lib/products.ts`.
+2. Поменять расширение в `image` с `.svg` на `.jpg`/`.png`/`.webp`.
+3. Удалить `scripts/gen-placeholders.mjs` и старые SVG.

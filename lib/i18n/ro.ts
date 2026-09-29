@@ -1,0 +1,171 @@
+import type { Dictionary } from "./ru";
+
+export const ro: Dictionary = {
+  nav: {
+    catalog: "Catalog",
+    about: "Despre FitSweet",
+    where: "Unde cumperi",
+    delivery: "Livrare",
+    reviews: "Recenzii",
+    instagram: "Instagram",
+  },
+  header: {
+    order: "Comandă",
+    cart: "Coș",
+    cartWithCount: "Coș, produse:",
+    cartEmpty: "Coș, gol",
+    openMenu: "Deschide meniul",
+    closeMenu: "Închide meniul",
+    skipToCatalog: "Sari la catalog",
+    switchLanguage: "Schimbă limba",
+  },
+  hero: {
+    line1: "Deserturi,",
+    line2: "pe care vrei",
+    line3: "să le mănânci zilnic",
+    subtitle:
+      "Deserturi sănătoase fără zahăr, lactoză și gluten — plăcere gustoasă fără compromisuri.",
+    ctaPrimary: "Vezi deserturile",
+    ctaSecondary: "Comandă",
+    imageAlt: "Sortimentul de batoane sănătoase FitSweet",
+    features: {
+      "no-sugar": "Fără zahăr",
+      "no-lactose": "Fără lactoză",
+      "no-gluten": "Fără gluten",
+      tasty: "Gustos și sățios",
+    },
+  },
+  catalog: {
+    title: "Deserturile noastre",
+    addToCart: "În coș",
+    added: "Adăugat ✓",
+    viewAll: "Vezi tot sortimentul",
+    perBar: (weight: number) => `per baton ${weight} g`,
+  },
+  moods: {
+    title: "Alege după dispoziție",
+    viewAll: "Vezi tot sortimentul",
+  },
+  where: {
+    title: "Unde cumperi FitSweet?",
+    subtitle: "Deserturile noastre sunt deja disponibile în locațiile partenere din oraș.",
+    categories: {
+      all: "Toate",
+      cafe: "Cafenele",
+      gym: "Cluburi fitness",
+      shop: "Magazine",
+      gas: "Benzinării",
+    },
+    showAll: (n: number) => `Arată toate locațiile (${n})`,
+    collapse: "Restrânge lista",
+    empty: "În această categorie încă nu sunt puncte — vor apărea în curând.",
+    mapLabel: "Harta punctelor de vânzare FitSweet",
+    mapHint: "Folosește două degete pentru a mișca și a mări harta",
+    aroundTheClock: "non-stop",
+  },
+  delivery: {
+    title: "FitSweet vine la tine",
+    subtitle: "Comandă deserturile preferate cu livrare acasă sau la birou.",
+    imageAlt: "Cutie cadou FitSweet cu deserturi",
+    steps: [
+      "Alegi deserturile",
+      "Plasezi comanda",
+      "Confirmăm comanda",
+      "Livrăm la adresa ta",
+    ],
+    terms: [
+      { title: "Livrare în Chișinău", value: "de la 40 MDL" },
+      { title: "Livrare gratuită", value: "la comenzi peste 300 MDL" },
+      { title: "Livrare", value: "zilnic între 10:00 și 21:00" },
+      { title: "Preluăm comenzi", value: "între 09:00 și 20:00" },
+    ],
+    cta: "Comandă livrare",
+  },
+  box: {
+    title: "Compune-ți cutia FitSweet",
+    chooseQty: "Alege numărul de deserturi",
+    yourBox: "Cutia ta:",
+    manualPick: "Alege gusturile manual",
+    hideManual: "Ascunde alegerea gusturilor",
+    freeSlot: "Loc liber",
+    total: "Total:",
+    checkout: "Plasează comanda",
+    addMore: (n: number) => `Mai adaugă ${n}`,
+    addOne: (name: string) => `Adaugă ${name}`,
+    removeOne: (name: string) => `Scoate ${name}`,
+  },
+  reviews: {
+    title: "Ce spun clienții",
+  },
+  instagram: {
+    title: "Mai mult FitSweet în fiecare zi",
+    followUs: "Urmărește-ne pe Instagram",
+    description: "Rețete, noutăți, promoții și mult conținut delicios.",
+    cta: "Mergi pe Instagram",
+  },
+  finalCta: {
+    line1: "Gata să-ți alegi",
+    line2: "FitSweet-ul preferat?",
+    subtitle: "Sănătos poate fi incredibil de gustos.",
+    cta: "Vezi deserturile",
+  },
+  order: {
+    title: "Plasează comanda",
+    name: "Nume",
+    namePlaceholder: "Cum să vă adresăm",
+    phone: "Telefon",
+    phonePlaceholder: "+373 60 000 000",
+    address: "Adresa de livrare",
+    addressPlaceholder: "Strada, blocul, apartamentul",
+    comment: "Comentariu",
+    commentPlaceholder: "Ora convenabilă, interfon, preferințe",
+    submit: (total: string) => `Trimite comanda · ${total}`,
+    sending: "Se trimite…",
+    needItems: "Adaugă mai întâi deserturi",
+    success: "Comanda a fost primită. Vă contactăm în 15 minute.",
+    agree: "Apăsând butonul, sunteți de acord cu prelucrarea datelor personale.",
+    yourOrder: "Comanda ta",
+    emptyCart: "Coșul este gol. Alege deserturi din catalog sau compune o cutie.",
+    deliveryRow: "Livrare",
+    free: "gratuit",
+    total: "Total",
+    errorGeneric: "Comanda nu a putut fi trimisă",
+    errorUnknown: "Eroare necunoscută",
+  },
+  cart: {
+    title: "Coș",
+    empty: "Deocamdată gol. Alege deserturi din catalog.",
+    toCatalog: "Spre catalog",
+    remove: "Scoate",
+    clear: "Golește coșul",
+    checkout: "Plasează comanda",
+    total: "Total",
+    freeDeliveryLeft: (sum: string) => `Până la livrarea gratuită ${sum}`,
+    close: "Închide coșul",
+    decrease: "Micșorează cantitatea",
+    increase: "Mărește cantitatea",
+  },
+  footer: {
+    copyright: (year: number, city: string) => `© ${year} FitSweet. ${city}.`,
+  },
+  common: {
+    /**
+     * Румынская плюрализация: 1 → singular, 2–19 → plural,
+     * от 20 — с предлогом «de» (20 de deserturi).
+     */
+    desserts: (n: number) => {
+      if (n === 1) return "1 desert";
+      const mod100 = n % 100;
+      const needsDe = n >= 20 && !(mod100 >= 1 && mod100 <= 19);
+      return needsDe ? `${n} de deserturi` : `${n} deserturi`;
+    },
+    price: (value: number) => `${value} MDL`,
+    ingredients: "Ingrediente",
+  },
+  meta: {
+    title: "FitSweet — deserturi sănătoase fără zahăr, lactoză și gluten",
+    description:
+      "Deserturi sănătoase fără zahăr, lactoză și gluten — plăcere gustoasă fără compromisuri. Livrare în Chișinău.",
+    keywords: ["deserturi sănătoase", "fără zahăr", "fără gluten", "fără lactoză", "batoane", "Chișinău", "FitSweet"],
+  },
+};

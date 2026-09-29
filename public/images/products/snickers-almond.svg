@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <rect width="600" height="600" fill="#F7F5F0"/>
+  <ellipse cx="300" cy="452" rx="215" ry="30" fill="#2D3526" opacity="0.07"/>
+  
+  <g transform="translate(86 322) rotate(-5)">
+    <rect width="250" height="96" rx="26.880000000000003" fill="#3B2519"/>
+    <rect width="250" height="40.32" rx="19.200000000000003" fill="#fff" opacity="0.07"/>
+    <circle cx="195.29756606291042" cy="72.96549075131398" r="6.485479898078184" fill="#C79A72" opacity="0.9"/><circle cx="222.23468725143462" cy="32.85290293290205" r="4.902088273667186" fill="#C79A72" opacity="0.9"/><circle cx="231.99728567972366" cy="51.91396285140161" r="5.654498533607958" fill="#C79A72" opacity="0.9"/><circle cx="222.86099760840438" cy="55.68473592495329" r="5.803344839142893" fill="#C79A72" opacity="0.9"/><circle cx="196.4395618364628" cy="29.43432047901411" r="4.767144229434768" fill="#C79A72" opacity="0.9"/>
+  </g>
+  
+  <g transform="translate(268 224) rotate(10)">
+    <rect width="250" height="96" rx="26.880000000000003" fill="#3B2519"/>
+    <rect width="250" height="40.32" rx="19.200000000000003" fill="#fff" opacity="0.07"/>
+    <circle cx="195.29756606291042" cy="72.96549075131398" r="6.485479898078184" fill="#C79A72" opacity="0.9"/><circle cx="222.23468725143462" cy="32.85290293290205" r="4.902088273667186" fill="#C79A72" opacity="0.9"/><circle cx="231.99728567972366" cy="51.91396285140161" r="5.654498533607958" fill="#C79A72" opacity="0.9"/><circle cx="222.86099760840438" cy="55.68473592495329" r="5.803344839142893" fill="#C79A72" opacity="0.9"/><circle cx="196.4395618364628" cy="29.43432047901411" r="4.767144229434768" fill="#C79A72" opacity="0.9"/>
+  </g>
+  <text x="300" y="566" text-anchor="middle" font-family="Inter, sans-serif" font-size="15"
+        letter-spacing="2.6" fill="#7C7A70" opacity="0.45">ФОТО СКОРО</text>
+</svg>

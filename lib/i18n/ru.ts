@@ -1,0 +1,170 @@
+export const ru = {
+  nav: {
+    catalog: "Каталог",
+    about: "О FitSweet",
+    where: "Где купить",
+    delivery: "Доставка",
+    reviews: "Отзывы",
+    instagram: "Instagram",
+  },
+  header: {
+    order: "Заказать",
+    cart: "Корзина",
+    cartWithCount: "Корзина, товаров:",
+    cartEmpty: "Корзина, пусто",
+    openMenu: "Открыть меню",
+    closeMenu: "Закрыть меню",
+    skipToCatalog: "Перейти к каталогу",
+    switchLanguage: "Сменить язык",
+  },
+  hero: {
+    line1: "Десерты,",
+    line2: "которые хочется",
+    line3: "есть каждый день",
+    subtitle:
+      "ПП-десерты без сахара, лактозы и глютена — вкусное удовольствие без компромиссов.",
+    ctaPrimary: "Смотреть десерты",
+    ctaSecondary: "Заказать",
+    imageAlt: "Ассортимент ПП-батончиков FitSweet",
+    features: {
+      "no-sugar": "Без сахара",
+      "no-lactose": "Без лактозы",
+      "no-gluten": "Без глютена",
+      tasty: "Вкусно и сытно",
+    },
+  },
+  catalog: {
+    title: "Наши десерты",
+    addToCart: "В корзину",
+    added: "Добавлено ✓",
+    viewAll: "Смотреть весь ассортимент",
+    perBar: (weight: number) => `на батончик ${weight} гр`,
+  },
+  moods: {
+    title: "Выбирайте по настроению",
+    viewAll: "Смотреть весь ассортимент",
+  },
+  where: {
+    title: "Где купить FitSweet?",
+    subtitle: "Наши десерты уже представлены в партнёрских локациях по городу.",
+    categories: {
+      all: "Все",
+      cafe: "Кафе",
+      gym: "Фитнес-клубы",
+      shop: "Магазины",
+      gas: "Заправки",
+    },
+    showAll: (n: number) => `Показать все локации (${n})`,
+    collapse: "Свернуть список",
+    empty: "В этой категории пока нет точек — скоро появятся.",
+    mapLabel: "Карта точек продаж FitSweet",
+    /** Подсказка поверх карты, когда по ней ведут одним пальцем */
+    mapHint: "Используйте два пальца, чтобы двигать и увеличивать карту",
+    aroundTheClock: "круглосуточно",
+  },
+  delivery: {
+    title: "FitSweet приезжает к вам",
+    subtitle: "Закажите любимые десерты с доставкой прямо домой или в офис.",
+    imageAlt: "Подарочная коробка FitSweet с десертами",
+    steps: [
+      "Вы выбираете десерты",
+      "Оформляете заказ",
+      "Мы подтверждаем заказ",
+      "Доставляем по вашему адресу",
+    ],
+    terms: [
+      { title: "Доставка по Кишинёву", value: "от 40 MDL" },
+      { title: "Бесплатная доставка", value: "при заказе от 300 MDL" },
+      { title: "Доставка", value: "ежедневно с 10:00 до 21:00" },
+      { title: "Заказы принимаем", value: "с 09:00 до 20:00" },
+    ],
+    cta: "Заказать доставку",
+  },
+  box: {
+    title: "Соберите свою коробку FitSweet",
+    chooseQty: "Выберите количество десертов",
+    yourBox: "Ваша коробка:",
+    manualPick: "Выбрать вкусы вручную",
+    hideManual: "Скрыть выбор вкусов",
+    freeSlot: "Свободное место",
+    total: "Итого:",
+    checkout: "Оформить заказ",
+    addMore: (n: number) => `Добавьте ещё ${n}`,
+    addOne: (name: string) => `Добавить ${name}`,
+    removeOne: (name: string) => `Убрать ${name}`,
+  },
+  reviews: {
+    title: "Что говорят о нас",
+  },
+  instagram: {
+    title: "Больше FitSweet каждый день",
+    followUs: "Следите за нами в Instagram",
+    description: "Рецепты, новинки, акции и много вкусного контента.",
+    cta: "Перейти в Instagram",
+  },
+  finalCta: {
+    line1: "Готовы выбрать",
+    line2: "свой любимый FitSweet?",
+    subtitle: "Полезное может быть невероятно вкусным.",
+    cta: "Смотреть десерты",
+  },
+  order: {
+    title: "Оформить заказ",
+    name: "Имя",
+    namePlaceholder: "Как к вам обращаться",
+    phone: "Телефон",
+    phonePlaceholder: "+373 60 000 000",
+    address: "Адрес доставки",
+    addressPlaceholder: "Улица, дом, квартира",
+    comment: "Комментарий",
+    commentPlaceholder: "Удобное время, домофон, пожелания",
+    submit: (total: string) => `Отправить заказ · ${total}`,
+    sending: "Отправляем…",
+    needItems: "Сначала добавьте десерты",
+    success: "Заказ принят. Мы свяжемся с вами в течение 15 минут.",
+    agree: "Нажимая кнопку, вы соглашаетесь на обработку персональных данных.",
+    yourOrder: "Ваш заказ",
+    emptyCart: "Корзина пуста. Выберите десерты в каталоге или соберите коробку.",
+    deliveryRow: "Доставка",
+    free: "бесплатно",
+    total: "Итого",
+    errorGeneric: "Не удалось отправить заказ",
+    errorUnknown: "Неизвестная ошибка",
+  },
+  cart: {
+    title: "Корзина",
+    empty: "Пока пусто. Выберите десерты в каталоге.",
+    toCatalog: "В каталог",
+    remove: "Убрать",
+    clear: "Очистить корзину",
+    checkout: "Оформить заказ",
+    total: "Итого",
+    freeDeliveryLeft: (sum: string) => `До бесплатной доставки ${sum}`,
+    close: "Закрыть корзину",
+    decrease: "Уменьшить количество",
+    increase: "Увеличить количество",
+  },
+  footer: {
+    copyright: (year: number, city: string) => `© ${year} FitSweet. ${city}.`,
+  },
+  common: {
+    /** 1 десерт / 4 десерта / 8 десертов */
+    desserts: (n: number) => {
+      const mod10 = n % 10;
+      const mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return `${n} десерт`;
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${n} десерта`;
+      return `${n} десертов`;
+    },
+    price: (value: number) => `${value} MDL`,
+    ingredients: "Состав",
+  },
+  meta: {
+    title: "FitSweet — ПП-десерты без сахара, лактозы и глютена",
+    description:
+      "ПП-десерты без сахара, лактозы и глютена — вкусное удовольствие без компромиссов. Доставка по Кишинёву.",
+    keywords: ["ПП десерты", "без сахара", "без глютена", "без лактозы", "батончики", "Кишинёв", "FitSweet"],
+  },
+};
+
+export type Dictionary = typeof ru;
