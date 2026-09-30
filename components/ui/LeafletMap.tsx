@@ -22,8 +22,11 @@ export function LeafletMap({
   const map = useRef<LeafletMapType | null>(null);
   const markers = useRef<Map<string, Marker>>(new Map());
   const onPickRef = useRef(onPick);
-  onPickRef.current = onPick;
   const [hintVisible, setHintVisible] = useState(false);
+
+  useEffect(() => {
+    onPickRef.current = onPick;
+  }, [onPick]);
 
   // Инициализация карты — один раз
   useEffect(() => {

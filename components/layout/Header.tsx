@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { navLinks } from "@/lib/site";
 import { useI18n } from "@/lib/i18n/context";
 import { LocaleSwitch } from "./LocaleSwitch";
@@ -10,16 +10,18 @@ import { CartIcon, CloseIcon } from "@/components/ui/Icons";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "./Logo";
 
+const noopSubscribe = () => () => {};
+
 export function Header() {
   const { dict } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   const lines = useCart((s) => s.lines);
   const openCart = useCart((s) => s.open);
 
-  useEffect(() => setMounted(true), []);
+  // true только на клиенте: счётчик корзины из localStorage не должен ломать гидрацию
+  const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);

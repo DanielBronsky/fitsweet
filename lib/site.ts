@@ -8,7 +8,12 @@ export const siteConfig = {
   instagramUrl: "https://instagram.com/fitsweet.md",
   phone: "+373 60 000 000",
   city: { ru: "Кишинёв", ro: "Chișinău" },
-  url: "https://fitsweet.md",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://fitsweet.md",
+  /**
+   * Индексация поисковиками. Выключается только на тестовом сервере: SITE_INDEXING=false в .env.
+   * Намеренно не в админке — чтобы сайт нельзя было случайно убрать из поиска.
+   */
+  indexing: process.env.SITE_INDEXING !== "false",
 };
 
 export type NavLink = {
