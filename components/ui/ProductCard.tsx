@@ -38,7 +38,6 @@ export function ProductCard({ product }: { product: Product }) {
           {tileName(product, locale)}
         </h3>
 
-        {/* На макете КБЖУ в две строки */}
         <p className="mt-1.5 min-h-[26px] text-[9.5px] leading-[1.4] text-muted">
           {kbjuNumbers(product)}
           <span className="block">{dict.catalog.perBar(product.weight)}</span>

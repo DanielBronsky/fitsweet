@@ -51,7 +51,6 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Преимущества: на макете — тонкие иконки без обводки, прижаты влево под кнопками */}
         <ul className="mt-9 grid max-w-[460px] grid-cols-4 gap-x-4 lg:mt-10">
           {featureKeys.map((key) => (
             <li key={key} className="flex flex-col items-center gap-2 text-center">

@@ -10,6 +10,9 @@ import { Users } from "./cms/collections/Users";
 import { Media } from "./cms/collections/Media";
 import { Theme } from "./cms/globals/Theme";
 import { Seo } from "./cms/globals/Seo";
+import { Header } from "./cms/globals/Header";
+import { Typography } from "./cms/globals/Typography";
+import { ruOverrides } from "./cms/i18n-ru";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,26 +22,16 @@ export default buildConfig({
     importMap: { baseDir: dirname },
     meta: {
       titleSuffix: " — FitSweet",
-      // Админка не должна попадать в поиск
       robots: "noindex, nofollow",
     },
   },
-  // Интерфейс админки — на русском
   i18n: {
     supportedLanguages: { ru },
     fallbackLanguage: "ru",
-  },
-  // Языки контента сайта: у полей с localized: true в админке есть переключатель RU / RO
-  localization: {
-    locales: [
-      { code: "ru", label: "Русский" },
-      { code: "ro", label: "Română" },
-    ],
-    defaultLocale: "ru",
-    fallback: true,
+    translations: { ru: ruOverrides },
   },
   collections: [Users, Media],
-  globals: [Theme, Seo],
+  globals: [Header, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
@@ -47,7 +40,6 @@ export default buildConfig({
   db: sqliteAdapter({
     client: { url: process.env.DATABASE_URL || "file:./data/fitsweet.db" },
     migrationDir: path.resolve(dirname, "cms/migrations"),
-    // Схема меняется только миграциями (pnpm payload migrate:create → pnpm migrate)
     push: false,
   }),
   sharp,

@@ -1,10 +1,6 @@
 import type { Locale } from "./i18n/config";
 import type { Product } from "./types";
 
-/**
- * Цены и составы — реальные, с карточек-сторис заказчика.
- * КБЖУ и вес — ЗАГЛУШКА у всех, кроме «Миндаль-клюква» (kbjuIsPlaceholder: false).
- */
 export const products: Product[] = [
   {
     id: "snickers-peanut",
@@ -123,13 +119,10 @@ export const products: Product[] = [
 
 export const productById = (id: string) => products.find((p) => p.id === id);
 
-/** Полное название на нужном языке */
 export const productName = (p: Product, locale: Locale) => p.name[locale];
 
-/** Короткое название для плитки каталога */
 export const tileName = (p: Product, locale: Locale) =>
   (p.shortName ?? p.name)[locale];
 
-/** «183/2/14.5/12.5» — первая строка КБЖУ на карточке */
 export const kbjuNumbers = (p: Product) =>
   `${p.kbju.kcal}/${p.kbju.protein}/${p.kbju.fat}/${p.kbju.carbs}`;

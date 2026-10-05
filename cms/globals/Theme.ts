@@ -1,11 +1,7 @@
 import type { GlobalConfig } from "payload";
 import { HEX_RE, paletteTokens } from "../palette";
-import { revalidateAfterChange } from "../hooks/revalidateSite";
+import { afterContentChange } from "../hooks/revalidateSite";
 
-/**
- * Палитра бренда. Все цветовые поля в разделах сайта выбирают цвет отсюда —
- * поменяли HEX здесь, перекрасились все элементы с этим цветом.
- */
 export const Theme: GlobalConfig = {
   slug: "theme",
   label: "Палитра",
@@ -18,7 +14,7 @@ export const Theme: GlobalConfig = {
     read: () => true,
   },
   hooks: {
-    afterChange: [revalidateAfterChange],
+    afterChange: [afterContentChange],
   },
   fields: [
     {

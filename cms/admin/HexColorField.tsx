@@ -4,7 +4,6 @@ import { FieldError, FieldLabel, useField } from "@payloadcms/ui";
 import type { TextFieldClientComponent } from "payload";
 import { HEX_RE } from "../palette";
 
-/** HEX-цвет палитры: системная пипетка + поле для ввода */
 export const HexColorField: TextFieldClientComponent = ({ path, field }) => {
   const { value, setValue, showError } = useField<string>({ path });
   const label = typeof field.label === "string" ? field.label : field.name;

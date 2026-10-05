@@ -9,11 +9,6 @@ type I18nValue = { locale: Locale; dict: Dictionary };
 
 const I18nContext = createContext<I18nValue | null>(null);
 
-/**
- * Словарь содержит функции-форматтеры (плюрализация, подстановки),
- * поэтому его нельзя передать из серверного компонента пропсом —
- * провайдер получает только локаль и собирает словарь уже на клиенте.
- */
 export function I18nProvider({
   locale,
   children,

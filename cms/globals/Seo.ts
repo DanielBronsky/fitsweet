@@ -1,5 +1,8 @@
 import type { GlobalConfig } from "payload";
-import { revalidateAfterChange } from "../hooks/revalidateSite";
+import { afterContentChange } from "../hooks/revalidateSite";
+import { imageField } from "../fields/image";
+import { bilingual } from "../fields/bilingual";
+import { framePresets } from "../media/frames";
 
 export const Seo: GlobalConfig = {
   slug: "seo",
@@ -7,55 +10,40 @@ export const Seo: GlobalConfig = {
   admin: {
     group: "Настройки",
     description:
-      "Как сайт выглядит в Google и в превью ссылок (Telegram, Facebook, Viber). Заполните на обоих языках — переключатель языка вверху.",
+      "Как сайт выглядит в Google и в превью ссылок (Telegram, Facebook, Viber).",
   },
   access: {
     read: () => true,
   },
   hooks: {
-    afterChange: [revalidateAfterChange],
+    afterChange: [afterContentChange],
   },
   fields: [
-    {
+    bilingual({
       name: "title",
-      type: "text",
       label: "Заголовок страницы (title)",
-      localized: true,
       required: true,
       maxLength: 70,
-      admin: {
-        description: "Показывается в поиске и на вкладке браузера. Оптимально 50–60 символов.",
-      },
-    },
-    {
+      description: "Показывается в поиске и на вкладке браузера. Оптимально 50–60 символов.",
+    }),
+    bilingual({
       name: "description",
-      type: "textarea",
       label: "Описание (description)",
-      localized: true,
+      multiline: true,
       required: true,
       maxLength: 200,
-      admin: {
-        description: "Текст под заголовком в поиске. Оптимально 140–160 символов.",
-      },
-    },
-    {
+      description: "Текст под заголовком в поиске. Оптимально 140–160 символов.",
+    }),
+    bilingual({
       name: "keywords",
-      type: "text",
       label: "Ключевые слова",
-      localized: true,
-      admin: {
-        description: "Через запятую. Google их почти не учитывает, но другие поисковики — да.",
-      },
-    },
-    {
+      description: "Через запятую. Google их почти не учитывает, но другие поисковики — да.",
+    }),
+    imageField({
       name: "ogImage",
-      type: "upload",
-      relationTo: "media",
       label: "Картинка для превью ссылок",
-      admin: {
-        description:
-          "Берётся рамка «Соцсети» из кропера и отдаётся как JPG 1200×630 — так превью работает везде.",
-      },
-    },
+      frames: framePresets.og,
+      description: "Показывается, когда ссылку на сайт отправляют в Telegram, Facebook, Viber. Отдаётся как JPG 1200×630.",
+    }),
   ],
 };

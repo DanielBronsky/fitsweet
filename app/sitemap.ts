@@ -3,7 +3,6 @@ import { defaultLocale, locales, localeTags } from "@/lib/i18n";
 import { getCms } from "@/lib/cms";
 import { siteConfig } from "@/lib/site";
 
-/** Дата последней правки в админке — чтобы поисковик знал, когда перечитать страницу */
 async function lastModified(): Promise<Date> {
   try {
     const payload = await getCms();

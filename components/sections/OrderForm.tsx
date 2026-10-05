@@ -31,7 +31,6 @@ export function OrderForm() {
     setError("");
     setStatus("sending");
 
-    // currentTarget обнуляется после await — держим ссылку на форму заранее
     const form = e.currentTarget;
     const fd = new FormData(form);
     const payload = {

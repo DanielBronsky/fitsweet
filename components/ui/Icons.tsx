@@ -1,6 +1,5 @@
 type IconProps = { className?: string };
 
-/** Декоративная веточка справа от заголовков секций */
 export function Leaf({ className = "" }: IconProps) {
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={className} fill="none">
@@ -100,7 +99,6 @@ export function ArrowIcon({ className = "" }: IconProps) {
   );
 }
 
-/** Иконки-преимущества под hero */
 export function FeatureIcon({ name, className = "" }: IconProps & { name: string }) {
   const common = { stroke: "currentColor", strokeWidth: 1.5, fill: "none" } as const;
   const art: Record<string, React.ReactNode> = {

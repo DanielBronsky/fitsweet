@@ -1,49 +1,50 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
-import { FieldLabel, useField, useFormFields } from "@payloadcms/ui";
+import { FieldLabel, useConfig, useField, useFormFields } from "@payloadcms/ui";
 import type { JSONFieldClientComponent } from "payload";
-import {
-  aspectOptions,
-  cropKinds,
-  cropLabels,
-  defaultCrops,
-  normalizeCrops,
-  parseAspect,
-  type CropFrame,
-  type CropKind,
-  type Crops,
-} from "../media/crops";
+import { aspectLabel, aspectRatio, normalizeCrops, type CropRect, type Crops, type FrameSpec } from "../media/frames";
 
-const hints: Record<CropKind, string> = {
-  desktop: "Как картинка выглядит на компьютере.",
-  mobile: "Как картинка выглядит на телефоне — обычно вертикальнее.",
-  og: "Превью ссылки в Telegram, Facebook, Viber (1200×630).",
-};
+type MediaInfo = { id: number; url: string; mimeType?: string };
 
-/**
- * Кропер с тремя рамками: Десктоп / Мобилка / Соцсети.
- * Хранит рамки в процентах от исходника; файлы режет сервер (cms/collections/Media.ts).
- */
-export const CropperField: JSONFieldClientComponent = ({ path, field }) => {
+export const CropperField: JSONFieldClientComponent = (props) => {
+  const { path, field } = props;
+  const frames = (props as unknown as { frames: FrameSpec[] }).frames;
   const { value, setValue } = useField<Crops | null>({ path });
+  const { config } = useConfig();
 
-  // Только что выбранный файл (ещё не сохранён) или уже загруженный
-  const file = useFormFields(([fields]) => fields.file?.value) as File | undefined;
-  const savedUrl = useFormFields(([fields]) => fields.url?.value) as string | undefined;
+  const imagePath = path.replace(/crops$/, "image");
+  const rawImage = useFormFields(([fields]) => fields[imagePath]?.value) as number | { id: number } | null | undefined;
+  const mediaId = rawImage && typeof rawImage === "object" ? rawImage.id : (rawImage ?? null);
 
-  const localUrl = useMemo(() => (file instanceof File ? URL.createObjectURL(file) : null), [file]);
-  useEffect(
-    () => () => {
-      if (localUrl) URL.revokeObjectURL(localUrl);
-    },
-    [localUrl],
-  );
+  const initialMedia = useRef(mediaId);
+  useEffect(() => {
+    if (mediaId !== initialMedia.current) {
+      initialMedia.current = mediaId;
+      setValue(null);
+    }
+  }, [mediaId, setValue]);
 
-  const src = localUrl ?? savedUrl ?? null;
+  const [media, setMedia] = useState<MediaInfo | null>(null);
+  useEffect(() => {
+    if (!mediaId) return;
+    let alive = true;
+    fetch(`${config.serverURL}${config.routes.api}/media/${mediaId}?depth=0`, { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((doc) => {
+        if (alive && doc?.url) setMedia({ id: doc.id, url: doc.url, mimeType: doc.mimeType });
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [mediaId, config.serverURL, config.routes.api]);
 
-  // Натуральный размер картинки — привязан к src, чтобы не смешать с предыдущим файлом
+  const current = media && media.id === mediaId ? media : null;
+  const src = current?.url ?? null;
+  const isVector = current?.mimeType === "image/svg+xml";
+
   const [loaded, setLoaded] = useState<{ src: string; w: number; h: number } | null>(null);
   useEffect(() => {
     if (!src) return;
@@ -59,36 +60,31 @@ export const CropperField: JSONFieldClientComponent = ({ path, field }) => {
   }, [src]);
   const natural = loaded && loaded.src === src ? loaded : null;
 
-  // Новый файл → старые рамки не подходят, ставим по центру
-  useEffect(() => {
-    if (localUrl && natural) setValue(defaultCrops(natural.w, natural.h));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localUrl, natural]);
-
   const crops = useMemo(
-    () => (natural ? normalizeCrops(value, natural.w, natural.h) : null),
-    [value, natural],
+    () => (natural ? normalizeCrops(value, frames, natural.w, natural.h) : null),
+    [value, frames, natural],
   );
 
-  const [kind, setKind] = useState<CropKind>("desktop");
-
-  const update = useCallback(
-    (k: CropKind, frame: CropFrame) => {
-      if (!crops) return;
-      setValue({ ...crops, [k]: frame });
-    },
-    [crops, setValue],
-  );
-
+  const [activeKey, setActiveKey] = useState(frames[0].key);
+  const active = frames.find((f) => f.key === activeKey) ?? frames[0];
   const label = typeof field.label === "string" ? field.label : "Обрезка";
+
+  if (!mediaId) {
+    return (
+      <div className="field-type" style={{ marginBottom: 24 }}>
+        <FieldLabel label={label} path={path} />
+        <p style={{ color: "var(--theme-elevation-500)" }}>
+          Выберите картинку выше — здесь появится рамка: {frames.map((f) => `${f.label} ${aspectLabel(f)}`).join(", ")}.
+        </p>
+      </div>
+    );
+  }
 
   if (!src || !natural || !crops) {
     return (
       <div className="field-type" style={{ marginBottom: 24 }}>
         <FieldLabel label={label} path={path} />
-        <p style={{ color: "var(--theme-elevation-500)" }}>
-          Загрузите картинку — здесь появятся рамки для десктопа, мобилки и соцсетей.
-        </p>
+        <p style={{ color: "var(--theme-elevation-500)" }}>Загружаю картинку…</p>
       </div>
     );
   }
@@ -97,93 +93,74 @@ export const CropperField: JSONFieldClientComponent = ({ path, field }) => {
     <div className="field-type" style={{ marginBottom: 32 }}>
       <FieldLabel label={label} path={path} />
 
-      <div style={{ display: "flex", gap: 8, margin: "8px 0 12px", flexWrap: "wrap" }}>
-        {cropKinds.map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => setKind(k)}
-            style={tabStyle(k === kind)}
-          >
-            {cropLabels[k]}
-          </button>
-        ))}
-      </div>
+      {frames.length > 1 && (
+        <div style={{ display: "flex", gap: 8, margin: "8px 0 12px", flexWrap: "wrap" }}>
+          {frames.map((f) => (
+            <button key={f.key} type="button" onClick={() => setActiveKey(f.key)} style={tabStyle(f.key === active.key)}>
+              {f.label} · {aspectLabel(f)}
+            </button>
+          ))}
+        </div>
+      )}
 
       <FrameEditor
-        key={`${kind}-${src}`}
+        key={`${active.key}-${src}`}
         src={src}
-        kind={kind}
-        frame={crops[kind]}
+        spec={active}
+        rect={crops[active.key]}
         natural={natural}
-        onChange={(f) => update(kind, f)}
+        isVector={isVector}
+        onChange={(rect) => setValue({ ...crops, [active.key]: rect })}
       />
 
-      <div style={{ display: "flex", gap: 16, marginTop: 16, flexWrap: "wrap", alignItems: "flex-end" }}>
-        {cropKinds.map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => setKind(k)}
-            style={{ all: "unset", cursor: "pointer", textAlign: "center" }}
-            title={`Редактировать: ${cropLabels[k]}`}
-          >
-            <Preview src={src} frame={crops[k]} height={k === "mobile" ? 140 : 100} active={k === kind} />
-            <div style={{ fontSize: 12, marginTop: 4 }}>
-              {cropLabels[k]} · {k === "og" ? "1200×630" : crops[k].aspect}
-            </div>
-          </button>
-        ))}
-      </div>
+      {frames.length > 1 && (
+        <div style={{ display: "flex", gap: 16, marginTop: 16, flexWrap: "wrap", alignItems: "flex-end" }}>
+          {frames.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => setActiveKey(f.key)}
+              style={{ all: "unset", cursor: "pointer", textAlign: "center" }}
+              title={`Редактировать: ${f.label}`}
+            >
+              <Preview src={src} spec={f} rect={crops[f.key]} height={120} active={f.key === active.key} />
+              <div style={{ fontSize: 12, marginTop: 4 }}>
+                {f.label} · {aspectLabel(f)}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 function FrameEditor({
   src,
-  kind,
-  frame,
+  spec,
+  rect,
   natural,
+  isVector,
   onChange,
 }: {
   src: string;
-  kind: CropKind;
-  frame: CropFrame;
+  spec: FrameSpec;
+  rect: CropRect;
   natural: { w: number; h: number };
-  onChange: (frame: CropFrame) => void;
+  isVector: boolean;
+  onChange: (rect: CropRect) => void;
 }) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [aspect, setAspect] = useState(frame.aspect);
-  // Начальная рамка — из сохранённых процентов; при смене пропорции — заново по центру
-  const [initial] = useState<Area>({ x: frame.x, y: frame.y, width: frame.width, height: frame.height });
+  const [initial] = useState<Area>(rect);
 
-  const lowRes = (frame.width / 100) * natural.w < (kind === "og" ? 1200 : kind === "desktop" ? 1280 : 750);
+  const pickedWidth = Math.round((rect.width / 100) * natural.w);
+  const lowRes = !isVector && pickedWidth < spec.minWidth;
 
   return (
     <div>
-      {aspectOptions[kind].length > 1 && (
-        <label style={{ display: "inline-flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
-          Пропорция
-          <select
-            value={aspect}
-            onChange={(e) => {
-              setAspect(e.target.value);
-              setZoom(1);
-              setCrop({ x: 0, y: 0 });
-            }}
-            style={{ padding: "4px 8px" }}
-          >
-            {aspectOptions[kind].map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
       <p style={{ margin: "0 0 10px", color: "var(--theme-elevation-500)" }}>
-        {hints[kind]} Перетаскивайте картинку, колесо мыши или ползунок — масштаб.
+        {spec.hint} Перетаскивайте картинку, колесо мыши или ползунок — масштаб.
       </p>
 
       <div style={{ position: "relative", height: 420, background: "#222", borderRadius: 8, overflow: "hidden" }}>
@@ -192,19 +169,17 @@ function FrameEditor({
           crop={crop}
           zoom={zoom}
           maxZoom={6}
-          aspect={parseAspect(aspect)}
-          initialCroppedAreaPercentages={aspect === frame.aspect ? initial : undefined}
+          aspect={aspectRatio(spec)}
+          initialCroppedAreaPercentages={initial}
           onCropChange={setCrop}
           onZoomChange={setZoom}
           onCropComplete={(area) => {
-            // Cropper сообщает рамку и при открытии — не помечаем форму изменённой зря
             const same =
-              aspect === frame.aspect &&
-              Math.abs(area.x - frame.x) < 0.05 &&
-              Math.abs(area.y - frame.y) < 0.05 &&
-              Math.abs(area.width - frame.width) < 0.05 &&
-              Math.abs(area.height - frame.height) < 0.05;
-            if (!same) onChange({ aspect, ...area });
+              Math.abs(area.x - rect.x) < 0.05 &&
+              Math.abs(area.y - rect.y) < 0.05 &&
+              Math.abs(area.width - rect.width) < 0.05 &&
+              Math.abs(area.height - rect.height) < 0.05;
+            if (!same) onChange(area);
           }}
           objectFit="contain"
         />
@@ -223,21 +198,32 @@ function FrameEditor({
 
       {lowRes && (
         <p style={{ color: "var(--theme-warning-500)", margin: "6px 0 0" }}>
-          ⚠️ Выбранная область меньше рекомендуемой ширины — на больших экранах картинка может быть нечёткой.
+          ⚠️ В рамку попадает {pickedWidth} px по ширине, а для «{spec.label}» нужно от {spec.minWidth} px — картинка
+          может быть нечёткой. Уменьшите масштаб или загрузите исходник побольше.
         </p>
       )}
     </div>
   );
 }
 
-/** Превью рамки чистым CSS — без повторной загрузки файла */
-function Preview({ src, frame, height, active }: { src: string; frame: CropFrame; height: number; active: boolean }) {
-  const width = height * parseAspect(frame.aspect);
+function Preview({
+  src,
+  spec,
+  rect,
+  height,
+  active,
+}: {
+  src: string;
+  spec: FrameSpec;
+  rect: CropRect;
+  height: number;
+  active: boolean;
+}) {
   return (
     <div
       style={{
         position: "relative",
-        width,
+        width: height * aspectRatio(spec),
         height,
         overflow: "hidden",
         borderRadius: 6,
@@ -252,10 +238,10 @@ function Preview({ src, frame, height, active }: { src: string; frame: CropFrame
         style={{
           position: "absolute",
           maxWidth: "none",
-          width: `${(100 / frame.width) * 100}%`,
-          height: `${(100 / frame.height) * 100}%`,
-          left: `${(-frame.x / frame.width) * 100}%`,
-          top: `${(-frame.y / frame.height) * 100}%`,
+          width: `${(100 / rect.width) * 100}%`,
+          height: `${(100 / rect.height) * 100}%`,
+          left: `${(-rect.x / rect.width) * 100}%`,
+          top: `${(-rect.y / rect.height) * 100}%`,
         }}
       />
     </div>

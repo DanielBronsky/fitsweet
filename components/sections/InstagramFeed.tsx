@@ -8,7 +8,6 @@ import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Button } from "@/components/ui/Button";
 import { InstagramIcon } from "@/components/ui/Icons";
 
-/** TODO(данные): плитки — заглушки. Подключить реальную ленту или залить фото вручную. */
 const tiles = ["1", "2", "3", "4", "5"];
 
 export function InstagramFeed() {

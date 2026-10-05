@@ -36,7 +36,6 @@ export function Catalog() {
           </div>
         )}
 
-        {/* Один список: слайдер на мобиле, сетка от sm — без дублирования DOM */}
         <div
           className="scroll-snap-x -mx-5 mt-8 flex gap-3 overflow-x-auto px-5 pb-2
             sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0

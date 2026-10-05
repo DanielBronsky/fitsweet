@@ -5,7 +5,6 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary: "bg-green-700 text-cream hover:bg-green-900 border border-transparent",
-  // На макете «Заказать» и «Смотреть весь ассортимент» — светлая заливка с тонкой обводкой
   outline:
     "bg-white text-green-900 border border-green-200 hover:border-green-700 hover:bg-cream",
   ghost: "bg-transparent text-green-900 border border-transparent hover:bg-green-700/8",

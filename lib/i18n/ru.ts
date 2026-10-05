@@ -58,7 +58,6 @@ export const ru = {
     collapse: "Свернуть список",
     empty: "В этой категории пока нет точек — скоро появятся.",
     mapLabel: "Карта точек продаж FitSweet",
-    /** Подсказка поверх карты, когда по ней ведут одним пальцем */
     mapHint: "Используйте два пальца, чтобы двигать и увеличивать карту",
     aroundTheClock: "круглосуточно",
   },
@@ -148,7 +147,6 @@ export const ru = {
     copyright: (year: number, city: string) => `© ${year} FitSweet. ${city}.`,
   },
   common: {
-    /** 1 десерт / 4 десерта / 8 десертов */
     desserts: (n: number) => {
       const mod10 = n % 10;
       const mod100 = n % 100;

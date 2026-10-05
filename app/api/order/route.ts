@@ -14,11 +14,6 @@ type OrderPayload = {
   locale?: string;
 };
 
-/**
- * TODO(интеграция): сейчас заказ только логируется в консоль сервера.
- * Подключить отправку в Telegram-бота / на почту / в CRM,
- * когда заказчик определится с каналом приёма заказов.
- */
 export async function POST(req: Request) {
   let body: OrderPayload;
 

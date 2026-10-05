@@ -1,7 +1,3 @@
-/**
- * Генератор SVG-заглушек под фото FitSweet.
- * Удалить вместе с public/images/**, когда заказчик пришлёт реальные снимки.
- */
 import { writeFileSync, mkdirSync } from "node:fs";
 
 const CHOCO_DARK = "#3B2519";
@@ -58,7 +54,6 @@ for (const [name, cfg] of Object.entries(products)) {
   writeFileSync(`public/images/products/${name}.svg`, productSvg(cfg));
 }
 
-// ---- Настроения: круглые иконки-ингредиенты ----
 const moods = {
   chocolate: { bg: "#EFE7DE", art: `${bar(30, 96, 118, 46, -8, CHOCO_DARK, "")}${bar(112, 62, 118, 46, 12, CHOCO, "")}` },
   caramel: { bg: "#F3EADC", art: `${bar(36, 92, 122, 48, -5, "#B9793C", "")}${bar(108, 66, 122, 48, 10, "#D89B52", "")}` },
@@ -89,7 +84,6 @@ for (const [name, cfg] of Object.entries(moods)) {
   );
 }
 
-// ---- Hero: горка батончиков ----
 const heroBars = [
   [70, 330, -6], [250, 296, 8], [140, 250, 14], [300, 218, -10],
   [110, 176, 4], [268, 142, 11], [180, 100, -8],
@@ -108,7 +102,6 @@ writeFileSync(
 </svg>`,
 );
 
-// ---- Доставка: коробка ----
 mkdirSync("public/images/delivery", { recursive: true });
 writeFileSync(
   "public/images/delivery/box.svg",
@@ -125,7 +118,6 @@ writeFileSync(
 </svg>`,
 );
 
-// ---- Instagram: 5 плиток ----
 mkdirSync("public/images/instagram", { recursive: true });
 const igBg = ["#EFE7DE", "#E7EADD", "#F1EADF", "#E4E9D8", "#F2EEE4"];
 for (let i = 0; i < 5; i++) {

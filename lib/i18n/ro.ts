@@ -149,10 +149,6 @@ export const ro: Dictionary = {
     copyright: (year: number, city: string) => `© ${year} FitSweet. ${city}.`,
   },
   common: {
-    /**
-     * Румынская плюрализация: 1 → singular, 2–19 → plural,
-     * от 20 — с предлогом «de» (20 de deserturi).
-     */
     desserts: (n: number) => {
       if (n === 1) return "1 desert";
       const mod100 = n % 100;

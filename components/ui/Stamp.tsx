@@ -1,4 +1,3 @@
-/** Круглая «печать» FIT & SWEET · GUILT-FREE из правого верхнего угла hero */
 export function Stamp({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 160 160" aria-hidden className={className}>

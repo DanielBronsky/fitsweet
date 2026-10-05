@@ -5,7 +5,6 @@ import type { Map as LeafletMapType, Marker } from "leaflet";
 import type { SalePoint } from "@/lib/types";
 import { useI18n } from "@/lib/i18n/context";
 
-/** Центр Кишинёва — фолбэк, если точек нет */
 const CHISINAU: [number, number] = [47.0245, 28.8322];
 
 export function LeafletMap({
@@ -28,7 +27,6 @@ export function LeafletMap({
     onPickRef.current = onPick;
   }, [onPick]);
 
-  // Инициализация карты — один раз
   useEffect(() => {
     if (!holder.current || map.current) return;
     let cancelled = false;
@@ -41,27 +39,22 @@ export function LeafletMap({
 
       const el = holder.current;
 
-      // Тач-устройства: одним пальцем скроллим страницу, двумя — двигаем и зумим карту.
-      // Leaflet сам выставляет контейнеру touch-action: pan-x pan-y, когда dragging
-      // выключен, а touchZoom включён — за счёт этого вертикальный скролл не «залипает».
       const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
       const instance = L.map(el, {
         center: CHISINAU,
         zoom: 13,
-        scrollWheelZoom: false, // включаем, только пока курсор над картой, см. ниже
+        scrollWheelZoom: false,
         touchZoom: true,
         dragging: !coarsePointer,
         attributionControl: false,
       });
       map.current = instance;
 
-      // Светлые тайлы CARTO — ближе всего к макету, доп. приглушение через CSS-фильтр
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 19,
       }).addTo(instance);
 
-      // Колесо мыши зумит карту при наведении; увёл курсор — страница скроллится как обычно
       const enableWheel = () => instance.scrollWheelZoom.enable();
       const disableWheel = () => instance.scrollWheelZoom.disable();
       el.addEventListener("mouseenter", enableWheel);
@@ -71,8 +64,6 @@ export function LeafletMap({
         el.removeEventListener("mouseleave", disableWheel);
       });
 
-      // Ведут одним пальцем — карта не двигается, поэтому объясняем почему.
-      // Появился второй палец — жест сработал, подсказка больше не нужна.
       if (coarsePointer) {
         let hideTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -110,7 +101,6 @@ export function LeafletMap({
     };
   }, []);
 
-  // Перерисовка пинов при смене фильтра
   useEffect(() => {
     let cancelled = false;
 
@@ -160,7 +150,6 @@ export function LeafletMap({
     };
   }, [points, locale, dict.where.aroundTheClock]);
 
-  // Подсветка выбранной точки из списка
   useEffect(() => {
     if (!activeId || !map.current) return;
     const marker = markers.current.get(activeId);
@@ -178,8 +167,6 @@ export function LeafletMap({
         className="absolute inset-0 z-0"
       />
 
-      {/* Подсказка про жест двумя пальцами. Только визуальная — жест ловится
-          в обработчике, поэтому от скринридера её прячем. */}
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-green-900/40 px-6 text-center transition-opacity duration-200 ${

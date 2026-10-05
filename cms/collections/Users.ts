@@ -9,7 +9,6 @@ export const Users: CollectionConfig = {
     group: "Настройки",
   },
   auth: {
-    // Блокировка после 5 неудачных попыток входа на 10 минут
     maxLoginAttempts: 5,
     lockTime: 10 * 60 * 1000,
   },

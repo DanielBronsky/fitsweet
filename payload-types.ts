@@ -86,16 +86,20 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ru' | 'ro') | ('ru' | 'ro')[];
+  fallbackLocale: null;
   globals: {
+    header: Header;
     theme: Theme;
+    typography: Typography;
     seo: Seo;
   };
   globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
+    typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
   };
-  locale: 'ru' | 'ro';
+  locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
@@ -151,7 +155,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Загрузите исходник в хорошем качестве (JPG, PNG, WebP, AVIF или SVG). Сайт сам нарежет его в WebP под десктоп и мобилку по рамкам ниже.
+ * Все исходные картинки сайта. Загружайте в хорошем качестве — от 2000 px по ширине (JPG, PNG, WebP, AVIF или SVG). Обрезка под десктоп и мобилку делается там, где картинку ставят на сайт.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -165,24 +169,6 @@ export interface Media {
     ru: string;
     ro: string;
   };
-  crops?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  variants?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -192,6 +178,18 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -302,8 +300,6 @@ export interface MediaSelect<T extends boolean = true> {
         ru?: T;
         ro?: T;
       };
-  crops?: T;
-  variants?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -313,6 +309,22 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -355,6 +367,107 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Верхняя панель сайта: логотип, меню, переключатель языка, кнопка «Заказать» и корзина.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: number;
+  style: {
+    background: string;
+  };
+  logo?: {
+    show?: boolean | null;
+    kind?: ('text' | 'image') | null;
+    text?: string | null;
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    /**
+     * SVG или PNG с прозрачным фоном. Высота на сайте — 44 px, ширина подстроится.
+     */
+    image?: {
+      image?: (number | null) | Media;
+      variants?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+    };
+  };
+  tagline?: {
+    show?: boolean | null;
+    text?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  menu?: {
+    show?: boolean | null;
+    items?:
+      | {
+          label: {
+            ru: string;
+            ro: string;
+          };
+          target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
+          url?: string | null;
+          newTab?: boolean | null;
+          id?: string | null;
+        }[]
+      | null;
+    color?: string | null;
+    hoverColor?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  language?: {
+    show?: boolean | null;
+    color?: string | null;
+  };
+  order: {
+    show?: boolean | null;
+    text?: {
+      ru: string;
+      ro: string;
+    };
+    target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
+    url?: string | null;
+    newTab?: boolean | null;
+    background?: string | null;
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  cart?: {
+    show?: boolean | null;
+    color?: string | null;
+    badge?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Фирменные цвета сайта. В настройках разделов цвета выбираются из этого списка.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -381,7 +494,38 @@ export interface Theme {
   createdAt?: string | null;
 }
 /**
- * Как сайт выглядит в Google и в превью ссылок (Telegram, Facebook, Viber). Заполните на обоих языках — переключатель языка вверху.
+ * Шрифты всего сайта. В настройках разделов у элементов можно выбрать другой шрифт или оставить «Как в оформлении».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "typography".
+ */
+export interface Typography {
+  id: number;
+  /**
+   * Крупные заголовки разделов: «Десерты, которые хочется есть каждый день», «Наши десерты»…
+   */
+  heading: string;
+  /**
+   * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+   */
+  headingWeight: '300' | '400' | '500' | '600' | '700';
+  /**
+   * Меню, кнопки, описания, цены — весь обычный текст.
+   */
+  body: string;
+  /**
+   * Логотип текстом и цитаты в отзывах.
+   */
+  accent: string;
+  /**
+   * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+   */
+  accentWeight: '300' | '400' | '500' | '600' | '700';
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Как сайт выглядит в Google и в превью ссылок (Telegram, Facebook, Viber).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seo".
@@ -391,21 +535,148 @@ export interface Seo {
   /**
    * Показывается в поиске и на вкладке браузера. Оптимально 50–60 символов.
    */
-  title: string;
+  title: {
+    ru: string;
+    ro: string;
+  };
   /**
    * Текст под заголовком в поиске. Оптимально 140–160 символов.
    */
-  description: string;
+  description: {
+    ru: string;
+    ro: string;
+  };
   /**
    * Через запятую. Google их почти не учитывает, но другие поисковики — да.
    */
-  keywords?: string | null;
+  keywords?: {
+    ru?: string | null;
+    ro?: string | null;
+  };
   /**
-   * Берётся рамка «Соцсети» из кропера и отдаётся как JPG 1200×630 — так превью работает везде.
+   * Показывается, когда ссылку на сайт отправляют в Telegram, Facebook, Viber. Отдаётся как JPG 1200×630.
    */
-  ogImage?: (number | null) | Media;
+  ogImage?: {
+    image?: (number | null) | Media;
+    crops?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    variants?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  style?:
+    | T
+    | {
+        background?: T;
+      };
+  logo?:
+    | T
+    | {
+        show?: T;
+        kind?: T;
+        text?: T;
+        color?: T;
+        font?: T;
+        weight?: T;
+        image?:
+          | T
+          | {
+              image?: T;
+              variants?: T;
+            };
+      };
+  tagline?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        font?: T;
+        weight?: T;
+      };
+  menu?:
+    | T
+    | {
+        show?: T;
+        items?:
+          | T
+          | {
+              label?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              target?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+        color?: T;
+        hoverColor?: T;
+        font?: T;
+        weight?: T;
+      };
+  language?:
+    | T
+    | {
+        show?: T;
+        color?: T;
+      };
+  order?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        target?: T;
+        url?: T;
+        newTab?: T;
+        background?: T;
+        color?: T;
+        font?: T;
+        weight?: T;
+      };
+  cart?:
+    | T
+    | {
+        show?: T;
+        color?: T;
+        badge?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -435,13 +706,48 @@ export interface ThemeSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "typography_select".
+ */
+export interface TypographySelect<T extends boolean = true> {
+  heading?: T;
+  headingWeight?: T;
+  body?: T;
+  accent?: T;
+  accentWeight?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "seo_select".
  */
 export interface SeoSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
-  keywords?: T;
-  ogImage?: T;
+  title?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  description?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  keywords?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  ogImage?:
+    | T
+    | {
+        image?: T;
+        crops?: T;
+        variants?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

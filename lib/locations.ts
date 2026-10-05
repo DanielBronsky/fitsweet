@@ -8,11 +8,6 @@ export const locationCategoryKeys: (LocationCategory | "all")[] = [
   "gas",
 ];
 
-/**
- * TODO(данные): все точки — ЗАГЛУШКА. Заменить на реальный список
- * партнёрских локаций с адресами, часами работы и координатами.
- * hours: null означает круглосуточно — подпись берётся из словаря.
- */
 export const salePoints: SalePoint[] = [
   {
     id: "1",

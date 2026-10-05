@@ -1,8 +1,3 @@
-/**
- * Палитра бренда — общий источник для сайта и админки.
- * HEX по умолчанию совпадают с @theme в app/(site)/globals.css;
- * в админке («Оформление → Палитра») их можно переопределить.
- */
 export const paletteTokens = [
   { key: "cream", label: "Кремовый — фон страницы", hex: "#faf8f3" },
   { key: "beige", label: "Бежевый — фон секций", hex: "#f1ece1" },
@@ -30,12 +25,6 @@ export const HEX_RE = /^#[0-9a-f]{6}$/i;
 
 const paletteKeys = new Set<string>(paletteTokens.map((t) => t.key));
 
-/**
- * Значение цветового поля из админки → CSS.
- * Хранится либо ключ палитры («green-700»), либо свой HEX («#aabbcc»).
- * Ключ палитры отдаём как CSS-переменную — тогда смена палитры
- * перекрашивает все элементы, где выбран этот цвет.
- */
 export function colorToCss(value?: string | null): string | undefined {
   if (!value) return undefined;
   if (HEX_RE.test(value)) return value;

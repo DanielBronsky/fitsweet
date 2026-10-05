@@ -1,8 +1,3 @@
-/**
- * Первичное наполнение админки текущими данными сайта.
- * Запуск: pnpm seed
- * Заполняет только пустое — правки, сделанные в админке, не затирает.
- */
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { ru } from "../lib/i18n/ru";
@@ -11,29 +6,24 @@ import { paletteTokens } from "../cms/palette";
 
 const payload = await getPayload({ config });
 
-// SEO — из словарей сайта
-for (const [locale, dict] of [
-  ["ru", ru],
-  ["ro", ro],
-] as const) {
-  const current = await payload.findGlobal({ slug: "seo", locale, fallbackLocale: false, depth: 0 });
-  if (current.title) {
-    payload.logger.info(`SEO [${locale}] уже заполнено — пропускаю`);
-    continue;
-  }
+const seo = await payload.findGlobal({ slug: "seo", depth: 0 });
+if (seo.title?.ru && seo.title?.ro) {
+  payload.logger.info("SEO уже заполнено — пропускаю");
+} else {
   await payload.updateGlobal({
     slug: "seo",
-    locale,
     data: {
-      title: dict.meta.title,
-      description: dict.meta.description,
-      keywords: dict.meta.keywords.join(", "),
+      title: { ru: seo.title?.ru || ru.meta.title, ro: seo.title?.ro || ro.meta.title },
+      description: { ru: seo.description?.ru || ru.meta.description, ro: seo.description?.ro || ro.meta.description },
+      keywords: {
+        ru: seo.keywords?.ru || ru.meta.keywords.join(", "),
+        ro: seo.keywords?.ro || ro.meta.keywords.join(", "),
+      },
     },
   });
-  payload.logger.info(`SEO [${locale}] заполнено из словаря`);
+  payload.logger.info("SEO заполнено из словарей");
 }
 
-// Палитра — значения из дизайна
 const theme = await payload.findGlobal({ slug: "theme", depth: 0 });
 const colors = (theme.colors ?? {}) as Record<string, string | null | undefined>;
 const missing = paletteTokens.filter((t) => !colors[t.key.replace("-", "_")]);

@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/Button";
 import dynamic from "next/dynamic";
 import { ClockIcon, PinIcon } from "@/components/ui/Icons";
 
-// Leaflet работает только в браузере — грузим на клиенте
 const LeafletMap = dynamic(
   () => import("@/components/ui/LeafletMap").then((m) => m.LeafletMap),
   {

@@ -1,26 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Inter, Playfair_Display } from "next/font/google";
 import { getDictionary, locales, localeTags, isLocale, defaultLocale, type Locale } from "@/lib/i18n";
-import { getPalette, getSeo, mediaAlt, mediaVariants, paletteCss } from "@/lib/cms";
+import { getPalette, getSeo, getTypographyCss, imageAlt, imageFrame, paletteCss } from "@/lib/cms";
+import { getHeaderData } from "@/lib/header";
+import type { FixedVariant } from "@/cms/media/frames";
 import { I18nProvider } from "@/lib/i18n/context";
 import { siteConfig } from "@/lib/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import "../globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  display: "swap",
-});
+import { fontVariables } from "../fonts";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -36,15 +26,15 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const dict = getDictionary(locale);
-  const seo = await getSeo(locale);
+  const seo = await getSeo();
 
-  // Пустое поле в админке → текст из словаря, чтобы мета-теги не пропадали
-  const title = seo?.title || dict.meta.title;
-  const description = seo?.description || dict.meta.description;
-  const keywords = seo?.keywords
-    ? seo.keywords.split(",").map((k) => k.trim()).filter(Boolean)
+  const title = seo?.title?.[locale] || dict.meta.title;
+  const description = seo?.description?.[locale] || dict.meta.description;
+  const keywordsText = seo?.keywords?.[locale];
+  const keywords = keywordsText
+    ? keywordsText.split(",").map((k) => k.trim()).filter(Boolean)
     : dict.meta.keywords;
-  const og = mediaVariants(seo?.ogImage)?.og;
+  const og = imageFrame<FixedVariant>(seo?.ogImage, "og");
 
   return {
     metadataBase: new URL(siteConfig.url),
@@ -60,7 +50,6 @@ export async function generateMetadata({
     },
     openGraph: {
       type: "website",
-      // Open Graph ждёт формат ru_MD, а не ru-MD
       locale: ogLocale(locale),
       alternateLocale: locales.filter((l) => l !== locale).map(ogLocale),
       url: `${siteConfig.url}/${locale}`,
@@ -68,7 +57,7 @@ export async function generateMetadata({
       title,
       description,
       ...(og && {
-        images: [{ url: og.src, width: og.width, height: og.height, alt: mediaAlt(seo?.ogImage, locale) }],
+        images: [{ url: og.src, width: og.width, height: og.height, alt: imageAlt(seo?.ogImage, locale) }],
       }),
     },
     twitter: {
@@ -92,12 +81,11 @@ export default async function LocaleLayout({
   if (!isLocale(locale)) notFound();
 
   const dict = getDictionary(locale);
-  const themeCss = paletteCss(await getPalette());
+  const themeCss = paletteCss(await getPalette()) + (await getTypographyCss());
 
   return (
-    <html lang={localeTags[locale]} className={`${inter.variable} ${playfair.variable}`}>
+    <html lang={localeTags[locale]} className={fontVariables}>
       <body className="antialiased">
-        {/* Палитра из админки поверх токенов дизайна */}
         {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
         <I18nProvider locale={locale}>
           <a
@@ -106,7 +94,7 @@ export default async function LocaleLayout({
           >
             {dict.header.skipToCatalog}
           </a>
-          <Header />
+          <Header data={await getHeaderData(locale)} />
           <main>{children}</main>
           <Footer />
           <CartDrawer />

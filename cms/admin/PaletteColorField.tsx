@@ -5,10 +5,6 @@ import { FieldError, FieldLabel, useConfig, useField } from "@payloadcms/ui";
 import type { TextFieldClientComponent } from "payload";
 import { HEX_RE, defaultPalette, paletteTokens, type Palette } from "../palette";
 
-/**
- * Выбор цвета элемента: образцы палитры бренда (актуальные HEX из «Оформление → Палитра»)
- * или свой цвет.
- */
 export const PaletteColorField: TextFieldClientComponent = ({ path, field }) => {
   const { value, setValue, showError } = useField<string>({ path });
   const { config } = useConfig();

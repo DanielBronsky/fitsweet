@@ -3,10 +3,6 @@ import { HEX_RE, paletteTokens } from "../palette";
 
 const paletteKeys = new Set<string>(paletteTokens.map((t) => t.key));
 
-/**
- * Цвет элемента: цвет из палитры бренда или свой HEX.
- * В админке — образцы палитры + «свой цвет» (cms/admin/PaletteColorField).
- */
 export function colorField({
   name,
   label,

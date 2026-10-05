@@ -2,15 +2,11 @@ import { cache } from "react";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { defaultPalette, HEX_RE, paletteTokens, type Palette } from "@/cms/palette";
-import type { MediaVariants } from "@/cms/media/crops";
+import { fontToCss } from "@/cms/fonts";
+import type { FixedVariant, ImageVariants, ResponsiveVariant } from "@/cms/media/frames";
 import type { Media } from "@/payload-types";
 import type { Locale } from "./i18n/config";
 
-/**
- * Данные из админки для серверных компонентов.
- * Читаются через Local API (без HTTP) во время сборки / revalidate —
- * всё попадает в готовый HTML, что и нужно для SEO.
- */
 export const getCms = cache(() => getPayload({ config }));
 
 async function safe<T>(label: string, fn: () => Promise<T>): Promise<T | null> {
@@ -22,8 +18,8 @@ async function safe<T>(label: string, fn: () => Promise<T>): Promise<T | null> {
   }
 }
 
-export const getSeo = cache((locale: Locale) =>
-  safe("seo", async () => (await getCms()).findGlobal({ slug: "seo", locale, depth: 1 })),
+export const getSeo = cache(() =>
+  safe("seo", async () => (await getCms()).findGlobal({ slug: "seo", depth: 1 })),
 );
 
 export const getPalette = cache(async (): Promise<Palette> => {
@@ -37,7 +33,20 @@ export const getPalette = cache(async (): Promise<Palette> => {
   return palette;
 });
 
-/** Переопределения палитры для <style> — только то, что отличается от дизайна */
+const fontDefaults = { heading: "inter", body: "inter", accent: "playfair" } as const;
+const fontVars = { heading: "--font-heading", body: "--font-sans", accent: "--font-display" } as const;
+
+export const getTypographyCss = cache(async (): Promise<string> => {
+  const doc = await safe("typography", async () => (await getCms()).findGlobal({ slug: "typography", depth: 0 }));
+  const vars = (Object.keys(fontVars) as (keyof typeof fontVars)[])
+    .filter((k) => doc?.[k] && doc[k] !== fontDefaults[k])
+    .map((k) => `${fontVars[k]}:${fontToCss(doc?.[k])}`)
+    .filter((v) => !v.endsWith("undefined"));
+  if (doc?.headingWeight && doc.headingWeight !== "700") vars.push(`--fw-heading:${doc.headingWeight}`);
+  if (doc?.accentWeight && doc.accentWeight !== "400") vars.push(`--fw-accent:${doc.accentWeight}`);
+  return vars.length ? `:root{${vars.join(";")}}` : "";
+});
+
 export function paletteCss(palette: Palette): string {
   const vars = paletteTokens
     .filter((t) => palette[t.key].toLowerCase() !== t.hex.toLowerCase())
@@ -45,12 +54,18 @@ export function paletteCss(palette: Palette): string {
   return vars.length ? `:root{${vars.join(";")}}` : "";
 }
 
-export function mediaVariants(media: number | Media | null | undefined): MediaVariants | null {
-  if (!media || typeof media === "number") return null;
-  return (media.variants as unknown as MediaVariants | null) ?? null;
+type ImageGroup = { image?: number | Media | null; variants?: unknown } | null | undefined;
+
+export function imageFrame<T extends ResponsiveVariant | FixedVariant = ResponsiveVariant>(
+  group: ImageGroup,
+  key: string,
+): T | null {
+  const variants = group?.variants as ImageVariants | null | undefined;
+  return (variants?.frames?.[key] as T | undefined) ?? null;
 }
 
-export function mediaAlt(media: number | Media | null | undefined, locale: Locale): string {
+export function imageAlt(group: ImageGroup, locale: Locale): string {
+  const media = group?.image;
   if (!media || typeof media === "number") return "";
   return media.alt?.[locale] ?? "";
 }

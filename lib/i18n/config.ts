@@ -8,7 +8,6 @@ export const localeNames: Record<Locale, string> = {
   ro: "RO",
 };
 
-/** Полные коды для html lang и hreflang */
 export const localeTags: Record<Locale, string> = {
   ru: "ru-MD",
   ro: "ro-MD",

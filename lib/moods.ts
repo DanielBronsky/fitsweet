@@ -45,7 +45,6 @@ export const moods: Mood[] = [
 export const productsByMood = (key: MoodKey) =>
   products.filter((p) => p.moods.includes(key));
 
-/** «Сникерс с арахисом, Сникерс с миндалем, Марс» */
 export const moodProductNames = (key: MoodKey, locale: Locale) =>
   productsByMood(key)
     .map((p) => tileName(p, locale))
