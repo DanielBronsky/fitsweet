@@ -1,0 +1,196 @@
+import path from "path"
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
+
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  await db.run(sql`CREATE TABLE \`products_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`moods_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`products\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`moods_id\`) REFERENCES \`moods\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`products_rels_order_idx\` ON \`products_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`products_rels_parent_idx\` ON \`products_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`products_rels_path_idx\` ON \`products_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`products_rels_moods_id_idx\` ON \`products_rels\` (\`moods_id\`);`)
+  await db.run(sql`CREATE TABLE \`moods\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`_order\` text,
+  	\`name\` text,
+  	\`title_ru\` text NOT NULL,
+  	\`title_ro\` text NOT NULL,
+  	\`picture_image_id\` integer,
+  	\`picture_crops\` text,
+  	\`picture_variants\` text,
+  	\`active\` integer DEFAULT true,
+  	\`slug\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	FOREIGN KEY (\`picture_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`moods__order_idx\` ON \`moods\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`moods_picture_picture_image_idx\` ON \`moods\` (\`picture_image_id\`);`)
+  await db.run(sql`CREATE UNIQUE INDEX \`moods_slug_idx\` ON \`moods\` (\`slug\`);`)
+  await db.run(sql`CREATE INDEX \`moods_updated_at_idx\` ON \`moods\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`moods_created_at_idx\` ON \`moods\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`layout_blocks\` (
+  	\`_order\` integer NOT NULL,
+  	\`_parent_id\` integer NOT NULL,
+  	\`id\` text PRIMARY KEY NOT NULL,
+  	\`block\` text NOT NULL,
+  	FOREIGN KEY (\`_parent_id\`) REFERENCES \`layout\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`layout_blocks_order_idx\` ON \`layout_blocks\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`layout_blocks_parent_id_idx\` ON \`layout_blocks\` (\`_parent_id\`);`)
+  await db.run(sql`CREATE TABLE \`layout\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`updated_at\` text,
+  	\`created_at\` text
+  );
+  `)
+  await db.run(sql`CREATE TABLE \`moods_section\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`section_show\` integer DEFAULT true,
+  	\`section_background\` text DEFAULT 'beige',
+  	\`heading_text_ru\` text NOT NULL,
+  	\`heading_text_ro\` text NOT NULL,
+  	\`heading_color\` text DEFAULT 'green-900',
+  	\`heading_leaf_color\` text DEFAULT 'green-500',
+  	\`heading_leaf\` integer DEFAULT true,
+  	\`heading_font\` text,
+  	\`heading_weight\` text,
+  	\`cards_background\` text DEFAULT 'white',
+  	\`cards_active_border\` text DEFAULT 'green-700',
+  	\`cards_title_color\` text DEFAULT 'green-900',
+  	\`cards_list_color\` text DEFAULT 'muted',
+  	\`cards_title_font\` text,
+  	\`cards_title_weight\` text,
+  	\`cards_show_list\` integer DEFAULT true,
+  	\`more_show\` integer DEFAULT true,
+  	\`more_text_ru\` text,
+  	\`more_text_ro\` text,
+  	\`more_background\` text DEFAULT 'white',
+  	\`more_color\` text DEFAULT 'green-900',
+  	\`more_border\` text DEFAULT 'green-200',
+  	\`more_font\` text,
+  	\`updated_at\` text,
+  	\`created_at\` text
+  );
+  `)
+  const oldLinks = (await db.all(
+    sql`SELECT parent_id AS product, value FROM products_moods ORDER BY parent_id, "order";`,
+  )) as { product: number; value: string }[]
+  await db.run(sql`DROP TABLE \`products_moods\`;`)
+  await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`moods_id\` integer REFERENCES moods(id);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_moods_id_idx\` ON \`payload_locked_documents_rels\` (\`moods_id\`);`)
+  await db.run(sql`ALTER TABLE \`catalog\` ADD \`more_initial_count\` numeric DEFAULT 8;`)
+
+  const moods = [
+    { slug: "chocolate", title: { ru: "Хочется шоколада", ro: "Poftă de ciocolată" } },
+    { slug: "caramel", title: { ru: "Любите карамель", ro: "Vă place caramelul" } },
+    { slug: "coconut", title: { ru: "Мечтаете о кокосе", ro: "Visați la cocos" } },
+    { slug: "fruity", title: { ru: "Хочется чего-то лёгкого и фруктового", ro: "Poftă de ceva ușor și fructat" } },
+    { slug: "nuts-berries", title: { ru: "Любите сочетание орехов и ягод", ro: "Vă place combinația de nuci și fructe de pădure" } },
+  ]
+  const moodIds: Record<string, number> = {}
+  for (const m of moods) {
+    const media = await payload.create({
+      collection: "media",
+      req,
+      filePath: path.resolve("public/images/moods", `${m.slug}.svg`),
+      data: { alt: { ru: m.title.ru, ro: m.title.ro } },
+    })
+    const doc = await payload.create({
+      collection: "moods",
+      req,
+      data: { slug: m.slug, title: m.title, active: true, picture: { image: media.id } } as never,
+    })
+    moodIds[m.slug] = doc.id
+  }
+
+  const byProduct = new Map<number, number[]>()
+  for (const link of oldLinks) {
+    const id = moodIds[link.value]
+    if (!id) continue
+    byProduct.set(link.product, [...(byProduct.get(link.product) ?? []), id])
+  }
+  for (const [product, ids] of byProduct) {
+    await payload.update({ collection: "products", id: product, req, data: { moods: ids } })
+  }
+
+  await payload.updateGlobal({
+    slug: "moodsSection",
+    req,
+    data: {
+      section: { show: true, background: "beige" },
+      heading: { text: { ru: "Выбирайте по настроению", ro: "Alege după dispoziție" }, color: "green-900", leafColor: "green-500", leaf: true },
+      cards: { background: "white", activeBorder: "green-700", titleColor: "green-900", listColor: "muted", showList: true },
+      more: {
+        show: true,
+        text: { ru: "Смотреть весь ассортимент", ro: "Vezi tot sortimentul" },
+        background: "white",
+        color: "green-900",
+        border: "green-200",
+      },
+    },
+  })
+
+  await payload.updateGlobal({
+    slug: "layout",
+    req,
+    data: {
+      blocks: ["hero", "moods", "catalog", "where", "delivery", "box", "reviews", "instagram", "order", "finalCta"].map(
+        (block) => ({ block }),
+      ),
+    } as never,
+  })
+}
+
+export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  await db.run(sql`CREATE TABLE \`products_moods\` (
+  	\`order\` integer NOT NULL,
+  	\`parent_id\` integer NOT NULL,
+  	\`value\` text,
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`products\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`products_moods_order_idx\` ON \`products_moods\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`products_moods_parent_idx\` ON \`products_moods\` (\`parent_id\`);`)
+  await db.run(sql`DROP TABLE \`products_rels\`;`)
+  await db.run(sql`DROP TABLE \`moods\`;`)
+  await db.run(sql`DROP TABLE \`layout_blocks\`;`)
+  await db.run(sql`DROP TABLE \`layout\`;`)
+  await db.run(sql`DROP TABLE \`moods_section\`;`)
+  await db.run(sql`PRAGMA foreign_keys=OFF;`)
+  await db.run(sql`CREATE TABLE \`__new_payload_locked_documents_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`users_id\` integer,
+  	\`media_id\` integer,
+  	\`products_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`payload_locked_documents\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`products_id\`) REFERENCES \`products\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`INSERT INTO \`__new_payload_locked_documents_rels\`("id", "order", "parent_id", "path", "users_id", "media_id", "products_id") SELECT "id", "order", "parent_id", "path", "users_id", "media_id", "products_id" FROM \`payload_locked_documents_rels\`;`)
+  await db.run(sql`DROP TABLE \`payload_locked_documents_rels\`;`)
+  await db.run(sql`ALTER TABLE \`__new_payload_locked_documents_rels\` RENAME TO \`payload_locked_documents_rels\`;`)
+  await db.run(sql`PRAGMA foreign_keys=ON;`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_order_idx\` ON \`payload_locked_documents_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_parent_idx\` ON \`payload_locked_documents_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_path_idx\` ON \`payload_locked_documents_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_users_id_idx\` ON \`payload_locked_documents_rels\` (\`users_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_media_id_idx\` ON \`payload_locked_documents_rels\` (\`media_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_products_id_idx\` ON \`payload_locked_documents_rels\` (\`products_id\`);`)
+  await db.run(sql`ALTER TABLE \`catalog\` DROP COLUMN \`more_initial_count\`;`)
+}

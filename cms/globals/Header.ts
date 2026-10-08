@@ -11,7 +11,7 @@ export const Header: GlobalConfig = {
   slug: "header",
   label: "Шапка",
   admin: {
-    group: "Шапка сайта · Header",
+    group: false,
     description: "Верхняя панель сайта: логотип, меню, переключатель языка, кнопка «Заказать» и корзина.",
   },
   access: {

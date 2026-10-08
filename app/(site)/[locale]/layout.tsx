@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getDictionary, locales, localeTags, isLocale, defaultLocale, type Locale } from "@/lib/i18n";
 import { getPalette, getSeo, getTypographyCss, imageAlt, imageFrame, paletteCss } from "@/lib/cms";
 import { getHeaderData } from "@/lib/header";
+import { getMoods, getProducts } from "@/lib/catalog";
+import { ProductsProvider } from "@/lib/products-context";
 import type { FixedVariant } from "@/cms/media/frames";
 import { I18nProvider } from "@/lib/i18n/context";
 import { siteConfig } from "@/lib/site";
@@ -88,6 +90,7 @@ export default async function LocaleLayout({
       <body className="antialiased">
         {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
         <I18nProvider locale={locale}>
+          <ProductsProvider products={await getProducts()} moods={await getMoods()}>
           <a
             href="#catalog"
             className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-green-700 focus:px-5 focus:py-3 focus:text-cream"
@@ -98,6 +101,7 @@ export default async function LocaleLayout({
           <main>{children}</main>
           <Footer />
           <CartDrawer />
+          </ProductsProvider>
         </I18nProvider>
       </body>
     </html>

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { productById } from "./products";
+import type { Product } from "./types";
 
 export type CartLine = { id: string; qty: number };
 
@@ -68,5 +68,5 @@ export const useCart = create<CartState>()(
 export const cartCount = (lines: CartLine[]) =>
   lines.reduce((sum, l) => sum + l.qty, 0);
 
-export const cartTotal = (lines: CartLine[]) =>
-  lines.reduce((sum, l) => sum + (productById(l.id)?.price ?? 0) * l.qty, 0);
+export const cartTotal = (lines: CartLine[], byId: (id: string) => Product | undefined) =>
+  lines.reduce((sum, l) => sum + (byId(l.id)?.price ?? 0) * l.qty, 0);

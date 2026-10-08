@@ -1,14 +1,13 @@
 import type { Locale } from "./i18n/config";
 import type { Product } from "./types";
 
-export const products: Product[] = [
+export const fallbackProducts: Product[] = [
   {
     id: "snickers-peanut",
     name: { ru: "Сникерс с арахисом", ro: "Snickers cu arahide" },
     price: 55,
     weight: 55,
     kbju: { kcal: 212, protein: 7.4, fat: 14.8, carbs: 13.6 },
-    kbjuIsPlaceholder: true,
     moods: ["chocolate"],
     ingredients: {
       ru: "тофу, арахисовая паста, арахис, кокосовый сахар, эритрит, кокосовое масло, псиллиум, вода, какао масло, какао порошок, сироп цикория",
@@ -22,7 +21,6 @@ export const products: Product[] = [
     price: 65,
     weight: 55,
     kbju: { kcal: 218, protein: 6.8, fat: 15.9, carbs: 12.9 },
-    kbjuIsPlaceholder: true,
     moods: ["chocolate"],
     ingredients: {
       ru: "тофу, миндальная паста, миндаль, кокосовый сахар, эритрит, кокосовое масло, псиллиум, вода, какао масло, какао порошок, сироп цикория",
@@ -36,7 +34,6 @@ export const products: Product[] = [
     price: 50,
     weight: 40,
     kbju: { kcal: 176, protein: 1.9, fat: 13.4, carbs: 11.2 },
-    kbjuIsPlaceholder: true,
     moods: ["coconut"],
     ingredients: {
       ru: "кокосовая стружка, кокосовое молоко, сироп цикория, какао масло, какао порошок",
@@ -50,7 +47,6 @@ export const products: Product[] = [
     price: 40,
     weight: 45,
     kbju: { kcal: 195, protein: 3.2, fat: 12.6, carbs: 17.4 },
-    kbjuIsPlaceholder: true,
     moods: ["caramel"],
     ingredients: {
       ru: "миндальная мука, кокосовый сахар, нутовая мука, сироп цикория, кокосовое масло, сухое кокосовое молоко, какао масло, какао порошок",
@@ -64,7 +60,6 @@ export const products: Product[] = [
     price: 60,
     weight: 45,
     kbju: { kcal: 201, protein: 3.8, fat: 13.1, carbs: 16.2 },
-    kbjuIsPlaceholder: true,
     moods: ["chocolate"],
     ingredients: {
       ru: "кокосовая мука, миндальная паста, сироп цикория, кокосовое масло, эритрит, миндальная мука, какао порошок, псиллиум, какао масло, кэроб",
@@ -79,7 +74,6 @@ export const products: Product[] = [
     price: 35,
     weight: 35,
     kbju: { kcal: 168, protein: 2.6, fat: 12.9, carbs: 10.4 },
-    kbjuIsPlaceholder: true,
     moods: ["caramel"],
     ingredients: {
       ru: "кокосовый сахар, какао масло, какао порошок, сироп цикория, кокосовое масло, кокосовое молоко, фисташка, сублимированная малина, соль, кэроб",
@@ -93,7 +87,6 @@ export const products: Product[] = [
     price: 60,
     weight: 40,
     kbju: { kcal: 152, protein: 1.4, fat: 9.8, carbs: 14.1 },
-    kbjuIsPlaceholder: true,
     moods: ["fruity"],
     ingredients: {
       ru: "манго, эритрит, сухое кокосовое молоко, инулин, кокосовое масло, малина, агар, какао масло, какао порошок, сироп цикория, кэроб",
@@ -107,7 +100,6 @@ export const products: Product[] = [
     price: 40,
     weight: 37,
     kbju: { kcal: 183, protein: 2, fat: 14.5, carbs: 12.5 },
-    kbjuIsPlaceholder: false,
     moods: ["nuts-berries"],
     ingredients: {
       ru: "кокосовый сахар, кокосовое масло, миндальная паста, миндаль, клюква вяленая, вода, кокосовая стружка, какао масло, какао порошок, сироп цикория",
@@ -116,8 +108,6 @@ export const products: Product[] = [
     image: "/images/products/almond-cranberry.svg",
   },
 ];
-
-export const productById = (id: string) => products.find((p) => p.id === id);
 
 export const productName = (p: Product, locale: Locale) => p.name[locale];
 

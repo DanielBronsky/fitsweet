@@ -1,8 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
-import { products, tileName } from "@/lib/products";
+import { tileName } from "@/lib/products";
+import { useProducts } from "@/lib/products-context";
+import { ProductImage } from "@/components/ui/ProductImage";
+import type { Product } from "@/lib/types";
 import { useCart } from "@/lib/cart";
 import { useI18n } from "@/lib/i18n/context";
 import { Container } from "@/components/ui/Container";
@@ -12,8 +14,9 @@ import { Button } from "@/components/ui/Button";
 
 const SIZES = [4, 6, 8, 12];
 
-const assorted = (n: number) => {
+const assorted = (products: Product[], n: number) => {
   const next: Record<string, number> = {};
+  if (!products.length) return next;
   for (let i = 0; i < n; i++) {
     const id = products[i % products.length].id;
     next[id] = (next[id] ?? 0) + 1;
@@ -23,8 +26,9 @@ const assorted = (n: number) => {
 
 export function BoxBuilder() {
   const { locale, dict } = useI18n();
+  const { products } = useProducts();
   const [size, setSize] = useState(8);
-  const [picked, setPicked] = useState<Record<string, number>>(() => assorted(8));
+  const [picked, setPicked] = useState<Record<string, number>>(() => assorted(products, 8));
   const [manual, setManual] = useState(false);
 
   const addMany = useCart((s) => s.addMany);
@@ -37,14 +41,14 @@ export function BoxBuilder() {
         (sum, [id, qty]) => sum + (products.find((p) => p.id === id)?.price ?? 0) * qty,
         0,
       ),
-    [picked],
+    [picked, products],
   );
 
   const left = size - chosen;
 
   const changeSize = (next: number) => {
     setSize(next);
-    setPicked(assorted(next));
+    setPicked(assorted(products, next));
   };
 
   const inc = (id: string) => {
@@ -68,7 +72,7 @@ export function BoxBuilder() {
   };
 
   const slots = Object.entries(picked).flatMap(([id, qty]) =>
-    Array.from({ length: qty }, () => products.find((p) => p.id === id)!),
+    Array.from({ length: qty }, () => products.find((p) => p.id === id)).filter((p): p is Product => Boolean(p)),
   );
 
   return (
@@ -121,7 +125,7 @@ export function BoxBuilder() {
                     }`}
                     title={p ? tileName(p, locale) : dict.box.freeSlot}
                   >
-                    {p && <Image src={p.image} alt="" fill sizes="90px" className="object-cover" />}
+                    {p && <ProductImage product={p} sizes="90px" className="mix-blend-multiply" />}
                   </div>
                 );
               })}

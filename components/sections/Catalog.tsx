@@ -1,27 +1,39 @@
 "use client";
 
-import { products } from "@/lib/products";
-import { moods } from "@/lib/moods";
+import { useState, type CSSProperties } from "react";
 import { useMoodFilter } from "@/lib/filter";
 import { useI18n } from "@/lib/i18n/context";
+import { useProducts } from "@/lib/products-context";
+import type { CatalogData } from "@/lib/catalog";
 import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { ProductCard } from "@/components/ui/ProductCard";
-import { Button } from "@/components/ui/Button";
 import { CloseIcon } from "@/components/ui/Icons";
 
-export function Catalog() {
-  const { locale, dict } = useI18n();
+export function Catalog({ data }: { data: CatalogData | null }) {
+  const { locale } = useI18n();
+  const { products, moods } = useProducts();
   const mood = useMoodFilter((s) => s.mood);
   const setMood = useMoodFilter((s) => s.setMood);
+  const [expanded, setExpanded] = useState(false);
+
+  if (!data) return null;
 
   const visible = mood ? products.filter((p) => p.moods.includes(mood)) : products;
+  const limit = data.more?.initialCount ?? visible.length;
+  const collapsed = !expanded && !mood && visible.length > limit;
+  const showMore = Boolean(data.more) && (Boolean(mood) || collapsed);
+
+  const onMore = () => {
+    if (mood) setMood(null);
+    else setExpanded(true);
+  };
   const moodTitle = moods.find((m) => m.key === mood)?.title[locale];
 
   return (
-    <section id="catalog" className="bg-white py-14 sm:py-16 lg:py-20">
+    <section id="catalog" style={{ background: data.background }} className="py-14 sm:py-16 lg:py-20">
       <Container>
-        <SectionTitle>{dict.catalog.title}</SectionTitle>
+        <SectionTitle data={data.title} />
 
         {mood && (
           <div className="mt-6 flex justify-center">
@@ -38,26 +50,40 @@ export function Catalog() {
 
         <div
           className="scroll-snap-x -mx-5 mt-8 flex gap-3 overflow-x-auto px-5 pb-2
-            sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0
-            md:grid-cols-4 lg:mt-9 lg:grid-cols-8 lg:gap-2.5"
+            sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0
+            lg:mt-9 lg:gap-2.5"
         >
-          {visible.map((p) => (
-            <div key={p.id} className="snap-item w-[58%] shrink-0 sm:w-auto">
-              <ProductCard product={p} />
+          {visible.map((p, i) => (
+            <div
+              key={p.id}
+              className={`snap-item w-[58%] shrink-0 sm:w-[calc((100%-1.5rem)/3)] md:w-[calc((100%-2.25rem)/4)] lg:w-[calc((100%-7*0.625rem)/8)] ${
+                collapsed && i >= limit ? "hidden" : ""
+              }`}
+            >
+              <ProductCard product={p} style={data.cards} />
             </div>
           ))}
         </div>
 
-        <div className="mt-9 flex justify-center lg:mt-11">
-          <Button
-            variant="outline"
-            size="md"
-            onClick={() => setMood(null)}
-            className="px-9"
-          >
-            {dict.catalog.viewAll}
-          </Button>
-        </div>
+        {data.more && showMore && (
+          <div className="mt-9 flex justify-center lg:mt-11">
+            <button
+              type="button"
+              onClick={onMore}
+              style={
+                {
+                  background: data.more.background,
+                  color: data.more.color,
+                  borderColor: data.more.border,
+                  fontFamily: data.more.font,
+                } as CSSProperties
+              }
+              className="inline-flex h-10 items-center justify-center rounded-full border px-9 text-[13px] font-medium transition-[filter] duration-200 hover:brightness-95"
+            >
+              {data.more.text}
+            </button>
+          </div>
+        )}
       </Container>
     </section>
   );

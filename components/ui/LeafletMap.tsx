@@ -22,6 +22,7 @@ export function LeafletMap({
   const markers = useRef<Map<string, Marker>>(new Map());
   const onPickRef = useRef(onPick);
   const [hintVisible, setHintVisible] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     onPickRef.current = onPick;
@@ -35,6 +36,9 @@ export function LeafletMap({
 
     (async () => {
       const L = (await import("leaflet")).default;
+      const maplibre = await import("maplibre-gl");
+      maplibre.setWorkerUrl(`/vendor/maplibre-worker?v=${maplibre.getVersion()}`);
+      const { maplibreGL } = await import("@maplibre/maplibre-gl-leaflet");
       if (cancelled || !holder.current || map.current) return;
 
       const el = holder.current;
@@ -47,13 +51,13 @@ export function LeafletMap({
         scrollWheelZoom: false,
         touchZoom: true,
         dragging: !coarsePointer,
-        attributionControl: false,
+        attributionControl: true,
       });
+      instance.attributionControl.setPrefix(false);
       map.current = instance;
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        maxZoom: 19,
-      }).addTo(instance);
+      maplibreGL({ style: "https://tiles.openfreemap.org/styles/positron" }).addTo(instance);
+      setReady(true);
 
       const enableWheel = () => instance.scrollWheelZoom.enable();
       const disableWheel = () => instance.scrollWheelZoom.disable();
@@ -106,7 +110,7 @@ export function LeafletMap({
 
     (async () => {
       const L = (await import("leaflet")).default;
-      if (cancelled || !map.current) return;
+      if (cancelled || !ready || !map.current) return;
 
       markers.current.forEach((m) => m.remove());
       markers.current.clear();
@@ -148,7 +152,7 @@ export function LeafletMap({
     return () => {
       cancelled = true;
     };
-  }, [points, locale, dict.where.aroundTheClock]);
+  }, [points, locale, dict.where.aroundTheClock, ready]);
 
   useEffect(() => {
     if (!activeId || !map.current) return;

@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect } from "react";
 import { useCart, cartTotal, cartCount } from "@/lib/cart";
-import { productById, tileName } from "@/lib/products";
+import { tileName } from "@/lib/products";
+import { useProducts } from "@/lib/products-context";
+import { ProductImage } from "@/components/ui/ProductImage";
 import { useI18n } from "@/lib/i18n/context";
 import { FREE_DELIVERY_FROM } from "@/lib/delivery";
 import { Button } from "@/components/ui/Button";
@@ -12,7 +13,8 @@ import { CloseIcon } from "@/components/ui/Icons";
 export function CartDrawer() {
   const { locale, dict } = useI18n();
   const { lines, isOpen, close, setQty, remove, clear } = useCart();
-  const total = cartTotal(lines);
+  const { byId: productById } = useProducts();
+  const total = cartTotal(lines, productById);
   const count = cartCount(lines);
   const left = FREE_DELIVERY_FROM - total;
 
@@ -83,7 +85,7 @@ export function CartDrawer() {
                 return (
                   <li key={line.id} className="flex gap-4 border-b border-green-200/40 py-4 last:border-0">
                     <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-tile bg-card">
-                      <Image src={p.image} alt="" fill className="object-cover" sizes="72px" />
+                      <ProductImage product={p} sizes="72px" className="mix-blend-multiply" />
                     </div>
 
                     <div className="flex min-w-0 flex-1 flex-col justify-between">

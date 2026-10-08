@@ -1,29 +1,37 @@
 "use client";
 
-import Image from "next/image";
-import { moods, moodProductNames } from "@/lib/moods";
+import type { CSSProperties } from "react";
+import { moodProductNames } from "@/lib/moods";
+import { useProducts } from "@/lib/products-context";
 import { useMoodFilter } from "@/lib/filter";
 import { useI18n } from "@/lib/i18n/context";
+import type { MoodsData } from "@/lib/catalog";
 import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { Button } from "@/components/ui/Button";
 
-export function Moods() {
-  const { locale, dict } = useI18n();
+export function Moods({ data }: { data: MoodsData | null }) {
+  const { locale } = useI18n();
+  const { products, moods } = useProducts();
   const active = useMoodFilter((s) => s.mood);
   const setMood = useMoodFilter((s) => s.setMood);
 
-  const pick = (key: (typeof moods)[number]["key"]) => {
+  if (!data || moods.length === 0) return null;
+
+  const pick = (key: string) => {
     setMood(active === key ? null : key);
     document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  return (
-    <section id="about" className="bg-beige py-14 sm:py-16 lg:py-20">
-      <Container>
-        <SectionTitle>{dict.moods.title}</SectionTitle>
+  const cols = moods.length >= 5 ? "lg:grid-cols-5" : moods.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
 
-        <div className="scroll-snap-x -mx-5 mt-9 flex gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:mt-11 lg:grid-cols-5">
+  return (
+    <section id="about" style={{ background: data.background }} className="py-14 sm:py-16 lg:py-20">
+      <Container>
+        <SectionTitle data={data.title} />
+
+        <div
+          className={`scroll-snap-x -mx-5 mt-9 flex gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:mt-11 ${cols}`}
+        >
           {moods.map((m) => {
             const isActive = active === m.key;
             return (
@@ -32,35 +40,60 @@ export function Moods() {
                 type="button"
                 onClick={() => pick(m.key)}
                 aria-pressed={isActive}
-                className={`snap-item flex w-[70%] shrink-0 flex-col items-center rounded-card border bg-white p-4 text-center transition-all duration-300 hover:shadow-lift sm:w-auto lg:p-5
-                  ${isActive ? "border-green-700 shadow-lift" : "border-transparent"}`}
+                style={{ background: data.cards.background, borderColor: isActive ? data.cards.activeBorder : "transparent" }}
+                className={`snap-item flex w-[70%] shrink-0 flex-col items-center rounded-card border p-4 text-center transition-all duration-300 hover:shadow-lift sm:w-auto lg:p-5 ${
+                  isActive ? "shadow-lift" : ""
+                }`}
               >
                 <div className="relative aspect-[13/11] w-full overflow-hidden rounded-tile">
-                  <Image
-                    src={m.image}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={m.thumb?.src ?? m.image}
+                    srcSet={m.thumb?.srcSet}
+                    sizes={m.thumb ? "(max-width: 640px) 70vw, (max-width: 1024px) 33vw, 220px" : undefined}
+                    width={m.thumb?.width ?? 440}
+                    height={m.thumb?.height ?? 372}
                     alt=""
-                    fill
-                    sizes="(max-width: 640px) 70vw, (max-width: 1024px) 33vw, 220px"
-                    className="object-cover"
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
 
-                <h3 className="mt-4 text-[12.5px] font-semibold leading-snug text-green-900">
+                <h3
+                  style={{ color: data.cards.titleColor, fontFamily: data.cards.titleFont, fontWeight: data.cards.titleWeight ?? 600 }}
+                  className="mt-4 text-[12.5px] leading-snug"
+                >
                   {m.title[locale]}
                 </h3>
-                <p className="mt-1.5 text-[10.5px] leading-relaxed text-muted">
-                  {moodProductNames(m.key, locale)}
-                </p>
+                {data.cards.showList && (
+                  <p style={{ color: data.cards.listColor }} className="mt-1.5 text-[10.5px] leading-relaxed">
+                    {moodProductNames(products, m.key, locale)}
+                  </p>
+                )}
               </button>
             );
           })}
         </div>
 
-        <div className="mt-9 flex justify-center lg:mt-11">
-          <Button as="a" href="#catalog" variant="outline" onClick={() => setMood(null)} className="px-9">
-            {dict.moods.viewAll}
-          </Button>
-        </div>
+        {data.more && (
+          <div className="mt-9 flex justify-center lg:mt-11">
+            <a
+              href="#catalog"
+              onClick={() => setMood(null)}
+              style={
+                {
+                  background: data.more.background,
+                  color: data.more.color,
+                  borderColor: data.more.border,
+                  fontFamily: data.more.font,
+                } as CSSProperties
+              }
+              className="inline-flex h-10 items-center justify-center rounded-full border px-9 text-[13px] font-medium transition-[filter] duration-200 hover:brightness-95"
+            >
+              {data.more.text}
+            </a>
+          </div>
+        )}
       </Container>
     </section>
   );

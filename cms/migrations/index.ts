@@ -7,6 +7,9 @@ import * as migration_20261005_192825_fonts from './20261005_192825_fonts';
 import * as migration_20261005_194020_font_weights from './20261005_194020_font_weights';
 import * as migration_20261008_091014_hero from './20261008_091014_hero';
 import * as migration_20261008_092204_media_rotate from './20261008_092204_media_rotate';
+import * as migration_20261008_094748_catalog_products from './20261008_094748_catalog_products';
+import * as migration_20261008_101109_moods_layout from './20261008_101109_moods_layout';
+import * as migration_20261008_161552_catalog_blend from './20261008_161552_catalog_blend';
 
 export const migrations = [
   {
@@ -52,6 +55,21 @@ export const migrations = [
   {
     up: migration_20261008_092204_media_rotate.up,
     down: migration_20261008_092204_media_rotate.down,
-    name: '20261008_092204_media_rotate'
+    name: '20261008_092204_media_rotate',
+  },
+  {
+    up: migration_20261008_094748_catalog_products.up,
+    down: migration_20261008_094748_catalog_products.down,
+    name: '20261008_094748_catalog_products',
+  },
+  {
+    up: migration_20261008_101109_moods_layout.up,
+    down: migration_20261008_101109_moods_layout.down,
+    name: '20261008_101109_moods_layout',
+  },
+  {
+    up: migration_20261008_161552_catalog_blend.up,
+    down: migration_20261008_161552_catalog_blend.down,
+    name: '20261008_161552_catalog_blend'
   },
 ];

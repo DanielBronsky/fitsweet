@@ -32,6 +32,8 @@ export const ruOverrides = {
     deleteLabel: "Удалить: {{label}}",
     documentIsTrashed: "Эта запись ({{label}}) в корзине и доступна только для чтения.",
     editLabel: "Редактировать: {{label}}",
+    false: "Нет",
+    true: "Да",
     newLabel: "Добавить: {{label}}",
     noResults: "Ничего не найдено. Записей ещё нет или они не подходят под фильтры.",
     selectLabel: "Выбрать: {{label}}",

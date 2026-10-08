@@ -2,7 +2,7 @@ import type { Locale } from "./i18n/config";
 
 export type I18nString = Record<Locale, string>;
 
-export type MoodKey = "chocolate" | "caramel" | "coconut" | "fruity" | "nuts-berries";
+export type MoodKey = string;
 
 export type Kbju = {
   kcal: number;
@@ -18,11 +18,13 @@ export type Product = {
   price: number;
   weight: number;
   kbju: Kbju;
-  kbjuIsPlaceholder: boolean;
   moods: MoodKey[];
   ingredients: I18nString;
   image: string;
+  thumb?: ProductThumb;
 };
+
+export type ProductThumb = { src: string; srcSet: string; width: number; height: number };
 
 export type LocationCategory = "cafe" | "gym" | "shop" | "gas";
 

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
+@import "maplibre-gl/dist/maplibre-gl.css";
 
 @theme {
   --color-cream: #faf8f3;
@@ -117,11 +118,20 @@
 }
 
 .leaflet-tile-pane {
-  filter: saturate(0.55) sepia(0.16) hue-rotate(38deg) brightness(1.02);
+  filter: saturate(0.7) sepia(0.12) hue-rotate(30deg) contrast(1.06);
 }
 
 .leaflet-control-attribution {
-  display: none !important;
+  background: color-mix(in srgb, var(--color-cream) 80%, transparent) !important;
+  color: var(--color-muted) !important;
+  font-size: 9px !important;
+  line-height: 1.4 !important;
+  padding: 1px 6px !important;
+  border-top-left-radius: 6px;
+}
+
+.leaflet-control-attribution a {
+  color: inherit !important;
 }
 
 .leaflet-control-zoom a {

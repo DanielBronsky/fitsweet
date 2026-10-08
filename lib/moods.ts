@@ -1,14 +1,16 @@
 import type { Locale } from "./i18n/config";
 import type { I18nString, MoodKey } from "./types";
-import { products, tileName } from "./products";
+import { tileName } from "./products";
+import type { Product, ProductThumb } from "./types";
 
 export type Mood = {
   key: MoodKey;
   title: I18nString;
   image: string;
+  thumb?: ProductThumb;
 };
 
-export const moods: Mood[] = [
+export const fallbackMoods: Mood[] = [
   {
     key: "chocolate",
     title: { ru: "Хочется шоколада", ro: "Poftă de ciocolată" },
@@ -42,10 +44,10 @@ export const moods: Mood[] = [
   },
 ];
 
-export const productsByMood = (key: MoodKey) =>
+export const productsByMood = (products: Product[], key: MoodKey) =>
   products.filter((p) => p.moods.includes(key));
 
-export const moodProductNames = (key: MoodKey, locale: Locale) =>
-  productsByMood(key)
+export const moodProductNames = (products: Product[], key: MoodKey, locale: Locale) =>
+  productsByMood(products, key)
     .map((p) => tileName(p, locale))
     .join(", ");

@@ -1,3 +1,6 @@
+import { Fragment, type ReactNode } from "react";
+import { getSectionOrder } from "@/lib/layout";
+import type { SectionKey } from "@/cms/sections";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
 import { getHeroData } from "@/lib/hero";
@@ -10,7 +13,7 @@ import { Reviews } from "@/components/sections/Reviews";
 import { InstagramFeed } from "@/components/sections/InstagramFeed";
 import { OrderForm } from "@/components/sections/OrderForm";
 import { FinalCta } from "@/components/sections/FinalCta";
-import { products } from "@/lib/products";
+import { getCatalogData, getMoodsData, getProducts } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site";
 
 export default async function Home({
@@ -21,6 +24,7 @@ export default async function Home({
   const { locale } = await params;
   const l = locale as Locale;
   const dict = getDictionary(locale);
+  const products = await getProducts();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -45,22 +49,29 @@ export default async function Home({
     })),
   };
 
+  const order = await getSectionOrder();
+  const sections: Record<SectionKey, ReactNode> = {
+    hero: <Hero data={await getHeroData(l)} />,
+    catalog: <Catalog data={await getCatalogData(l)} />,
+    moods: <Moods data={await getMoodsData(l)} />,
+    where: <WhereToBuy />,
+    delivery: <Delivery />,
+    box: <BoxBuilder />,
+    reviews: <Reviews />,
+    instagram: <InstagramFeed />,
+    order: <OrderForm />,
+    finalCta: <FinalCta />,
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Hero data={await getHeroData(l)} />
-      <Catalog />
-      <Moods />
-      <WhereToBuy />
-      <Delivery />
-      <BoxBuilder />
-      <Reviews />
-      <InstagramFeed />
-      <OrderForm />
-      <FinalCta />
+      {order.map((key) => (
+        <Fragment key={key}>{sections[key]}</Fragment>
+      ))}
     </>
   );
 }

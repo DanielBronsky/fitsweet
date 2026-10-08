@@ -13,9 +13,9 @@ const row = (fields: Field[]): Field => ({ type: "row", fields });
 
 export const Hero: GlobalConfig = {
   slug: "hero",
-  label: "1 · Баннер",
+  label: "Баннер",
   admin: {
-    group: "Основное содержимое · Body",
+    group: false,
     description: "Первый экран: большой заголовок, подзаголовок, кнопки, картинка и строка преимуществ.",
   },
   access: {

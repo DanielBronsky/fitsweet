@@ -1,4 +1,22 @@
-export const extraNavGroups = [
+import type { SectionKey } from "../sections";
+
+export type NavItem = { label: string; path: string; sub?: boolean; section?: SectionKey };
+
+export const BODY_GROUP = "Основное содержимое · Body";
+
+export const extraNavGroups: { label: string; items: NavItem[] }[] = [
+  { label: "Шапка сайта · Header", items: [{ label: "Шапка", path: "/globals/header" }] },
+  {
+    label: BODY_GROUP,
+    items: [
+      { label: "Порядок блоков", path: "/globals/layout" },
+      { label: "Баннер", path: "/globals/hero", section: "hero" },
+      { label: "Выбирайте по настроению", path: "/globals/moodsSection", section: "moods" },
+      { label: "Настроения", path: "/collections/moods", sub: true, section: "moods" },
+      { label: "Наши десерты", path: "/globals/catalog", section: "catalog" },
+      { label: "Товары", path: "/collections/products", sub: true, section: "catalog" },
+    ],
+  },
   { label: "Медиатека", items: [{ label: "Медиатека", path: "/collections/media" }] },
   {
     label: "Оформление",

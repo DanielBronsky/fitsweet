@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    products: Product;
+    moods: Mood;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +80,8 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    moods: MoodsSelect<false> | MoodsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -88,15 +92,21 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    layout: Layout;
     header: Header;
     hero: Hero;
+    moodsSection: MoodsSection;
+    catalog: Catalog;
     theme: Theme;
     typography: Typography;
     seo: Seo;
   };
   globalsSelect: {
+    layout: LayoutSelect<false> | LayoutSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     hero: HeroSelect<false> | HeroSelect<true>;
+    moodsSection: MoodsSectionSelect<false> | MoodsSectionSelect<true>;
+    catalog: CatalogSelect<false> | CatalogSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -195,6 +205,119 @@ export interface Media {
   };
 }
 /**
+ * Десерты: каталог, корзина, конструктор коробки и форма заказа берут товары отсюда. Порядок — перетаскиванием.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  _order?: string | null;
+  title?: string | null;
+  name: {
+    ru: string;
+    ro: string;
+  };
+  /**
+   * Если название длинное. Пусто — в карточке будет полное название.
+   */
+  shortName?: {
+    ru?: string | null;
+    ro?: string | null;
+  };
+  price: number;
+  weight: number;
+  kcal?: number | null;
+  protein?: number | null;
+  fat?: number | null;
+  carbs?: number | null;
+  ingredients?: {
+    ru?: string | null;
+    ro?: string | null;
+  };
+  /**
+   * Лучше на светлом однотонном фоне, товар по центру.
+   */
+  picture?: {
+    image?: (number | null) | Media;
+    crops?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    variants?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  /**
+   * Снимите, если товар временно закончился.
+   */
+  active?: boolean | null;
+  /**
+   * В каких подборках «Выбирайте по настроению» показывать.
+   */
+  moods?: (number | Mood)[] | null;
+  /**
+   * Латиницей, заполняется сам. Не меняйте у товаров, которые уже продаются — на нём держатся корзины покупателей.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Карточки блока «Выбирайте по настроению». Какие десерты в каком настроении — отмечается в самих товарах. Порядок — перетаскиванием.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moods".
+ */
+export interface Mood {
+  id: number;
+  _order?: string | null;
+  name?: string | null;
+  title: {
+    ru: string;
+    ro: string;
+  };
+  picture?: {
+    image?: (number | null) | Media;
+    crops?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    variants?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  active?: boolean | null;
+  /**
+   * Латиницей, заполняется сам.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -225,6 +348,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'moods';
+        value: number | Mood;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -332,6 +463,75 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  _order?: T;
+  title?: T;
+  name?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  shortName?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  price?: T;
+  weight?: T;
+  kcal?: T;
+  protein?: T;
+  fat?: T;
+  carbs?: T;
+  ingredients?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  picture?:
+    | T
+    | {
+        image?: T;
+        crops?: T;
+        variants?: T;
+      };
+  active?: T;
+  moods?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moods_select".
+ */
+export interface MoodsSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  title?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  picture?:
+    | T
+    | {
+        image?: T;
+        crops?: T;
+        variants?: T;
+      };
+  active?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -369,6 +569,24 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Перетаскивайте блоки за ⠿, чтобы поменять их порядок на странице. Шапка всегда сверху, подвал — снизу. Баннер лучше оставить первым: в нём главный заголовок страницы для Google.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "layout".
+ */
+export interface Layout {
+  id: number;
+  blocks?:
+    | {
+        block:
+          'hero' | 'moods' | 'catalog' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'finalCta';
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * Верхняя панель сайта: логотип, меню, переключатель языка, кнопка «Заказать» и корзина.
@@ -621,6 +839,127 @@ export interface Hero {
   createdAt?: string | null;
 }
 /**
+ * Оформление блока. Сами карточки — в «Настроения».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moodsSection".
+ */
+export interface MoodsSection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  cards?: {
+    background?: string | null;
+    activeBorder?: string | null;
+    titleColor?: string | null;
+    listColor?: string | null;
+    titleFont?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    titleWeight?: ('300' | '400' | '500' | '600' | '700') | null;
+    showList?: boolean | null;
+  };
+  more?: {
+    show?: boolean | null;
+    text?: {
+      ru: string;
+      ro: string;
+    };
+    background?: string | null;
+    color?: string | null;
+    border?: string | null;
+    font?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Оформление блока с карточками. Сами товары — в «Товары».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "catalog".
+ */
+export interface Catalog {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  cards: {
+    background?: string | null;
+    nameColor?: string | null;
+    infoColor?: string | null;
+    priceColor?: string | null;
+    /**
+     * Для фото товаров на белом фоне: белое становится цветом карточки, и карточка выглядит цельной. Выключите, если у фото цветной фон.
+     */
+    blendPhoto?: boolean | null;
+    nameFont?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    nameWeight?: ('300' | '400' | '500' | '600' | '700') | null;
+    addText: {
+      ru: string;
+      ro: string;
+    };
+    addedText: {
+      ru: string;
+      ro: string;
+    };
+    buttonColor?: string | null;
+    buttonActive?: string | null;
+  };
+  more?: {
+    show?: boolean | null;
+    /**
+     * Кнопка появляется сама: если товаров больше этого числа (раскрывает остальные) или если покупатель выбрал настроение (возвращает все десерты). Иначе её нет.
+     */
+    initialCount?: number | null;
+    text?: {
+      ru: string;
+      ro: string;
+    };
+    background?: string | null;
+    color?: string | null;
+    border?: string | null;
+    font?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Фирменные цвета сайта. В настройках разделов цвета выбираются из этого списка.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -732,6 +1071,21 @@ export interface Seo {
   };
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "layout_select".
+ */
+export interface LayoutSelect<T extends boolean = true> {
+  blocks?:
+    | T
+    | {
+        block?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -940,6 +1294,133 @@ export interface HeroSelect<T extends boolean = true> {
         color?: T;
         font?: T;
         weight?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moodsSection_select".
+ */
+export interface MoodsSectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+      };
+  cards?:
+    | T
+    | {
+        background?: T;
+        activeBorder?: T;
+        titleColor?: T;
+        listColor?: T;
+        titleFont?: T;
+        titleWeight?: T;
+        showList?: T;
+      };
+  more?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        background?: T;
+        color?: T;
+        border?: T;
+        font?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "catalog_select".
+ */
+export interface CatalogSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+      };
+  cards?:
+    | T
+    | {
+        background?: T;
+        nameColor?: T;
+        infoColor?: T;
+        priceColor?: T;
+        blendPhoto?: T;
+        nameFont?: T;
+        nameWeight?: T;
+        addText?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        addedText?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        buttonColor?: T;
+        buttonActive?: T;
+      };
+  more?:
+    | T
+    | {
+        show?: T;
+        initialCount?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        background?: T;
+        color?: T;
+        border?: T;
+        font?: T;
       };
   updatedAt?: T;
   createdAt?: T;

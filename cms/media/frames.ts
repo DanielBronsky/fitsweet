@@ -49,6 +49,26 @@ const mobile = (aspect: [number, number]): FrameSpec => ({
 
 export const framePresets = {
   hero: [desktop([6, 5]), mobile([1, 1])],
+  productCard: [
+    {
+      key: "card",
+      label: "Карточка",
+      hint: "Квадратное фото товара в каталоге, корзине и конструкторе коробки.",
+      aspect: [1, 1],
+      minWidth: 480,
+      output: { type: "responsive", widths: [240, 360, 480, 720] },
+    },
+  ],
+  moodCard: [
+    {
+      key: "card",
+      label: "Карточка",
+      hint: "Картинка в карточке настроения.",
+      aspect: [13, 11],
+      minWidth: 440,
+      output: { type: "responsive", widths: [300, 440, 660] },
+    },
+  ],
   og: [
     {
       key: "og",

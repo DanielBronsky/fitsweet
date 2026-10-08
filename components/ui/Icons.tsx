@@ -1,8 +1,8 @@
 type IconProps = { className?: string; style?: React.CSSProperties };
 
-export function Leaf({ className = "" }: IconProps) {
+export function Leaf({ className = "", style }: IconProps) {
   return (
-    <svg viewBox="0 0 32 32" aria-hidden className={className} fill="none">
+    <svg viewBox="0 0 32 32" aria-hidden className={className} style={style} fill="none">
       <path
         d="M16 29V11"
         stroke="currentColor"

@@ -1,13 +1,15 @@
 "use client";
 
 import { reviews } from "@/lib/reviews";
-import { productById, tileName } from "@/lib/products";
+import { tileName } from "@/lib/products";
+import { useProducts } from "@/lib/products-context";
 import { useI18n } from "@/lib/i18n/context";
 import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
 export function Reviews() {
   const { locale, dict } = useI18n();
+  const { byId: productById } = useProducts();
 
   return (
     <section id="reviews" className="bg-white py-14 sm:py-16 lg:py-20">
