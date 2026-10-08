@@ -37,7 +37,8 @@ function buildVariants(frames: FrameSpec[]): FieldHook {
     if (!buffer) return { ...current, variants: null };
 
     const { width, height } = await loadOriented(buffer, media.mimeType);
-    const imageReplaced = idOf(previous.image) !== mediaId && sameCrops(current.crops, previous.crops);
+    const fileChanged = Boolean(previous.variants?.source) && previous.variants?.source !== media.filename;
+    const imageReplaced = (idOf(previous.image) !== mediaId || fileChanged) && sameCrops(current.crops, previous.crops);
     const crops = normalizeCrops(imageReplaced ? null : current.crops, frames, width, height);
     const variants = await generateImageVariants({
       buffer,

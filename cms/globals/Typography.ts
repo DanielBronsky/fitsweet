@@ -6,7 +6,7 @@ export const Typography: GlobalConfig = {
   slug: "typography",
   label: "Шрифты",
   admin: {
-    group: "Оформление",
+    group: false,
     description:
       "Шрифты всего сайта. В настройках разделов у элементов можно выбрать другой шрифт или оставить «Как в оформлении».",
   },

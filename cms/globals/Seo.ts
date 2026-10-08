@@ -8,7 +8,7 @@ export const Seo: GlobalConfig = {
   slug: "seo",
   label: "SEO",
   admin: {
-    group: "Настройки",
+    group: false,
     description:
       "Как сайт выглядит в Google и в превью ссылок (Telegram, Facebook, Viber).",
   },

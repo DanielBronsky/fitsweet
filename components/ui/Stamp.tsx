@@ -1,6 +1,14 @@
-export function Stamp({ className = "" }: { className?: string }) {
+export function Stamp({
+  className = "",
+  text = "FIT & SWEET · GUILT-FREE ·",
+  style,
+}: {
+  className?: string;
+  text?: string;
+  style?: React.CSSProperties;
+}) {
   return (
-    <svg viewBox="0 0 160 160" aria-hidden className={className}>
+    <svg viewBox="0 0 160 160" aria-hidden className={className} style={style}>
       <defs>
         <path id="stamp-arc" d="M80 80 m-58 0 a58 58 0 1 1 116 0 a58 58 0 1 1 -116 0" fill="none" />
       </defs>
@@ -14,7 +22,7 @@ export function Stamp({ className = "" }: { className?: string }) {
         fill="currentColor"
       >
         <textPath href="#stamp-arc" startOffset="0%">
-          FIT &amp; SWEET · GUILT-FREE ·&#160;
+          {`${text}\u00a0`}
         </textPath>
       </text>
       <path

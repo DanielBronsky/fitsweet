@@ -5,6 +5,8 @@ import * as migration_20261005_190912_bilingual_fields from './20261005_190912_b
 import * as migration_20261005_191636_header from './20261005_191636_header';
 import * as migration_20261005_192825_fonts from './20261005_192825_fonts';
 import * as migration_20261005_194020_font_weights from './20261005_194020_font_weights';
+import * as migration_20261008_091014_hero from './20261008_091014_hero';
+import * as migration_20261008_092204_media_rotate from './20261008_092204_media_rotate';
 
 export const migrations = [
   {
@@ -40,6 +42,16 @@ export const migrations = [
   {
     up: migration_20261005_194020_font_weights.up,
     down: migration_20261005_194020_font_weights.down,
-    name: '20261005_194020_font_weights'
+    name: '20261005_194020_font_weights',
+  },
+  {
+    up: migration_20261008_091014_hero.up,
+    down: migration_20261008_091014_hero.down,
+    name: '20261008_091014_hero',
+  },
+  {
+    up: migration_20261008_092204_media_rotate.up,
+    down: migration_20261008_092204_media_rotate.down,
+    name: '20261008_092204_media_rotate'
   },
 ];

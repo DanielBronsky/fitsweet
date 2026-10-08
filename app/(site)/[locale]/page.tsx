@@ -1,5 +1,6 @@
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
+import { getHeroData } from "@/lib/hero";
 import { Catalog } from "@/components/sections/Catalog";
 import { Moods } from "@/components/sections/Moods";
 import { WhereToBuy } from "@/components/sections/WhereToBuy";
@@ -50,7 +51,7 @@ export default async function Home({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Hero />
+      <Hero data={await getHeroData(l)} />
       <Catalog />
       <Moods />
       <WhereToBuy />

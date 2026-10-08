@@ -6,7 +6,7 @@ export const Theme: GlobalConfig = {
   slug: "theme",
   label: "Палитра",
   admin: {
-    group: "Оформление",
+    group: false,
     description:
       "Фирменные цвета сайта. В настройках разделов цвета выбираются из этого списка.",
   },

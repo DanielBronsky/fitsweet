@@ -89,12 +89,14 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     header: Header;
+    hero: Hero;
     theme: Theme;
     typography: Typography;
     seo: Seo;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
+    hero: HeroSelect<false> | HeroSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -162,6 +164,7 @@ export interface User {
  */
 export interface Media {
   id: number;
+  rotate?: number | null;
   /**
    * Что изображено — для Google и незрячих посетителей. Например: «Шоколадные ПП-батончики FitSweet с орехами».
    */
@@ -294,6 +297,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  rotate?: T;
   alt?:
     | T
     | {
@@ -424,6 +428,9 @@ export interface Header {
             ru: string;
             ro: string;
           };
+          /**
+           * К какому блоку страницы прокрутить при нажатии.
+           */
           target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
           url?: string | null;
           newTab?: boolean | null;
@@ -448,6 +455,9 @@ export interface Header {
       ru: string;
       ro: string;
     };
+    /**
+     * К какому блоку страницы прокрутить при нажатии.
+     */
     target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
     url?: string | null;
     newTab?: boolean | null;
@@ -463,6 +473,149 @@ export interface Header {
     show?: boolean | null;
     color?: string | null;
     badge?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Первый экран: большой заголовок, подзаголовок, кнопки, картинка и строка преимуществ.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero".
+ */
+export interface Hero {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading?: {
+    /**
+     * Каждая строка — с новой строки на сайте и может быть своего цвета.
+     */
+    lines?:
+      | {
+          text: {
+            ru: string;
+            ro: string;
+          };
+          color?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    /**
+     * Если строка не помещается в ширину, сайт сам немного уменьшит заголовок.
+     */
+    size?: ('70' | '85' | '100' | '115' | '130') | null;
+  };
+  subtitle?: {
+    show?: boolean | null;
+    text?: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  buttons?: {
+    items?:
+      | {
+          text: {
+            ru: string;
+            ro: string;
+          };
+          /**
+           * К какому блоку страницы прокрутить при нажатии.
+           */
+          target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
+          url?: string | null;
+          newTab?: boolean | null;
+          background?: string | null;
+          color?: string | null;
+          border?: string | null;
+          font?: string | null;
+          /**
+           * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+           */
+          weight?: ('300' | '400' | '500' | '600' | '700') | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  media?: {
+    show?: boolean | null;
+    /**
+     * Справа от текста на компьютере, под текстом на телефоне. Это самая заметная картинка сайта.
+     */
+    picture?: {
+      image?: (number | null) | Media;
+      crops?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+      variants?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+    };
+    background?: string | null;
+    stampShow?: boolean | null;
+    stampText?: string | null;
+    stampColor?: string | null;
+  };
+  features?: {
+    show?: boolean | null;
+    items?:
+      | {
+          text: {
+            ru: string;
+            ro: string;
+          };
+          icon: string;
+          /**
+           * SVG или PNG с прозрачным фоном, примерно квадратная.
+           */
+          iconImage?: {
+            image?: (number | null) | Media;
+            variants?:
+              | {
+                  [k: string]: unknown;
+                }
+              | unknown[]
+              | string
+              | number
+              | boolean
+              | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    iconColor?: string | null;
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -673,6 +826,120 @@ export interface HeaderSelect<T extends boolean = true> {
         show?: T;
         color?: T;
         badge?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero_select".
+ */
+export interface HeroSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        lines?:
+          | T
+          | {
+              text?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              color?: T;
+              id?: T;
+            };
+        font?: T;
+        weight?: T;
+        size?: T;
+      };
+  subtitle?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        font?: T;
+        weight?: T;
+      };
+  buttons?:
+    | T
+    | {
+        items?:
+          | T
+          | {
+              text?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              target?: T;
+              url?: T;
+              newTab?: T;
+              background?: T;
+              color?: T;
+              border?: T;
+              font?: T;
+              weight?: T;
+              id?: T;
+            };
+      };
+  media?:
+    | T
+    | {
+        show?: T;
+        picture?:
+          | T
+          | {
+              image?: T;
+              crops?: T;
+              variants?: T;
+            };
+        background?: T;
+        stampShow?: T;
+        stampText?: T;
+        stampColor?: T;
+      };
+  features?:
+    | T
+    | {
+        show?: T;
+        items?:
+          | T
+          | {
+              text?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              icon?: T;
+              iconImage?:
+                | T
+                | {
+                    image?: T;
+                    variants?: T;
+                  };
+              id?: T;
+            };
+        iconColor?: T;
+        color?: T;
+        font?: T;
+        weight?: T;
       };
   updatedAt?: T;
   createdAt?: T;

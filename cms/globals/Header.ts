@@ -5,28 +5,13 @@ import { colorField } from "../fields/color";
 import { fontField, weightField } from "../fields/font";
 import { logoField } from "../fields/image";
 import { linkFields } from "../fields/link";
-
-const show = (label = "Показывать"): Field => ({
-  name: "show",
-  type: "checkbox",
-  label,
-  defaultValue: true,
-});
-
-const whenShown = (field: Field): Field =>
-  ({
-    ...field,
-    admin: {
-      ...("admin" in field ? field.admin : {}),
-      condition: (_: unknown, sibling: { show?: boolean }) => sibling?.show !== false,
-    },
-  }) as Field;
+import { show, whenShown } from "../fields/visibility";
 
 export const Header: GlobalConfig = {
   slug: "header",
   label: "Шапка",
   admin: {
-    group: "Разделы сайта",
+    group: "Шапка сайта · Header",
     description: "Верхняя панель сайта: логотип, меню, переключатель языка, кнопка «Заказать» и корзина.",
   },
   access: {

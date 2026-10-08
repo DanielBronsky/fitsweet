@@ -11,6 +11,7 @@ import { Media } from "./cms/collections/Media";
 import { Theme } from "./cms/globals/Theme";
 import { Seo } from "./cms/globals/Seo";
 import { Header } from "./cms/globals/Header";
+import { Hero } from "./cms/globals/Hero";
 import { Typography } from "./cms/globals/Typography";
 import { ruOverrides } from "./cms/i18n-ru";
 
@@ -20,6 +21,10 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     importMap: { baseDir: dirname },
+    components: {
+      afterNavLinks: ["/cms/admin/NavExtra#NavExtra"],
+      afterDashboard: ["/cms/admin/DashboardExtra#DashboardExtra"],
+    },
     meta: {
       titleSuffix: " — FitSweet",
       robots: "noindex, nofollow",
@@ -31,7 +36,7 @@ export default buildConfig({
     translations: { ru: ruOverrides },
   },
   collections: [Users, Media],
-  globals: [Header, Theme, Typography, Seo],
+  globals: [Header, Hero, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

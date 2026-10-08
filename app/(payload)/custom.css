@@ -15,3 +15,85 @@
   padding-left: 12px;
   border-left: 1px solid var(--theme-elevation-150);
 }
+
+.fs-dash {
+  padding: 0 6px;
+}
+
+.fs-dash__group {
+  margin-top: 16px;
+}
+
+.fs-dash__label {
+  margin: 0 0 16px;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.fs-dash__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fs-dash__cards > li {
+  margin: 0;
+}
+
+.confirmation-modal__wrapper {
+  align-items: center;
+  text-align: center;
+}
+
+.confirmation-modal__content {
+  align-items: center;
+}
+
+.confirmation-modal__controls {
+  justify-content: center;
+}
+
+.confirmation-modal__controls .btn {
+  min-width: 140px;
+}
+
+.list-selection {
+  padding: 6px 6px 6px 16px;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 999px;
+  background: var(--theme-elevation-50);
+  color: var(--theme-elevation-800);
+  font-weight: 500;
+}
+
+.list-selection__actions {
+  align-items: center;
+}
+
+.list-selection__button {
+  padding: 6px 14px;
+  border: 1px solid var(--theme-elevation-250);
+  border-radius: 999px;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-1000);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.list-selection__button:hover {
+  background: var(--theme-elevation-100);
+}
+
+.list-selection__button.delete-documents__toggle {
+  border-color: var(--theme-error-500);
+  background: var(--theme-error-500);
+  color: #fff;
+}
+
+.list-selection__button.delete-documents__toggle:hover {
+  filter: brightness(0.9);
+}

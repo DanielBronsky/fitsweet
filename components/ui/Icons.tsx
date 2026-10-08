@@ -1,4 +1,4 @@
-type IconProps = { className?: string };
+type IconProps = { className?: string; style?: React.CSSProperties };
 
 export function Leaf({ className = "" }: IconProps) {
   return (
@@ -99,7 +99,7 @@ export function ArrowIcon({ className = "" }: IconProps) {
   );
 }
 
-export function FeatureIcon({ name, className = "" }: IconProps & { name: string }) {
+export function FeatureIcon({ name, className = "", style }: IconProps & { name: string }) {
   const common = { stroke: "currentColor", strokeWidth: 1.5, fill: "none" } as const;
   const art: Record<string, React.ReactNode> = {
     "no-sugar": (
@@ -125,7 +125,7 @@ export function FeatureIcon({ name, className = "" }: IconProps & { name: string
     ),
   };
   return (
-    <svg viewBox="0 0 24 24" aria-hidden className={className}>
+    <svg viewBox="0 0 24 24" aria-hidden className={className} style={style}>
       {art[name] ?? art.tasty}
     </svg>
   );

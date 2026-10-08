@@ -48,7 +48,7 @@ const mobile = (aspect: [number, number]): FrameSpec => ({
 });
 
 export const framePresets = {
-  hero: [desktop([6, 5]), mobile([4, 5])],
+  hero: [desktop([6, 5]), mobile([1, 1])],
   og: [
     {
       key: "og",

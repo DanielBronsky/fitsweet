@@ -1,66 +1,114 @@
-"use client";
-
-import Image from "next/image";
-import { featureKeys } from "@/lib/site";
-import { useI18n } from "@/lib/i18n/context";
+import type { CSSProperties } from "react";
+import type { HeroData } from "@/lib/hero";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { FeatureIcon } from "@/components/ui/Icons";
+import { SiteIcon } from "@/components/ui/SiteIcon";
+import { ResponsivePicture } from "@/components/ui/ResponsivePicture";
 import { Stamp } from "@/components/ui/Stamp";
+import { HeroHeading } from "./HeroHeading";
 
-export function Hero() {
-  const { dict } = useI18n();
+export function Hero({ data }: { data: HeroData | null }) {
+  if (!data) return null;
+  const { heading, subtitle, buttons, media, features } = data;
 
   return (
-    <section className="bg-cream pb-4 pt-8 lg:pb-10 lg:pt-14">
+    <section style={{ background: data.background }} className="pb-4 pt-8 lg:pb-10 lg:pt-14">
       <Container>
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] lg:gap-10 xl:gap-12">
-          <div className="animate-fade-up">
-            <h1 className="heading-caps text-[32px] leading-[1.1] sm:text-[42px] lg:text-[46px] xl:text-[50px]">
-              <span className="block text-green-900">{dict.hero.line1}</span>
-              <span className="block text-green-500 sm:whitespace-nowrap">{dict.hero.line2}</span>
-              <span className="block text-green-500 sm:whitespace-nowrap">{dict.hero.line3}</span>
-            </h1>
+        <div
+          className={`grid items-center gap-10 lg:gap-10 xl:gap-12 ${
+            media ? "lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)]" : ""
+          }`}
+        >
+          <div className="min-w-0 animate-fade-up">
+            {heading.lines.length > 0 && <HeroHeading heading={heading} />}
 
-            <p className="mt-6 max-w-[440px] text-[15px] leading-relaxed text-muted sm:text-base">
-              {dict.hero.subtitle}
-            </p>
+            {subtitle && (
+              <p
+                style={{ color: subtitle.color, fontFamily: subtitle.font, fontWeight: subtitle.weight }}
+                className="mt-6 max-w-[440px] text-[15px] leading-relaxed sm:text-base"
+              >
+                {subtitle.text}
+              </p>
+            )}
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button as="a" href="#catalog" size="lg">
-                {dict.hero.ctaPrimary}
-              </Button>
-              <Button as="a" href="#order" variant="outline" size="lg">
-                {dict.hero.ctaSecondary}
-              </Button>
-            </div>
+            {buttons.length > 0 && (
+              <div className="mt-8 flex flex-wrap gap-3">
+                {buttons.map((b, i) => (
+                  <a
+                    key={i}
+                    href={b.href}
+                    {...(b.newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    style={
+                      {
+                        background: b.background,
+                        color: b.color,
+                        borderColor: b.border ?? "transparent",
+                        fontFamily: b.font,
+                        fontWeight: b.weight ?? 500,
+                      } as CSSProperties
+                    }
+                    className="inline-flex h-12 items-center justify-center rounded-full border px-7 text-[14px] transition-[filter] duration-200 hover:brightness-95"
+                  >
+                    {b.text}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="relative">
-            <div className="relative aspect-[6/5] w-full overflow-hidden rounded-card bg-sage">
-              <Image
-                src="/images/hero/bars.svg"
-                alt={dict.hero.imageAlt}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 640px"
-                className="object-cover"
-              />
+          {media && (
+            <div className="relative">
+              <div
+                style={{ background: media.background }}
+                className="relative aspect-square w-full overflow-hidden rounded-card lg:aspect-[6/5]"
+              >
+                {media.picture ? (
+                  <ResponsivePicture
+                    data={media.picture}
+                    priority
+                    sizesDesktop="(max-width: 1279px) 46vw, 600px"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  media.staticSrc && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={media.staticSrc} alt="" className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
+                  )
+                )}
+              </div>
+              {media.stamp && (
+                <Stamp
+                  text={media.stamp.text}
+                  style={{ color: media.stamp.color }}
+                  className="absolute right-4 top-4 w-[74px] opacity-85 sm:right-6 sm:top-5 sm:w-[88px] lg:w-[100px]"
+                />
+              )}
             </div>
-            <Stamp className="absolute right-4 top-4 w-[74px] text-green-700/85 sm:right-6 sm:top-5 sm:w-[88px] lg:w-[100px]" />
-          </div>
+          )}
         </div>
 
-        <ul className="mt-9 grid max-w-[460px] grid-cols-4 gap-x-4 lg:mt-10">
-          {featureKeys.map((key) => (
-            <li key={key} className="flex flex-col items-center gap-2 text-center">
-              <FeatureIcon name={key} className="w-[32px] text-green-700" />
-              <span className="text-[11px] leading-tight text-green-900/80">
-                {dict.hero.features[key]}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {features && features.items.length > 0 && (
+          <ul
+            style={{ gridTemplateColumns: `repeat(${features.items.length}, minmax(0, 1fr))` }}
+            className={`mt-9 grid gap-x-4 lg:mt-10 ${features.items.length > 4 ? "max-w-[640px]" : "max-w-[460px]"}`}
+          >
+            {features.items.map((f, i) => (
+              <li key={i} className="flex flex-col items-center gap-2 text-center">
+                {f.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={f.image.src} srcSet={f.image.srcSet} width={f.image.width} height={f.image.height} alt="" className="h-8 w-auto" />
+                ) : (
+                  <SiteIcon name={f.icon} className="h-8 w-8" style={{ color: features.iconColor }} />
+                )}
+                <span
+                  style={{ color: features.color, fontFamily: features.font, fontWeight: features.weight }}
+                  className="text-[11px] leading-tight opacity-80"
+                >
+                  {f.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </Container>
     </section>
   );

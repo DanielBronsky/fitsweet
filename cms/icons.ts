@@ -1,0 +1,105 @@
+export const iconGroups = {
+  brand: "Из макета",
+  free: "Без …",
+  food: "Еда и ингредиенты",
+  health: "Польза и спорт",
+  quality: "Качество",
+  service: "Доставка и заказ",
+} as const;
+
+type IconDef = { key: string; label: string; group: keyof typeof iconGroups; lucide?: string };
+
+const l = (lucide: string, label: string, group: IconDef["group"]): IconDef => ({ key: `lucide:${lucide}`, label, group, lucide });
+
+export const iconList: IconDef[] = [
+  { key: "no-sugar", label: "Без сахара", group: "brand" },
+  { key: "no-lactose", label: "Без лактозы", group: "brand" },
+  { key: "no-gluten", label: "Без глютена", group: "brand" },
+  { key: "tasty", label: "Сердце", group: "brand" },
+
+  l("CandyOff", "Без сахара, без конфет", "free"),
+  l("MilkOff", "Без молока, без лактозы", "free"),
+  l("WheatOff", "Без глютена, без пшеницы", "free"),
+  l("EggOff", "Без яиц", "free"),
+  l("NutOff", "Без орехов", "free"),
+  l("BeanOff", "Без бобовых, без сои", "free"),
+  l("Ban", "Запрет, без добавок", "free"),
+
+  l("Candy", "Конфета, сладкое", "food"),
+  l("Lollipop", "Леденец", "food"),
+  l("Cookie", "Печенье", "food"),
+  l("Cake", "Торт", "food"),
+  l("CakeSlice", "Кусок торта", "food"),
+  l("Dessert", "Десерт", "food"),
+  l("Donut", "Пончик", "food"),
+  l("Croissant", "Круассан, выпечка", "food"),
+  l("IceCreamCone", "Мороженое", "food"),
+  l("Popsicle", "Эскимо", "food"),
+  l("Nut", "Орехи", "food"),
+  l("Bean", "Бобы, какао", "food"),
+  l("Apple", "Яблоко, фрукты", "food"),
+  l("Cherry", "Вишня, ягоды", "food"),
+  l("Citrus", "Цитрус, апельсин", "food"),
+  l("Grape", "Виноград", "food"),
+  l("Banana", "Банан", "food"),
+  l("Carrot", "Морковь, овощи", "food"),
+  l("Milk", "Молоко", "food"),
+  l("Wheat", "Пшеница, злаки", "food"),
+  l("Egg", "Яйцо", "food"),
+  l("Coffee", "Кофе", "food"),
+  l("CupSoda", "Напиток", "food"),
+  l("Salad", "Салат, здоровая еда", "food"),
+  l("Utensils", "Приборы, еда", "food"),
+  l("ChefHat", "Повар, своё производство", "food"),
+
+  l("Heart", "Сердце, любовь", "health"),
+  l("HeartPulse", "Здоровье, пульс", "health"),
+  l("Leaf", "Лист, натуральное", "health"),
+  l("Sprout", "Росток, растительное", "health"),
+  l("Vegan", "Веган", "health"),
+  l("Flower2", "Цветок", "health"),
+  l("TreeDeciduous", "Дерево, природа", "health"),
+  l("Droplet", "Капля, вода", "health"),
+  l("Sun", "Солнце, энергия", "health"),
+  l("Zap", "Энергия, заряд", "health"),
+  l("Flame", "Калории, огонь", "health"),
+  l("Dumbbell", "Спорт, фитнес", "health"),
+  l("Activity", "Активность", "health"),
+  l("Bike", "Велосипед, спорт", "health"),
+  l("Weight", "Вес, гиря", "health"),
+  l("Scale", "Весы, баланс", "health"),
+  l("Baby", "Детям", "health"),
+
+  l("Sparkles", "Блеск, новинка", "quality"),
+  l("Star", "Звезда, лучшее", "quality"),
+  l("Award", "Награда", "quality"),
+  l("Medal", "Медаль", "quality"),
+  l("Crown", "Корона, премиум", "quality"),
+  l("Gem", "Драгоценность", "quality"),
+  l("BadgeCheck", "Знак качества", "quality"),
+  l("ShieldCheck", "Безопасно, проверено", "quality"),
+  l("CircleCheck", "Галочка, есть", "quality"),
+  l("ThumbsUp", "Нравится", "quality"),
+  l("HandHeart", "С заботой", "quality"),
+  l("FlaskConical", "Лаборатория, состав", "quality"),
+  l("Recycle", "Эко-упаковка", "quality"),
+  l("Percent", "Скидка, процент", "quality"),
+
+  l("Truck", "Доставка", "service"),
+  l("Package", "Коробка, посылка", "service"),
+  l("Gift", "Подарок", "service"),
+  l("ShoppingBag", "Покупка, пакет", "service"),
+  l("ShoppingCart", "Корзина", "service"),
+  l("Store", "Магазин", "service"),
+  l("MapPin", "Адрес, точка", "service"),
+  l("Clock", "Время, часы работы", "service"),
+  l("Timer", "Быстро, таймер", "service"),
+  l("Snowflake", "Холод, свежесть", "service"),
+  l("Users", "Для всех, компания", "service"),
+];
+
+const byKey = new Map(iconList.map((i) => [i.key, i]));
+
+export const isIconKey = (value: unknown): boolean => typeof value === "string" && (byKey.has(value) || value === "custom");
+
+export const iconDef = (key: string | null | undefined) => (key ? byKey.get(key) : undefined);
