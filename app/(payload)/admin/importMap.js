@@ -1,5 +1,6 @@
 import { RotateField as RotateField_091ad28ab8303cb2a45f187a47793981 } from '../../../cms/admin/RotateField'
 import { CropperField as CropperField_56337aa458177bf913755c1654138ca6 } from '../../../cms/admin/CropperField'
+import { MapPickerField as MapPickerField_e8677b9dc69153c8f17b3cd3b19a1d86 } from '../../../cms/admin/MapPickerField'
 import { SectionRowLabel as SectionRowLabel_130c940f5978bc93c5a6785473a67515 } from '../../../cms/admin/SectionRowLabel'
 import { PaletteColorField as PaletteColorField_2003b869025eda812233585f4fea684f } from '../../../cms/admin/PaletteColorField'
 import { FontField as FontField_dab38d0e1200deb05fdf56e293f5e270 } from '../../../cms/admin/FontField'
@@ -20,6 +21,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 export const importMap = {
   "/cms/admin/RotateField#RotateField": RotateField_091ad28ab8303cb2a45f187a47793981,
   "/cms/admin/CropperField#CropperField": CropperField_56337aa458177bf913755c1654138ca6,
+  "/cms/admin/MapPickerField#MapPickerField": MapPickerField_e8677b9dc69153c8f17b3cd3b19a1d86,
   "/cms/admin/SectionRowLabel#SectionRowLabel": SectionRowLabel_130c940f5978bc93c5a6785473a67515,
   "/cms/admin/PaletteColorField#PaletteColorField": PaletteColorField_2003b869025eda812233585f4fea684f,
   "/cms/admin/FontField#FontField": FontField_dab38d0e1200deb05fdf56e293f5e270,

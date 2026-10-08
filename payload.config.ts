@@ -10,6 +10,8 @@ import { Users } from "./cms/collections/Users";
 import { Media } from "./cms/collections/Media";
 import { Products } from "./cms/collections/Products";
 import { Moods } from "./cms/collections/Moods";
+import { SalePoints } from "./cms/collections/SalePoints";
+import { PointCategories } from "./cms/collections/PointCategories";
 import { Theme } from "./cms/globals/Theme";
 import { Seo } from "./cms/globals/Seo";
 import { Header } from "./cms/globals/Header";
@@ -17,6 +19,7 @@ import { Hero } from "./cms/globals/Hero";
 import { Catalog } from "./cms/globals/Catalog";
 import { Layout } from "./cms/globals/Layout";
 import { MoodsSection } from "./cms/globals/MoodsSection";
+import { WhereSection } from "./cms/globals/WhereSection";
 import { Typography } from "./cms/globals/Typography";
 import { ruOverrides } from "./cms/i18n-ru";
 
@@ -46,8 +49,8 @@ export default buildConfig({
     fallbackLanguage: "ru",
     translations: { ru: ruOverrides },
   },
-  collections: [Users, Media, Products, Moods],
-  globals: [Layout, Header, Hero, MoodsSection, Catalog, Theme, Typography, Seo],
+  collections: [Users, Media, Products, Moods, SalePoints, PointCategories],
+  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

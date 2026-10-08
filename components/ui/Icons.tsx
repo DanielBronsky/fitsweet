@@ -60,9 +60,9 @@ export function GlobeIcon({ className = "" }: IconProps) {
   );
 }
 
-export function PinIcon({ className = "" }: IconProps) {
+export function PinIcon({ className = "", style }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden className={className} fill="none">
+    <svg viewBox="0 0 24 24" aria-hidden className={className} style={style} fill="none">
       <path
         d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"
         stroke="currentColor"

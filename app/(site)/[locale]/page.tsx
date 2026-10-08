@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import { getSectionOrder } from "@/lib/layout";
+import { getWhereData } from "@/lib/where";
 import type { SectionKey } from "@/cms/sections";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
@@ -54,7 +55,7 @@ export default async function Home({
     hero: <Hero data={await getHeroData(l)} />,
     catalog: <Catalog data={await getCatalogData(l)} />,
     moods: <Moods data={await getMoodsData(l)} />,
-    where: <WhereToBuy />,
+    where: <WhereToBuy data={await getWhereData(l)} />,
     delivery: <Delivery />,
     box: <BoxBuilder />,
     reviews: <Reviews />,

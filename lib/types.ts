@@ -26,7 +26,7 @@ export type Product = {
 
 export type ProductThumb = { src: string; srcSet: string; width: number; height: number };
 
-export type LocationCategory = "cafe" | "gym" | "shop" | "gas";
+export type LocationCategory = string;
 
 export type SalePoint = {
   id: string;

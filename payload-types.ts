@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     products: Product;
     moods: Mood;
+    salePoints: SalePoint;
+    pointCategories: PointCategory;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +84,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     moods: MoodsSelect<false> | MoodsSelect<true>;
+    salePoints: SalePointsSelect<false> | SalePointsSelect<true>;
+    pointCategories: PointCategoriesSelect<false> | PointCategoriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -97,6 +101,7 @@ export interface Config {
     hero: Hero;
     moodsSection: MoodsSection;
     catalog: Catalog;
+    whereSection: WhereSection;
     theme: Theme;
     typography: Typography;
     seo: Seo;
@@ -107,6 +112,7 @@ export interface Config {
     hero: HeroSelect<false> | HeroSelect<true>;
     moodsSection: MoodsSectionSelect<false> | MoodsSectionSelect<true>;
     catalog: CatalogSelect<false> | CatalogSelect<true>;
+    whereSection: WhereSectionSelect<false> | WhereSectionSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -318,6 +324,50 @@ export interface Mood {
   createdAt: string;
 }
 /**
+ * Кафе, магазины и клубы, где продаётся FitSweet. Порядок в списке на сайте — перетаскиванием.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "salePoints".
+ */
+export interface SalePoint {
+  id: number;
+  _order?: string | null;
+  name: string;
+  address: {
+    ru: string;
+    ro: string;
+  };
+  allDay?: boolean | null;
+  hours?: string | null;
+  lat: number;
+  lng: number;
+  category: number | PointCategory;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Фильтры над списком точек: «Кафе», «Фитнес-клубы»… Порядок — перетаскиванием.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pointCategories".
+ */
+export interface PointCategory {
+  id: number;
+  _order?: string | null;
+  name?: string | null;
+  title: {
+    ru: string;
+    ro: string;
+  };
+  /**
+   * Латиницей, заполняется сам.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -356,6 +406,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'moods';
         value: number | Mood;
+      } | null)
+    | ({
+        relationTo: 'salePoints';
+        value: number | SalePoint;
+      } | null)
+    | ({
+        relationTo: 'pointCategories';
+        value: number | PointCategory;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -526,6 +584,45 @@ export interface MoodsSelect<T extends boolean = true> {
         variants?: T;
       };
   active?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "salePoints_select".
+ */
+export interface SalePointsSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  address?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  allDay?: T;
+  hours?: T;
+  lat?: T;
+  lng?: T;
+  category?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pointCategories_select".
+ */
+export interface PointCategoriesSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  title?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -955,6 +1052,84 @@ export interface Catalog {
     color?: string | null;
     border?: string | null;
     font?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Оформление блока. Сами точки — в «Точки продаж», фильтры — в «Категории точек».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whereSection".
+ */
+export interface WhereSection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    subtitle?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    subtitleColor?: string | null;
+  };
+  list: {
+    allLabel: {
+      ru: string;
+      ro: string;
+    };
+    chipActive?: string | null;
+    chipBorder?: string | null;
+    cardBackground?: string | null;
+    cardActive?: string | null;
+    nameColor?: string | null;
+    infoColor?: string | null;
+    pinColor?: string | null;
+    nameFont?: string | null;
+    allDay: {
+      ru: string;
+      ro: string;
+    };
+    empty?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+  };
+  more: {
+    /**
+     * Если точек больше — появится кнопка «Показать все».
+     */
+    initialCount?: number | null;
+    /**
+     * {n} заменится на число точек.
+     */
+    showAll: {
+      ru: string;
+      ro: string;
+    };
+    collapse: {
+      ru: string;
+      ro: string;
+    };
+    background?: string | null;
+    color?: string | null;
+  };
+  map?: {
+    show?: boolean | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1421,6 +1596,97 @@ export interface CatalogSelect<T extends boolean = true> {
         color?: T;
         border?: T;
         font?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whereSection_select".
+ */
+export interface WhereSectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+        subtitle?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        subtitleColor?: T;
+      };
+  list?:
+    | T
+    | {
+        allLabel?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        chipActive?: T;
+        chipBorder?: T;
+        cardBackground?: T;
+        cardActive?: T;
+        nameColor?: T;
+        infoColor?: T;
+        pinColor?: T;
+        nameFont?: T;
+        allDay?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        empty?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+      };
+  more?:
+    | T
+    | {
+        initialCount?: T;
+        showAll?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        collapse?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        background?: T;
+        color?: T;
+      };
+  map?:
+    | T
+    | {
+        show?: T;
       };
   updatedAt?: T;
   createdAt?: T;

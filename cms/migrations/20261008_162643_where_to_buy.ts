@@ -1,0 +1,271 @@
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
+
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  await db.run(sql`CREATE TABLE \`sale_points\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`_order\` text,
+  	\`name\` text NOT NULL,
+  	\`address_ru\` text NOT NULL,
+  	\`address_ro\` text NOT NULL,
+  	\`all_day\` integer DEFAULT false,
+  	\`hours\` text,
+  	\`lat\` numeric NOT NULL,
+  	\`lng\` numeric NOT NULL,
+  	\`category_id\` integer NOT NULL,
+  	\`active\` integer DEFAULT true,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	FOREIGN KEY (\`category_id\`) REFERENCES \`point_categories\`(\`id\`) ON UPDATE no action ON DELETE set null
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`sale_points__order_idx\` ON \`sale_points\` (\`_order\`);`)
+  await db.run(sql`CREATE INDEX \`sale_points_category_idx\` ON \`sale_points\` (\`category_id\`);`)
+  await db.run(sql`CREATE INDEX \`sale_points_updated_at_idx\` ON \`sale_points\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`sale_points_created_at_idx\` ON \`sale_points\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`point_categories\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`_order\` text,
+  	\`name\` text,
+  	\`title_ru\` text NOT NULL,
+  	\`title_ro\` text NOT NULL,
+  	\`slug\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`point_categories__order_idx\` ON \`point_categories\` (\`_order\`);`)
+  await db.run(sql`CREATE UNIQUE INDEX \`point_categories_slug_idx\` ON \`point_categories\` (\`slug\`);`)
+  await db.run(sql`CREATE INDEX \`point_categories_updated_at_idx\` ON \`point_categories\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`point_categories_created_at_idx\` ON \`point_categories\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`where_section\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`section_show\` integer DEFAULT true,
+  	\`section_background\` text DEFAULT 'beige',
+  	\`heading_text_ru\` text NOT NULL,
+  	\`heading_text_ro\` text NOT NULL,
+  	\`heading_color\` text DEFAULT 'green-900',
+  	\`heading_leaf_color\` text DEFAULT 'green-500',
+  	\`heading_leaf\` integer DEFAULT true,
+  	\`heading_font\` text,
+  	\`heading_weight\` text,
+  	\`heading_subtitle_ru\` text,
+  	\`heading_subtitle_ro\` text,
+  	\`heading_subtitle_color\` text DEFAULT 'muted',
+  	\`list_all_label_ru\` text NOT NULL,
+  	\`list_all_label_ro\` text NOT NULL,
+  	\`list_chip_active\` text DEFAULT 'green-700',
+  	\`list_chip_border\` text DEFAULT 'green-200',
+  	\`list_card_background\` text DEFAULT 'white',
+  	\`list_card_active\` text DEFAULT 'green-700',
+  	\`list_name_color\` text DEFAULT 'green-900',
+  	\`list_info_color\` text DEFAULT 'muted',
+  	\`list_pin_color\` text DEFAULT 'green-700',
+  	\`list_name_font\` text,
+  	\`list_all_day_ru\` text NOT NULL,
+  	\`list_all_day_ro\` text NOT NULL,
+  	\`list_empty_ru\` text,
+  	\`list_empty_ro\` text,
+  	\`more_initial_count\` numeric DEFAULT 4,
+  	\`more_show_all_ru\` text NOT NULL,
+  	\`more_show_all_ro\` text NOT NULL,
+  	\`more_collapse_ru\` text NOT NULL,
+  	\`more_collapse_ro\` text NOT NULL,
+  	\`more_background\` text DEFAULT 'green-700',
+  	\`more_color\` text DEFAULT 'cream',
+  	\`map_show\` integer DEFAULT true,
+  	\`updated_at\` text,
+  	\`created_at\` text
+  );
+  `)
+  await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`sale_points_id\` integer REFERENCES sale_points(id);`)
+  await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`point_categories_id\` integer REFERENCES point_categories(id);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_sale_points_id_idx\` ON \`payload_locked_documents_rels\` (\`sale_points_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_point_categories_id_idx\` ON \`payload_locked_documents_rels\` (\`point_categories_id\`);`)
+
+  const categories = [
+    { slug: "cafe", title: { ru: "Кафе", ro: "Cafenele" } },
+    { slug: "gym", title: { ru: "Фитнес-клубы", ro: "Cluburi fitness" } },
+    { slug: "shop", title: { ru: "Магазины", ro: "Magazine" } },
+    { slug: "gas", title: { ru: "Заправки", ro: "Benzinării" } },
+  ]
+  const catIds: Record<string, number> = {}
+  for (const c of categories) {
+    const doc = await payload.create({ collection: "pointCategories", req, data: c as never })
+    catIds[c.slug] = doc.id
+  }
+
+  const points = [
+    {
+      "name": "Balance Café",
+      "address": {
+        "ru": "ул. Пушкина, 25",
+        "ro": "str. Pușkin, 25"
+      },
+      "hours": "08:00 — 21:00",
+      "category": "cafe",
+      "lat": 47.0245,
+      "lng": 28.8322
+    },
+    {
+      "name": "Sport Life",
+      "address": {
+        "ru": "ул. Пушкина, 25",
+        "ro": "str. Pușkin, 25"
+      },
+      "hours": "08:00 — 21:00",
+      "category": "gym",
+      "lat": 47.0281,
+      "lng": 28.8401
+    },
+    {
+      "name": "Green Hills Market",
+      "address": {
+        "ru": "ул. Дачибева, 99",
+        "ro": "str. Dacia, 99"
+      },
+      "hours": "08:00 — 22:00",
+      "category": "shop",
+      "lat": 47.0196,
+      "lng": 28.8265
+    },
+    {
+      "name": "Rompetrol",
+      "address": {
+        "ru": "ул. Московская, 14/1",
+        "ro": "bd. Moscova, 14/1"
+      },
+      "hours": null,
+      "category": "gas",
+      "lat": 47.0512,
+      "lng": 28.8598
+    },
+    {
+      "name": "Coffee Molka",
+      "address": {
+        "ru": "бул. Штефан чел Маре, 132",
+        "ro": "bd. Ștefan cel Mare, 132"
+      },
+      "hours": "07:30 — 22:00",
+      "category": "cafe",
+      "lat": 47.0231,
+      "lng": 28.8367
+    },
+    {
+      "name": "World Class",
+      "address": {
+        "ru": "ул. Мичурина, 8",
+        "ro": "str. Miciurin, 8"
+      },
+      "hours": "06:00 — 23:00",
+      "category": "gym",
+      "lat": 47.0344,
+      "lng": 28.8189
+    },
+    {
+      "name": "Linella",
+      "address": {
+        "ru": "ул. Индепенденцей, 6/2",
+        "ro": "str. Independenței, 6/2"
+      },
+      "hours": "08:00 — 23:00",
+      "category": "shop",
+      "lat": 47.0157,
+      "lng": 28.8721
+    },
+    {
+      "name": "Petrom",
+      "address": {
+        "ru": "ул. Каля Ешилор, 51",
+        "ro": "str. Calea Ieșilor, 51"
+      },
+      "hours": null,
+      "category": "gas",
+      "lat": 47.0402,
+      "lng": 28.7936
+    }
+  ]
+  for (const p of points) {
+    const { category, hours, ...rest } = p
+    await payload.create({
+      collection: "salePoints",
+      req,
+      data: { ...rest, allDay: hours === null, hours: hours ?? undefined, category: catIds[category], active: true } as never,
+    })
+  }
+
+  await payload.updateGlobal({
+    slug: "whereSection",
+    req,
+    data: {
+      section: { show: true, background: "beige" },
+      heading: {
+        text: { ru: "Где купить FitSweet?", ro: "Unde cumperi FitSweet?" },
+        color: "green-900",
+        leafColor: "green-500",
+        leaf: true,
+        subtitle: {
+          ru: "Наши десерты уже представлены в партнёрских локациях по городу.",
+          ro: "Deserturile noastre sunt deja disponibile în locațiile partenere din oraș.",
+        },
+        subtitleColor: "muted",
+      },
+      list: {
+        allLabel: { ru: "Все", ro: "Toate" },
+        chipActive: "green-700",
+        chipBorder: "green-200",
+        cardBackground: "white",
+        cardActive: "green-700",
+        nameColor: "green-900",
+        infoColor: "muted",
+        pinColor: "green-700",
+        allDay: { ru: "круглосуточно", ro: "non-stop" },
+        empty: {
+          ru: "В этой категории пока нет точек — скоро появятся.",
+          ro: "În această categorie încă nu sunt puncte — vor apărea în curând.",
+        },
+      },
+      more: {
+        initialCount: 4,
+        showAll: { ru: "Показать все локации ({n})", ro: "Arată toate locațiile ({n})" },
+        collapse: { ru: "Свернуть список", ro: "Restrânge lista" },
+        background: "green-700",
+        color: "cream",
+      },
+      map: { show: true },
+    },
+  })
+}
+
+export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  await db.run(sql`DROP TABLE \`sale_points\`;`)
+  await db.run(sql`DROP TABLE \`point_categories\`;`)
+  await db.run(sql`DROP TABLE \`where_section\`;`)
+  await db.run(sql`PRAGMA foreign_keys=OFF;`)
+  await db.run(sql`CREATE TABLE \`__new_payload_locked_documents_rels\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`order\` integer,
+  	\`parent_id\` integer NOT NULL,
+  	\`path\` text NOT NULL,
+  	\`users_id\` integer,
+  	\`media_id\` integer,
+  	\`products_id\` integer,
+  	\`moods_id\` integer,
+  	FOREIGN KEY (\`parent_id\`) REFERENCES \`payload_locked_documents\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`products_id\`) REFERENCES \`products\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`moods_id\`) REFERENCES \`moods\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  );
+  `)
+  await db.run(sql`INSERT INTO \`__new_payload_locked_documents_rels\`("id", "order", "parent_id", "path", "users_id", "media_id", "products_id", "moods_id") SELECT "id", "order", "parent_id", "path", "users_id", "media_id", "products_id", "moods_id" FROM \`payload_locked_documents_rels\`;`)
+  await db.run(sql`DROP TABLE \`payload_locked_documents_rels\`;`)
+  await db.run(sql`ALTER TABLE \`__new_payload_locked_documents_rels\` RENAME TO \`payload_locked_documents_rels\`;`)
+  await db.run(sql`PRAGMA foreign_keys=ON;`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_order_idx\` ON \`payload_locked_documents_rels\` (\`order\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_parent_idx\` ON \`payload_locked_documents_rels\` (\`parent_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_path_idx\` ON \`payload_locked_documents_rels\` (\`path\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_users_id_idx\` ON \`payload_locked_documents_rels\` (\`users_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_media_id_idx\` ON \`payload_locked_documents_rels\` (\`media_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_products_id_idx\` ON \`payload_locked_documents_rels\` (\`products_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_moods_id_idx\` ON \`payload_locked_documents_rels\` (\`moods_id\`);`)
+}

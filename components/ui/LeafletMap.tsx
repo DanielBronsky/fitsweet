@@ -9,10 +9,12 @@ const CHISINAU: [number, number] = [47.0245, 28.8322];
 
 export function LeafletMap({
   points,
+  pinColor = "#6B7A52",
   activeId,
   onPick,
 }: {
   points: SalePoint[];
+  pinColor?: string;
   activeId?: string | null;
   onPick?: (id: string) => void;
 }) {
@@ -120,7 +122,7 @@ export function LeafletMap({
           className: "fitsweet-pin",
           html: `<svg viewBox="0 0 24 24" width="34" height="34" fill="none">
             <path d="M12 22.5s7-6 7-11.4a7 7 0 1 0-14 0c0 5.4 7 11.4 7 11.4Z"
-                  fill="#6B7A52" stroke="#FAF8F3" stroke-width="1.4" stroke-linejoin="round"/>
+                  fill="${pinColor}" stroke="#FAF8F3" stroke-width="1.4" stroke-linejoin="round"/>
             <circle cx="12" cy="10.6" r="2.6" fill="#FAF8F3"/>
           </svg>`,
           iconSize: [34, 34],
@@ -133,7 +135,7 @@ export function LeafletMap({
           .bindPopup(
             `<strong style="font-size:13px">${p.name}</strong><br/>
              <span style="font-size:12px;color:#7C7A70">${p.address[locale]}<br/>${
-               p.hours ?? dict.where.aroundTheClock
+               p.hours ?? ""
              }</span>`,
           )
           .on("click", () => onPickRef.current?.(p.id));
@@ -152,7 +154,7 @@ export function LeafletMap({
     return () => {
       cancelled = true;
     };
-  }, [points, locale, dict.where.aroundTheClock, ready]);
+  }, [points, locale, pinColor, ready]);
 
   useEffect(() => {
     if (!activeId || !map.current) return;
