@@ -50,7 +50,7 @@ export function Catalog({ data }: { data: CatalogData | null }) {
         )}
 
         <div
-          className="scroll-snap-x -mx-5 mt-8 flex gap-3 overflow-x-auto px-5 pb-2
+          className="scroll-snap-x -mx-5 mt-8 flex gap-3 overflow-x-auto px-5 scroll-px-5 sm:scroll-px-0 pb-2
             sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0
             lg:mt-9 lg:gap-2.5"
         >

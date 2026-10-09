@@ -31,7 +31,7 @@ export function Moods({ data }: { data: MoodsData | null }) {
         <SectionTitle data={data.title} />
 
         <div
-          className={`scroll-snap-x -mx-5 mt-9 flex gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:mt-11 ${cols}`}
+          className={`scroll-snap-x -mx-5 mt-9 flex gap-4 overflow-x-auto px-5 scroll-px-5 sm:scroll-px-0 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:mt-11 ${cols}`}
         >
           {moods.map((m) => {
             const isActive = active === m.key;

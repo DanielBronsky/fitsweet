@@ -100,6 +100,12 @@ export const ru = {
     followUs: "Следите за нами в Instagram",
     description: "Рецепты, новинки, акции и много вкусного контента.",
     cta: "Перейти в Instagram",
+    openVideo: "Открыть видео",
+    openPost: "Открыть пост",
+    close: "Закрыть",
+    openInInstagram: "Открыть в Instagram",
+    prev: "Назад",
+    next: "Дальше",
   },
   finalCta: {
     line1: "Готовы выбрать",

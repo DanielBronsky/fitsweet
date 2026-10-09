@@ -11,6 +11,9 @@ import { seedMoods } from "./seed/moods";
 import { seedWhere } from "./seed/where";
 import { seedDelivery } from "./seed/delivery";
 import { seedBox } from "./seed/box";
+import { seedReviews } from "./seed/reviews";
+import { seedFavicon } from "./seed/favicon";
+import { refreshInstagramCovers, seedInstagram } from "./seed/instagram";
 import { seedLayout } from "./seed/layout";
 
 const payload = await getPayload({ config });
@@ -35,6 +38,8 @@ await step("SEO", async () => {
   });
 });
 
+await step("Иконка сайта", () => seedFavicon(payload));
+
 await step("Палитра", async () => {
   const theme = await payload.findGlobal({ slug: "theme", depth: 0 });
   if (theme.updatedAt) return;
@@ -53,6 +58,11 @@ await step("Настроения", () => seedMoods(payload));
 await step("Где купить", () => seedWhere(payload));
 await step("Доставка", () => seedDelivery(payload));
 await step("Соберите коробку", () => seedBox(payload));
+await step("Отзывы", () => seedReviews(payload));
+await step("Instagram", async () => {
+  await seedInstagram(payload);
+  await refreshInstagramCovers(payload);
+});
 await step("Порядок блоков", () => seedLayout(payload, bakery));
 
 process.exit(0);

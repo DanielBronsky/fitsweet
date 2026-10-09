@@ -102,6 +102,12 @@ export const ro: Dictionary = {
     followUs: "Urmărește-ne pe Instagram",
     description: "Rețete, noutăți, promoții și mult conținut delicios.",
     cta: "Mergi pe Instagram",
+    openVideo: "Deschide video",
+    openPost: "Deschide postarea",
+    close: "Închide",
+    openInInstagram: "Deschide în Instagram",
+    prev: "Înapoi",
+    next: "Înainte",
   },
   finalCta: {
     line1: "Gata să-ți alegi",

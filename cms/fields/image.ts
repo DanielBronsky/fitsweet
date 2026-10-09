@@ -217,6 +217,7 @@ export function iconField({ name, label, description }: { name: string; label: s
     admin: { description },
     hooks: { beforeChange: [buildIconVariants] },
     fields: [
+      { name: "preview", type: "ui", admin: { components: { Field: "/cms/admin/SiteIconPreview#SiteIconPreview" } } },
       { name: "image", type: "upload", relationTo: "media", label: "Картинка (квадратная, PNG или SVG, от 512×512)" },
       colorField({ name: "background", label: "Подложка (пусто — без подложки, картинка как есть)" }),
       { name: "variants", type: "json", admin: { hidden: true } },

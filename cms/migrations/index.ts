@@ -16,6 +16,9 @@ import * as migration_20261008_165946_custom_sections from './20261008_165946_cu
 import * as migration_20261008_170133_category_weight_label from './20261008_170133_category_weight_label';
 import * as migration_20261009_101228_box from './20261009_101228_box';
 import * as migration_20261009_102254_favicon from './20261009_102254_favicon';
+import * as migration_20261009_103243_reviews from './20261009_103243_reviews';
+import * as migration_20261009_104704_instagram from './20261009_104704_instagram';
+import * as migration_20261009_111625_instagram_layout from './20261009_111625_instagram_layout';
 
 export const migrations = [
   {
@@ -106,6 +109,21 @@ export const migrations = [
   {
     up: migration_20261009_102254_favicon.up,
     down: migration_20261009_102254_favicon.down,
-    name: '20261009_102254_favicon'
+    name: '20261009_102254_favicon',
+  },
+  {
+    up: migration_20261009_103243_reviews.up,
+    down: migration_20261009_103243_reviews.down,
+    name: '20261009_103243_reviews',
+  },
+  {
+    up: migration_20261009_104704_instagram.up,
+    down: migration_20261009_104704_instagram.down,
+    name: '20261009_104704_instagram',
+  },
+  {
+    up: migration_20261009_111625_instagram_layout.up,
+    down: migration_20261009_111625_instagram_layout.down,
+    name: '20261009_111625_instagram_layout'
   },
 ];

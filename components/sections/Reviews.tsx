@@ -1,37 +1,52 @@
-"use client";
-
-import { reviews } from "@/lib/reviews";
-import { tileName } from "@/lib/products";
-import { useProducts } from "@/lib/products-context";
-import { useI18n } from "@/lib/i18n/context";
+import type { ReviewsData } from "@/lib/reviews";
 import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 
-export function Reviews() {
-  const { locale, dict } = useI18n();
-  const { byId: productById } = useProducts();
+export function Reviews({ data }: { data: ReviewsData | null }) {
+  if (!data) return null;
+  const { cards } = data;
+  const cols = data.items.length === 1 ? "sm:grid-cols-1 sm:max-w-[420px] sm:mx-auto" : data.items.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3";
 
   return (
-    <section id="reviews" className="bg-white py-14 sm:py-16 lg:py-20">
+    <section id="reviews" style={{ background: data.background }} className="py-14 sm:py-16 lg:py-20">
       <Container>
-        <SectionTitle>{dict.reviews.title}</SectionTitle>
+        <SectionTitle data={data.title} />
+        {data.subtitle && (
+          <p style={{ color: data.subtitle.color }} className="mx-auto mt-5 max-w-[560px] text-pretty text-center text-[15px] leading-relaxed">
+            {data.subtitle.text}
+          </p>
+        )}
 
-        <ul className="scroll-snap-x -mx-5 mt-9 flex gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:mt-11 lg:gap-5">
-          {reviews.map((r) => (
+        <ul
+          className={`scroll-snap-x -mx-5 mt-9 flex gap-4 overflow-x-auto px-5 scroll-px-5 sm:scroll-px-0 pb-2 sm:mx-0 sm:grid sm:overflow-visible sm:px-0 lg:mt-11 lg:gap-5 ${cols}`}
+        >
+          {data.items.map((r) => (
             <li
               key={r.id}
-              className="snap-item flex w-[80%] shrink-0 flex-col rounded-card bg-card p-6 sm:w-auto"
+              style={{ background: cards.background }}
+              className="snap-item flex w-[80%] shrink-0 flex-col rounded-card p-6 sm:w-auto"
             >
-              <span className="font-display text-[40px] leading-none text-green-200">“</span>
-              <p className="mt-1 flex-1 text-[14px] leading-relaxed text-green-900">{r.text[locale]}</p>
-              <div className="mt-5 flex items-center justify-between gap-3 border-t border-green-200/50 pt-4">
-                <span className="text-[13px] font-semibold text-green-900">{r.name[locale]}</span>
-                <span className="rounded-full bg-sage/70 px-3 py-1 text-[11px] text-green-900">
-                  {(() => {
-                    const p = productById(r.productId);
-                    return p ? tileName(p, locale) : "";
-                  })()}
+              <span aria-hidden style={{ color: cards.quoteColor }} className="font-display text-[40px] leading-none">
+                “
+              </span>
+              <p style={{ color: cards.textColor, fontFamily: cards.font }} className="mt-1 flex-1 text-[14px] leading-relaxed">
+                {r.text}
+              </p>
+              <div
+                style={{ borderColor: `color-mix(in srgb, ${cards.quoteColor} 50%, transparent)` }}
+                className="mt-5 flex items-center justify-between gap-3 border-t pt-4"
+              >
+                <span style={{ color: cards.nameColor }} className="text-[13px] font-semibold">
+                  {r.author}
                 </span>
+                {r.product && (
+                  <span
+                    style={{ background: cards.chipBackground, color: cards.chipColor }}
+                    className="truncate rounded-full px-3 py-1 text-[11px]"
+                  >
+                    {r.product}
+                  </span>
+                )}
               </div>
             </li>
           ))}

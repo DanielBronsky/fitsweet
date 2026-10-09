@@ -20,6 +20,10 @@ export const extraNavGroups: { label: string; items: NavItem[] }[] = [
       { label: "Категории точек", path: "/collections/pointCategories", sub: true, section: "where" },
       { label: "Доставка", path: "/globals/deliverySection", section: "delivery" },
       { label: "Соберите коробку", path: "/globals/boxSection", section: "box" },
+      { label: "Что говорят о нас", path: "/globals/reviewsSection", section: "reviews" },
+      { label: "Отзывы", path: "/collections/reviews", sub: true, section: "reviews" },
+      { label: "Больше FitSweet каждый день", path: "/globals/instagramSection", section: "instagram" },
+      { label: "Посты Instagram", path: "/collections/instagramPosts", sub: true, section: "instagram" },
     ],
   },
   {

@@ -5,6 +5,8 @@ import { CustomSection } from "@/components/sections/custom/CustomSection";
 import { getWhereData } from "@/lib/where";
 import { getDeliveryData } from "@/lib/delivery-data";
 import { getBoxData } from "@/lib/box";
+import { getReviewsData } from "@/lib/reviews";
+import { getInstagramData } from "@/lib/instagram-feed";
 import type { SectionKey } from "@/cms/sections";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
@@ -66,8 +68,8 @@ export default async function Home({
     where: <WhereToBuy data={await getWhereData(l)} />,
     delivery: <Delivery data={await getDeliveryData(l)} />,
     box: <BoxBuilder data={await getBoxData(l)} />,
-    reviews: <Reviews />,
-    instagram: <InstagramFeed />,
+    reviews: <Reviews data={await getReviewsData(l)} />,
+    instagram: <InstagramFeed data={await getInstagramData(l)} />,
     order: <OrderForm />,
     finalCta: <FinalCta />,
   };

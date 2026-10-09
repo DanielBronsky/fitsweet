@@ -89,6 +89,16 @@ export const framePresets = {
       output: { type: "responsive", widths: [360, 540, 720] },
     },
   ],
+  instagramTile: [
+    {
+      key: "desktop",
+      label: "Плитка",
+      hint: "Плитка 4:5 в блоке Instagram — как пост в самом Instagram.",
+      aspect: [4, 5],
+      minWidth: 320,
+      output: { type: "responsive", widths: [320, 480, 640] },
+    },
+  ],
   og: [
     {
       key: "og",

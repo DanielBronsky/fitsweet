@@ -24,6 +24,10 @@ import { MoodsSection } from "./cms/globals/MoodsSection";
 import { WhereSection } from "./cms/globals/WhereSection";
 import { DeliverySection } from "./cms/globals/DeliverySection";
 import { BoxSection } from "./cms/globals/BoxSection";
+import { ReviewsSection } from "./cms/globals/ReviewsSection";
+import { Reviews } from "./cms/collections/Reviews";
+import { InstagramSection } from "./cms/globals/InstagramSection";
+import { InstagramPosts } from "./cms/collections/InstagramPosts";
 import { Typography } from "./cms/globals/Typography";
 import { ruOverrides } from "./cms/i18n-ru";
 
@@ -58,8 +62,8 @@ export default buildConfig({
     fallbackLanguage: "ru",
     translations: { ru: ruOverrides },
   },
-  collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections],
-  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, BoxSection, Theme, Typography, Seo],
+  collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections, Reviews, InstagramPosts],
+  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, BoxSection, ReviewsSection, InstagramSection, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

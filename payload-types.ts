@@ -75,6 +75,8 @@ export interface Config {
     salePoints: SalePoint;
     pointCategories: PointCategory;
     customSections: CustomSection;
+    reviews: Review;
+    instagramPosts: InstagramPost;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +92,8 @@ export interface Config {
     salePoints: SalePointsSelect<false> | SalePointsSelect<true>;
     pointCategories: PointCategoriesSelect<false> | PointCategoriesSelect<true>;
     customSections: CustomSectionsSelect<false> | CustomSectionsSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    instagramPosts: InstagramPostsSelect<false> | InstagramPostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -108,6 +112,8 @@ export interface Config {
     whereSection: WhereSection;
     deliverySection: DeliverySection;
     boxSection: BoxSection;
+    reviewsSection: ReviewsSection;
+    instagramSection: InstagramSection;
     theme: Theme;
     typography: Typography;
     seo: Seo;
@@ -121,6 +127,8 @@ export interface Config {
     whereSection: WhereSectionSelect<false> | WhereSectionSelect<true>;
     deliverySection: DeliverySectionSelect<false> | DeliverySectionSelect<true>;
     boxSection: BoxSectionSelect<false> | BoxSectionSelect<true>;
+    reviewsSection: ReviewsSectionSelect<false> | ReviewsSectionSelect<true>;
+    instagramSection: InstagramSectionSelect<false> | InstagramSectionSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -181,7 +189,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Все исходные картинки сайта. Загружайте в хорошем качестве — от 2000 px по ширине (JPG, PNG, WebP, AVIF или SVG). Обрезка под десктоп и мобилку делается там, где картинку ставят на сайт.
+ * Все исходные картинки сайта (JPG, PNG, WebP, AVIF или SVG). Фото — в хорошем качестве, от 2000 px по ширине; обрезка под десктоп и мобилку делается там, где картинку ставят на сайт. Иконку сайта — квадратным PNG от 512×512 или SVG, логотип — PNG или SVG.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -626,6 +634,76 @@ export interface CustomSection {
   createdAt: string;
 }
 /**
+ * Отзывы на сайте. Порядок — перетаскиванием в списке.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  _order?: string | null;
+  name?: string | null;
+  show?: boolean | null;
+  author: {
+    ru: string;
+    ro: string;
+  };
+  text: {
+    ru: string;
+    ro: string;
+  };
+  /**
+   * Необязательно. Название показывается в углу карточки.
+   */
+  product?: (number | null) | Product;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Вставьте ссылку на пост или видео — обложка и тип подтянутся сами. Порядок — перетаскиванием в списке.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagramPosts".
+ */
+export interface InstagramPost {
+  id: number;
+  _order?: string | null;
+  name?: string | null;
+  show?: boolean | null;
+  url: string;
+  code?: string | null;
+  /**
+   * Определяется сам по ссылке. У видео на плитке значок ▶.
+   */
+  kind?: ('post' | 'reel') | null;
+  /**
+   * Подставляется из Instagram сразу после вставки ссылки. Можно поправить обрезку или заменить своей картинкой.
+   */
+  cover?: {
+    image?: (number | null) | Media;
+    crops?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    variants?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -680,6 +758,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'customSections';
         value: number | CustomSection;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'instagramPosts';
+        value: number | InstagramPost;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1090,6 +1176,51 @@ export interface CustomSectionsSelect<T extends boolean = true> {
   background?: T;
   show?: T;
   anchor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  show?: T;
+  author?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  text?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  product?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagramPosts_select".
+ */
+export interface InstagramPostsSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  show?: T;
+  url?: T;
+  code?: T;
+  kind?: T;
+  cover?:
+    | T
+    | {
+        image?: T;
+        crops?: T;
+        variants?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1815,6 +1946,109 @@ export interface BoxSection {
     accentText?: string | null;
     text?: string | null;
     muted?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Оформление блока отзывов. Сами отзывы — в «Отзывы».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviewsSection".
+ */
+export interface ReviewsSection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    subtitle?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    subtitleColor?: string | null;
+  };
+  cards?: {
+    background?: string | null;
+    quoteColor?: string | null;
+    textColor?: string | null;
+    nameColor?: string | null;
+    font?: string | null;
+    showProduct?: boolean | null;
+    chipBackground?: string | null;
+    chipColor?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Блок Instagram. Сами посты — в «Посты Instagram».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagramSection".
+ */
+export interface InstagramSection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  posts?: {
+    /**
+     * От 1 до 100. Берутся первые по порядку в «Посты Instagram». Больше 5 — на компьютере лента со стрелками.
+     */
+    count?: number | null;
+    open?: ('modal' | 'instagram') | null;
+    overlay?: string | null;
+  };
+  profile: {
+    /**
+     * Без @ и без ссылки — только имя аккаунта.
+     */
+    handle: string;
+    followUs: {
+      ru: string;
+      ro: string;
+    };
+    description?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    titleColor?: string | null;
+    textColor?: string | null;
+    cta: {
+      ru: string;
+      ro: string;
+    };
+    buttonBackground?: string | null;
+    buttonColor?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2613,6 +2847,119 @@ export interface BoxSectionSelect<T extends boolean = true> {
         accentText?: T;
         text?: T;
         muted?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviewsSection_select".
+ */
+export interface ReviewsSectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+        subtitle?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        subtitleColor?: T;
+      };
+  cards?:
+    | T
+    | {
+        background?: T;
+        quoteColor?: T;
+        textColor?: T;
+        nameColor?: T;
+        font?: T;
+        showProduct?: T;
+        chipBackground?: T;
+        chipColor?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instagramSection_select".
+ */
+export interface InstagramSectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+      };
+  posts?:
+    | T
+    | {
+        count?: T;
+        open?: T;
+        overlay?: T;
+      };
+  profile?:
+    | T
+    | {
+        handle?: T;
+        followUs?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        description?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        titleColor?: T;
+        textColor?: T;
+        cta?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        buttonBackground?: T;
+        buttonColor?: T;
       };
   updatedAt?: T;
   createdAt?: T;
