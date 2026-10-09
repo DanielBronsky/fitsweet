@@ -28,3 +28,27 @@ export function normalizeOrder(keys: (string | null | undefined)[] | null | unde
   for (const k of defaultSectionOrder) if (!seen.has(k)) out.push(k);
   return out;
 }
+
+export type LayoutEntry = { kind: "builtin"; key: SectionKey } | { kind: "custom"; id: number; name?: string };
+
+type RawBlock = { block?: string | null; custom?: number | { id: number; name?: string | null } | null };
+
+export function normalizeLayout(blocks: RawBlock[] | null | undefined): LayoutEntry[] {
+  const known = new Set<string>(defaultSectionOrder);
+  const seenBuiltin = new Set<string>();
+  const seenCustom = new Set<number>();
+  const out: LayoutEntry[] = [];
+  for (const b of blocks ?? []) {
+    if (b.block === "custom") {
+      const id = typeof b.custom === "object" ? b.custom?.id : b.custom;
+      if (!id || seenCustom.has(id)) continue;
+      seenCustom.add(id);
+      out.push({ kind: "custom", id, name: typeof b.custom === "object" ? (b.custom?.name ?? undefined) : undefined });
+    } else if (b.block && known.has(b.block) && !seenBuiltin.has(b.block)) {
+      seenBuiltin.add(b.block);
+      out.push({ kind: "builtin", key: b.block as SectionKey });
+    }
+  }
+  for (const k of defaultSectionOrder) if (!seenBuiltin.has(k)) out.push({ kind: "builtin", key: k });
+  return out;
+}

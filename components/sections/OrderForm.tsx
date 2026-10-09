@@ -5,7 +5,6 @@ import { useCart, cartTotal, cartCount } from "@/lib/cart";
 import { productName, tileName } from "@/lib/products";
 import { useProducts } from "@/lib/products-context";
 import { useI18n } from "@/lib/i18n/context";
-import { FREE_DELIVERY_FROM, DELIVERY_PRICE } from "@/lib/delivery";
 import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Button } from "@/components/ui/Button";
@@ -22,10 +21,10 @@ export function OrderForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
 
-  const { byId: productById } = useProducts();
+  const { byId: productById, shipping: rules } = useProducts();
   const subtotal = cartTotal(lines, productById);
   const count = cartCount(lines);
-  const shipping = subtotal >= FREE_DELIVERY_FROM || subtotal === 0 ? 0 : DELIVERY_PRICE;
+  const shipping = subtotal === 0 || (rules.freeFrom > 0 && subtotal >= rules.freeFrom) ? 0 : rules.price;
   const total = subtotal + shipping;
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

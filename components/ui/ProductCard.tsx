@@ -45,8 +45,14 @@ export function ProductCard({ product, style }: { product: Product; style: Catal
         </h3>
 
         <p style={{ color: style.infoColor }} className="mt-1.5 min-h-[26px] text-[9.5px] leading-[1.4]">
-          {kbjuNumbers(product)}
-          <span className="block">{dict.catalog.perBar(product.weight)}</span>
+          {product.kbju.kcal > 0 && kbjuNumbers(product)}
+          {product.weight > 0 && (
+            <span className="block">
+              {product.weightLabel
+                ? product.weightLabel[locale].replace("{w}", String(product.weight))
+                : dict.catalog.perBar(product.weight)}
+            </span>
+          )}
         </p>
 
         <p style={{ color: style.priceColor }} className="pt-2 text-[15px] font-bold leading-none">

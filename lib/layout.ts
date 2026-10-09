@@ -1,13 +1,13 @@
 import { cache } from "react";
-import { defaultSectionOrder, normalizeOrder, type SectionKey } from "@/cms/sections";
+import { normalizeLayout, type LayoutEntry } from "@/cms/sections";
 import { getCms } from "./cms";
 
-export const getSectionOrder = cache(async (): Promise<SectionKey[]> => {
+export const getLayout = cache(async (): Promise<LayoutEntry[]> => {
   try {
     const doc = await (await getCms()).findGlobal({ slug: "layout", depth: 0 });
-    return normalizeOrder((doc.blocks ?? []).map((b) => b.block));
+    return normalizeLayout(doc.blocks ?? []);
   } catch (err) {
     console.error("[cms] не удалось загрузить порядок блоков:", err);
-    return defaultSectionOrder;
+    return normalizeLayout([]);
   }
 });

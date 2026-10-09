@@ -318,6 +318,9 @@ fitsweet/
 | Порядок блоков | глобал `layout` («Порядок блоков», перетаскивание) → `lib/layout.ts` → `app/(site)/[locale]/page.tsx` рендерит блоки по порядку; список блоков — `cms/sections.ts`; номера разделов в меню админки считаются по этому порядку (`cms/admin/useNavGroups.ts`) |
 | Настроения | коллекция `moods` (текст RU/RO, картинка 13:11, порядок) + глобал «Выбирайте по настроению» (`moodsSection`); товары ссылаются на настроения (relationship) |
 | Где купить | глобал `whereSection` + коллекции «Точки продаж» (`salePoints`: название, адрес RU/RO, часы/круглосуточно, категория, координаты с выбором на карте в админке — `cms/admin/MapPickerField.tsx`, поиск Photon) и «Категории точек» (`pointCategories`) → `lib/where.ts` → `WhereToBuy.tsx`; карта сайта — OpenFreeMap Positron через MapLibre (`/vendor/maplibre-worker`) |
+| Доставка | глобал `deliverySection` (стоимость и порог бесплатной доставки — по ним считают корзина и форма заказа; шаги, условия с подстановкой {price}/{free}, картинка слева/справа, кнопка) → `lib/delivery-data.ts` (`getDeliveryData`, `getShippingRules` → `ProductsProvider.shipping`) |
+| Свои разделы | коллекция `customSections` (шаблоны-блоки `cms/blocks`: карточки товаров, текст+картинка, преимущества, галерея, FAQ с JSON-LD FAQPage) → `lib/custom-sections.ts` → `components/sections/custom/`; новый раздел сам встаёт в конец «Порядка блоков»; ссылки «Куда ведёт» → «Свой раздел…» по `anchor` |
+| Категории товаров | коллекция `productCategories` (участвует в коробке / настроениях, подпись к весу «{w}»); у товара обязательная категория; «Наши десерты» показывает выбранную категорию |
 | Каталог | глобал «Наши десерты»; «Смотреть весь ассортимент» умная: видна, только если товаров больше «показывать сразу» или выбран фильтр по настроению; `cms/globals/Catalog.ts` → `getCatalogData` → `components/sections/Catalog.tsx`; заголовок раздела — `sectionTitleFields()` + `<SectionTitle data>` |
 | Меню админки | весь список задаётся в `cms/admin/extraNavGroups.ts` (у всех глобалов/коллекций `group: false`) — новый раздел добавлять туда (подраздел — `sub: true`, рисуется с отступом); кнопка «← Назад» на всех экранах — `cms/admin/BackButton.tsx`; группы как на странице: «Шапка сайта · Header» → «Основное содержимое · Body» (разделы с номерами) → «Подвал сайта · Footer»; ниже Медиатека / Оформление / Настройки — своим блоком (`cms/admin/NavExtra.tsx`, `DashboardExtra.tsx`, список в `extraNavGroups.ts`) |
 | Баннер (Hero) | глобал `cms/globals/Hero.ts` («1 · Баннер») → `lib/hero.ts` → `components/sections/Hero.tsx` (серверный) + `HeroHeading.tsx` (автоподгонка размера заголовка под колонку); картинка — `<ResponsivePicture>` (десктоп 6:5 / мобилка 1:1, webp) |
@@ -333,9 +336,10 @@ fitsweet/
 **Команды:**
 - `pnpm dev` — разработка; админка на `/admin` (первый вход — создание первого админа)
 - изменили схему (поля/коллекции) → `pnpm payload migrate:create <имя>` → `pnpm migrate`
-- `pnpm seed` — заполнить пустые SEO / палитру текущими данными сайта
+- `pnpm seed` — начальное наполнение (шапка, баннер, товары, настроения, точки, доставка, категории, раздел «Наша выпечка», порядок блоков); заполняет только пустое, повторный запуск безопасен. Код — `scripts/seed-cms.ts` + `scripts/seed/*`
 - `pnpm generate:types` / `pnpm generate:importmap` — после изменения схемы / компонентов админки
-- деплой: `pnpm install` → `pnpm migrate` → `pnpm build` → `pnpm start`
+- деплой: `pnpm install` → `pnpm migrate` → `pnpm seed` → `pnpm build` → `pnpm start`
+- **миграции — только структура базы** (DDL). Данные в миграциях через Payload API не создавать: на чистой базе они ломаются, когда схема меняется в следующих миграциях. Начальные данные — в `scripts/seed/`
 
 **.env** (шаблон — `.env.example`): `PAYLOAD_SECRET`, `DATABASE_URL`, `MEDIA_DIR`, `NEXT_PUBLIC_SITE_URL`, `SITE_INDEXING`.
 На VPS база и `MEDIA_DIR` — вне папки релиза; бэкапить обе.

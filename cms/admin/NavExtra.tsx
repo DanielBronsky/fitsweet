@@ -11,8 +11,22 @@ export function NavExtra() {
   const adminRoute = config.routes.admin;
   const groups = useNavGroups();
 
+  const home = (
+    <>
+      {pathname === adminRoute && <div className="nav__link-indicator" />}
+      <span className="nav__link-label">Главная</span>
+    </>
+  );
+
   return (
     <>
+      {pathname === adminRoute ? (
+        <div className="nav__link fs-nav-home">{home}</div>
+      ) : (
+        <Link href={adminRoute} className="nav__link fs-nav-home" prefetch={false}>
+          {home}
+        </Link>
+      )}
       {groups.map((group) => (
         <NavGroup key={group.label} label={group.label}>
           {group.items.map((item) => {

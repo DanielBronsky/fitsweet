@@ -19,7 +19,8 @@ export function Catalog({ data }: { data: CatalogData | null }) {
 
   if (!data) return null;
 
-  const visible = mood ? products.filter((p) => p.moods.includes(mood)) : products;
+  const own = data.category ? products.filter((p) => p.category === data.category) : products;
+  const visible = mood ? own.filter((p) => p.inMoods !== false && p.moods.includes(mood)) : own;
   const limit = data.more?.initialCount ?? visible.length;
   const collapsed = !expanded && !mood && visible.length > limit;
   const showMore = Boolean(data.more) && (Boolean(mood) || collapsed);

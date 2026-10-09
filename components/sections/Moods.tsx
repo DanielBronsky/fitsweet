@@ -11,7 +11,8 @@ import { SectionTitle } from "@/components/ui/SectionTitle";
 
 export function Moods({ data }: { data: MoodsData | null }) {
   const { locale } = useI18n();
-  const { products, moods } = useProducts();
+  const { products: all, moods } = useProducts();
+  const products = all.filter((p) => p.inMoods !== false);
   const active = useMoodFilter((s) => s.mood);
   const setMood = useMoodFilter((s) => s.setMood);
 

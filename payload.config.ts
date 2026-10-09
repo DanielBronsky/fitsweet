@@ -12,6 +12,8 @@ import { Products } from "./cms/collections/Products";
 import { Moods } from "./cms/collections/Moods";
 import { SalePoints } from "./cms/collections/SalePoints";
 import { PointCategories } from "./cms/collections/PointCategories";
+import { ProductCategories } from "./cms/collections/ProductCategories";
+import { CustomSections } from "./cms/collections/CustomSections";
 import { Theme } from "./cms/globals/Theme";
 import { Seo } from "./cms/globals/Seo";
 import { Header } from "./cms/globals/Header";
@@ -20,6 +22,7 @@ import { Catalog } from "./cms/globals/Catalog";
 import { Layout } from "./cms/globals/Layout";
 import { MoodsSection } from "./cms/globals/MoodsSection";
 import { WhereSection } from "./cms/globals/WhereSection";
+import { DeliverySection } from "./cms/globals/DeliverySection";
 import { Typography } from "./cms/globals/Typography";
 import { ruOverrides } from "./cms/i18n-ru";
 
@@ -49,8 +52,8 @@ export default buildConfig({
     fallbackLanguage: "ru",
     translations: { ru: ruOverrides },
   },
-  collections: [Users, Media, Products, Moods, SalePoints, PointCategories],
-  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, Theme, Typography, Seo],
+  collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections],
+  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

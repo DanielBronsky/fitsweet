@@ -1,6 +1,9 @@
 import { Fragment, type ReactNode } from "react";
-import { getSectionOrder } from "@/lib/layout";
+import { getLayout } from "@/lib/layout";
+import { getCustomSection, type CustomSectionData } from "@/lib/custom-sections";
+import { CustomSection } from "@/components/sections/custom/CustomSection";
 import { getWhereData } from "@/lib/where";
+import { getDeliveryData } from "@/lib/delivery-data";
 import type { SectionKey } from "@/cms/sections";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
@@ -14,7 +17,7 @@ import { Reviews } from "@/components/sections/Reviews";
 import { InstagramFeed } from "@/components/sections/InstagramFeed";
 import { OrderForm } from "@/components/sections/OrderForm";
 import { FinalCta } from "@/components/sections/FinalCta";
-import { getCatalogData, getMoodsData, getProducts } from "@/lib/catalog";
+import { getCardStyle, getCatalogData, getMoodsData, getProducts } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site";
 
 export default async function Home({
@@ -50,13 +53,17 @@ export default async function Home({
     })),
   };
 
-  const order = await getSectionOrder();
+  const layout = await getLayout();
+  const cardStyle = await getCardStyle(l);
+  const customs = new Map<number, CustomSectionData | null>();
+  for (const e of layout) if (e.kind === "custom") customs.set(e.id, await getCustomSection(e.id, l));
+  const faqItems = [...customs.values()].flatMap((c) => (c?.template === "faq" ? c.items : []));
   const sections: Record<SectionKey, ReactNode> = {
     hero: <Hero data={await getHeroData(l)} />,
     catalog: <Catalog data={await getCatalogData(l)} />,
     moods: <Moods data={await getMoodsData(l)} />,
     where: <WhereToBuy data={await getWhereData(l)} />,
-    delivery: <Delivery />,
+    delivery: <Delivery data={await getDeliveryData(l)} />,
     box: <BoxBuilder />,
     reviews: <Reviews />,
     instagram: <InstagramFeed />,
@@ -70,9 +77,27 @@ export default async function Home({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {order.map((key) => (
-        <Fragment key={key}>{sections[key]}</Fragment>
-      ))}
+      {faqItems.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faqItems.map((q) => ({
+                "@type": "Question",
+                name: q.question,
+                acceptedAnswer: { "@type": "Answer", text: q.answer },
+              })),
+            }),
+          }}
+        />
+      )}
+      {layout.map((e) => {
+        if (e.kind === "builtin") return <Fragment key={e.key}>{sections[e.key]}</Fragment>;
+        const data = customs.get(e.id);
+        return data ? <CustomSection key={`c${e.id}`} data={data} cardStyle={cardStyle} /> : null;
+      })}
     </>
   );
 }

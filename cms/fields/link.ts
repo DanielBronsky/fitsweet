@@ -12,7 +12,12 @@ export const sectionAnchors = [
   { value: "order", label: ru.order.title },
 ] as const;
 
-export type LinkValue = { target?: string | null; url?: string | null; newTab?: boolean | null };
+export type LinkValue = {
+  target?: string | null;
+  url?: string | null;
+  newTab?: boolean | null;
+  section?: number | { anchor?: string | null } | null;
+};
 
 export function linkFields({ defaultTarget = "catalog" }: { defaultTarget?: string } = {}): Field[] {
   return [
@@ -23,13 +28,23 @@ export function linkFields({ defaultTarget = "catalog" }: { defaultTarget?: stri
           name: "target",
           type: "select",
           label: "Куда ведёт",
-          admin: { width: "50%", description: "К какому блоку страницы прокрутить при нажатии." },
+          admin: { width: "50%", components: { Field: "/cms/admin/LinkTargetField#LinkTargetField" } },
           defaultValue: defaultTarget,
           required: true,
           options: [
-            ...sectionAnchors.map((a) => ({ value: a.value, label: `Блок на странице: «${a.label}»` })),
+            ...sectionAnchors.map((a) => ({ value: a.value, label: a.label })),
+            { value: "section", label: "Раздел" },
             { value: "url", label: "Свой адрес (другой сайт, соцсеть, телефон…)" },
           ],
+        },
+        {
+          name: "section",
+          type: "relationship",
+          relationTo: "customSections",
+          label: "Раздел",
+          admin: { hidden: true },
+          validate: (value: unknown, { siblingData }: { siblingData: LinkValue }) =>
+            siblingData?.target !== "section" || Boolean(value) || "Выберите раздел",
         },
         {
           name: "url",
@@ -62,5 +77,9 @@ export type ResolvedLink = { href: string; newTab: boolean };
 
 export function resolveLink(link: LinkValue | null | undefined): ResolvedLink {
   if (link?.target === "url" && link.url) return { href: link.url, newTab: Boolean(link.newTab) };
+  if (link?.target === "section") {
+    const anchor = link.section && typeof link.section === "object" ? link.section.anchor : null;
+    return { href: anchor ? `#${anchor}` : "#", newTab: false };
+  }
   return { href: `#${link?.target || "catalog"}`, newTab: false };
 }

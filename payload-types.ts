@@ -70,9 +70,11 @@ export interface Config {
     users: User;
     media: Media;
     products: Product;
+    productCategories: ProductCategory;
     moods: Mood;
     salePoints: SalePoint;
     pointCategories: PointCategory;
+    customSections: CustomSection;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -83,9 +85,11 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    productCategories: ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     moods: MoodsSelect<false> | MoodsSelect<true>;
     salePoints: SalePointsSelect<false> | SalePointsSelect<true>;
     pointCategories: PointCategoriesSelect<false> | PointCategoriesSelect<true>;
+    customSections: CustomSectionsSelect<false> | CustomSectionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -102,6 +106,7 @@ export interface Config {
     moodsSection: MoodsSection;
     catalog: Catalog;
     whereSection: WhereSection;
+    deliverySection: DeliverySection;
     theme: Theme;
     typography: Typography;
     seo: Seo;
@@ -113,6 +118,7 @@ export interface Config {
     moodsSection: MoodsSectionSelect<false> | MoodsSectionSelect<true>;
     catalog: CatalogSelect<false> | CatalogSelect<true>;
     whereSection: WhereSectionSelect<false> | WhereSectionSelect<true>;
+    deliverySection: DeliverySectionSelect<false> | DeliverySectionSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -211,7 +217,7 @@ export interface Media {
   };
 }
 /**
- * Десерты: каталог, корзина, конструктор коробки и форма заказа берут товары отсюда. Порядок — перетаскиванием.
+ * Все товары сайта: десерты, выпечка… Разделы с карточками, корзина, коробка и форма заказа берут товары отсюда. Порядок — перетаскиванием.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
@@ -266,6 +272,10 @@ export interface Product {
       | null;
   };
   /**
+   * «Десерты», «Выпечка»… Определяет, в каком разделе показывается товар.
+   */
+  category: number | ProductCategory;
+  /**
    * Снимите, если товар временно закончился.
    */
   active?: boolean | null;
@@ -275,6 +285,42 @@ export interface Product {
   moods?: (number | Mood)[] | null;
   /**
    * Латиницей, заполняется сам. Не меняйте у товаров, которые уже продаются — на нём держатся корзины покупателей.
+   */
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * «Десерты», «Выпечка»… У каждого товара выбирается категория. Раздел с карточками показывает товары своей категории.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "productCategories".
+ */
+export interface ProductCategory {
+  id: number;
+  _order?: string | null;
+  name?: string | null;
+  title: {
+    ru: string;
+    ro: string;
+  };
+  /**
+   * {w} заменится на вес. Например: «на батончик {w} гр» или «1 шт. · {w} г».
+   */
+  weightLabel?: {
+    ru?: string | null;
+    ro?: string | null;
+  };
+  /**
+   * Товары этой категории можно класть в коробку в конструкторе.
+   */
+  inBox?: boolean | null;
+  /**
+   * Товары этой категории показываются в подборках по настроению и в фильтре каталога.
+   */
+  inMoods?: boolean | null;
+  /**
+   * Латиницей, заполняется сам.
    */
   slug?: string | null;
   updatedAt: string;
@@ -368,6 +414,216 @@ export interface PointCategory {
   createdAt: string;
 }
 /**
+ * Новые разделы страницы: карточки товаров, текст с картинкой, преимущества, галерея, вопросы-ответы. Новый раздел встаёт в конец страницы — передвинуть можно в «Порядке блоков».
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customSections".
+ */
+export interface CustomSection {
+  id: number;
+  name?: string | null;
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    align?: ('center' | 'left') | null;
+    subtitle?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    subtitleColor?: string | null;
+  };
+  /**
+   * Выберите шаблон и заполните его.
+   */
+  content?:
+    | (
+        | {
+            /**
+             * Раздел показывает все товары этой категории (с галочкой «Показывать на сайте»).
+             */
+            category: number | ProductCategory;
+            /**
+             * Если товаров больше — появится кнопка «Смотреть все».
+             */
+            initialCount?: number | null;
+            moreText?: {
+              ru?: string | null;
+              ro?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'products';
+          }
+        | {
+            /**
+             * Пустая строка между абзацами — новый абзац.
+             */
+            text?: {
+              ru?: string | null;
+              ro?: string | null;
+            };
+            textColor?: string | null;
+            picture?: {
+              image?: (number | null) | Media;
+              crops?:
+                | {
+                    [k: string]: unknown;
+                  }
+                | unknown[]
+                | string
+                | number
+                | boolean
+                | null;
+              variants?:
+                | {
+                    [k: string]: unknown;
+                  }
+                | unknown[]
+                | string
+                | number
+                | boolean
+                | null;
+            };
+            side?: ('left' | 'right') | null;
+            pictureBackground?: string | null;
+            button: {
+              show?: boolean | null;
+              text?: {
+                ru?: string | null;
+                ro?: string | null;
+              };
+              target:
+                | 'catalog'
+                | 'about'
+                | 'where'
+                | 'delivery'
+                | 'box'
+                | 'reviews'
+                | 'instagram'
+                | 'order'
+                | 'section'
+                | 'url';
+              section?: (number | null) | CustomSection;
+              url?: string | null;
+              newTab?: boolean | null;
+              background?: string | null;
+              color?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textImage';
+          }
+        | {
+            items?:
+              | {
+                  icon: string;
+                  title: {
+                    ru: string;
+                    ro: string;
+                  };
+                  text?: {
+                    ru?: string | null;
+                    ro?: string | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4') | null;
+            cardBackground?: string | null;
+            iconColor?: string | null;
+            titleColor?: string | null;
+            textColor?: string | null;
+            titleFont?: string | null;
+            /**
+             * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+             */
+            titleWeight?: ('300' | '400' | '500' | '600' | '700') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'features';
+          }
+        | {
+            items?:
+              | {
+                  picture: {
+                    image: number | Media;
+                    crops?:
+                      | {
+                          [k: string]: unknown;
+                        }
+                      | unknown[]
+                      | string
+                      | number
+                      | boolean
+                      | null;
+                    variants?:
+                      | {
+                          [k: string]: unknown;
+                        }
+                      | unknown[]
+                      | string
+                      | number
+                      | boolean
+                      | null;
+                  };
+                  caption?: {
+                    ru?: string | null;
+                    ro?: string | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            columns?: ('2' | '3' | '4' | '5') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            /**
+             * Google показывает такие вопросы прямо в поиске — пишите так, как спрашивают покупатели.
+             */
+            items?:
+              | {
+                  question: {
+                    ru: string;
+                    ro: string;
+                  };
+                  answer: {
+                    ru: string;
+                    ro: string;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            cardBackground?: string | null;
+            questionColor?: string | null;
+            answerColor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+      )[]
+    | null;
+  background?: string | null;
+  show?: boolean | null;
+  /**
+   * Латиницей, заполняется сам. По нему пункт меню прокручивает к разделу.
+   */
+  anchor?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -404,6 +660,10 @@ export interface PayloadLockedDocument {
         value: number | Product;
       } | null)
     | ({
+        relationTo: 'productCategories';
+        value: number | ProductCategory;
+      } | null)
+    | ({
         relationTo: 'moods';
         value: number | Mood;
       } | null)
@@ -414,6 +674,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pointCategories';
         value: number | PointCategory;
+      } | null)
+    | ({
+        relationTo: 'customSections';
+        value: number | CustomSection;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -557,8 +821,34 @@ export interface ProductsSelect<T extends boolean = true> {
         crops?: T;
         variants?: T;
       };
+  category?: T;
   active?: T;
   moods?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "productCategories_select".
+ */
+export interface ProductCategoriesSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  title?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  weightLabel?:
+    | T
+    | {
+        ru?: T;
+        ro?: T;
+      };
+  inBox?: T;
+  inMoods?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -629,6 +919,180 @@ export interface PointCategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customSections_select".
+ */
+export interface CustomSectionsSelect<T extends boolean = true> {
+  name?: T;
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+        align?: T;
+        subtitle?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        subtitleColor?: T;
+      };
+  content?:
+    | T
+    | {
+        products?:
+          | T
+          | {
+              category?: T;
+              initialCount?: T;
+              moreText?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        textImage?:
+          | T
+          | {
+              text?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              textColor?: T;
+              picture?:
+                | T
+                | {
+                    image?: T;
+                    crops?: T;
+                    variants?: T;
+                  };
+              side?: T;
+              pictureBackground?: T;
+              button?:
+                | T
+                | {
+                    show?: T;
+                    text?:
+                      | T
+                      | {
+                          ru?: T;
+                          ro?: T;
+                        };
+                    target?: T;
+                    section?: T;
+                    url?: T;
+                    newTab?: T;
+                    background?: T;
+                    color?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        features?:
+          | T
+          | {
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?:
+                      | T
+                      | {
+                          ru?: T;
+                          ro?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          ru?: T;
+                          ro?: T;
+                        };
+                    id?: T;
+                  };
+              columns?: T;
+              cardBackground?: T;
+              iconColor?: T;
+              titleColor?: T;
+              textColor?: T;
+              titleFont?: T;
+              titleWeight?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              items?:
+                | T
+                | {
+                    picture?:
+                      | T
+                      | {
+                          image?: T;
+                          crops?: T;
+                          variants?: T;
+                        };
+                    caption?:
+                      | T
+                      | {
+                          ru?: T;
+                          ro?: T;
+                        };
+                    id?: T;
+                  };
+              columns?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              items?:
+                | T
+                | {
+                    question?:
+                      | T
+                      | {
+                          ru?: T;
+                          ro?: T;
+                        };
+                    answer?:
+                      | T
+                      | {
+                          ru?: T;
+                          ro?: T;
+                        };
+                    id?: T;
+                  };
+              cardBackground?: T;
+              questionColor?: T;
+              answerColor?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  background?: T;
+  show?: T;
+  anchor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -668,7 +1132,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Перетаскивайте блоки за ⠿, чтобы поменять их порядок на странице. Шапка всегда сверху, подвал — снизу. Баннер лучше оставить первым: в нём главный заголовок страницы для Google.
+ * Перетаскивайте блоки за ⠿, чтобы поменять порядок на странице, и нажмите «Сохранить». Новые разделы появляются здесь сами. Шапка всегда сверху, подвал — снизу. Баннер лучше оставить первым: в нём главный заголовок страницы для Google.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "layout".
@@ -678,7 +1142,18 @@ export interface Layout {
   blocks?:
     | {
         block:
-          'hero' | 'moods' | 'catalog' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'finalCta';
+          | 'hero'
+          | 'moods'
+          | 'catalog'
+          | 'where'
+          | 'delivery'
+          | 'box'
+          | 'reviews'
+          | 'instagram'
+          | 'order'
+          | 'finalCta'
+          | 'custom';
+        custom?: (number | null) | CustomSection;
         id?: string | null;
       }[]
     | null;
@@ -743,10 +1218,9 @@ export interface Header {
             ru: string;
             ro: string;
           };
-          /**
-           * К какому блоку страницы прокрутить при нажатии.
-           */
-          target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
+          target:
+            'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+          section?: (number | null) | CustomSection;
           url?: string | null;
           newTab?: boolean | null;
           id?: string | null;
@@ -770,10 +1244,8 @@ export interface Header {
       ru: string;
       ro: string;
     };
-    /**
-     * К какому блоку страницы прокрутить при нажатии.
-     */
-    target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
+    target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+    section?: (number | null) | CustomSection;
     url?: string | null;
     newTab?: boolean | null;
     background?: string | null;
@@ -848,10 +1320,9 @@ export interface Hero {
             ru: string;
             ro: string;
           };
-          /**
-           * К какому блоку страницы прокрутить при нажатии.
-           */
-          target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'url';
+          target:
+            'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+          section?: (number | null) | CustomSection;
           url?: string | null;
           newTab?: boolean | null;
           background?: string | null;
@@ -998,6 +1469,10 @@ export interface Catalog {
   section?: {
     show?: boolean | null;
     background?: string | null;
+    /**
+     * Категория товаров для этого блока. Пусто — все товары.
+     */
+    category?: (number | null) | ProductCategory;
   };
   heading: {
     text: {
@@ -1135,6 +1610,129 @@ export interface WhereSection {
   createdAt?: string | null;
 }
 /**
+ * Блок про доставку. Здесь же — стоимость доставки, по которой считаются корзина и форма заказа.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliverySection".
+ */
+export interface DeliverySection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  pricing: {
+    price: number;
+    /**
+     * 0 — бесплатной доставки нет.
+     */
+    freeFrom: number;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    subtitle?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    subtitleColor?: string | null;
+  };
+  media?: {
+    show?: boolean | null;
+    picture?: {
+      image?: (number | null) | Media;
+      crops?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+      variants?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+    };
+    background?: string | null;
+    side?: ('left' | 'right') | null;
+  };
+  steps?: {
+    show?: boolean | null;
+    items?:
+      | {
+          text: {
+            ru: string;
+            ro: string;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    numberColor?: string | null;
+    color?: string | null;
+    font?: string | null;
+  };
+  terms?: {
+    show?: boolean | null;
+    /**
+     * {price} и {free} заменятся на стоимость доставки и порог бесплатной доставки из вкладки «Стоимость».
+     */
+    items?:
+      | {
+          title: {
+            ru: string;
+            ro: string;
+          };
+          value: {
+            ru: string;
+            ro: string;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    background?: string | null;
+    titleColor?: string | null;
+    valueColor?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  button: {
+    show?: boolean | null;
+    text?: {
+      ru: string;
+      ro: string;
+    };
+    target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+    section?: (number | null) | CustomSection;
+    url?: string | null;
+    newTab?: boolean | null;
+    background?: string | null;
+    color?: string | null;
+    font?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Фирменные цвета сайта. В настройках разделов цвета выбираются из этого списка.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1256,6 +1854,7 @@ export interface LayoutSelect<T extends boolean = true> {
     | T
     | {
         block?: T;
+        custom?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -1316,6 +1915,7 @@ export interface HeaderSelect<T extends boolean = true> {
                     ro?: T;
                   };
               target?: T;
+              section?: T;
               url?: T;
               newTab?: T;
               id?: T;
@@ -1342,6 +1942,7 @@ export interface HeaderSelect<T extends boolean = true> {
               ro?: T;
             };
         target?: T;
+        section?: T;
         url?: T;
         newTab?: T;
         background?: T;
@@ -1417,6 +2018,7 @@ export interface HeroSelect<T extends boolean = true> {
                     ro?: T;
                   };
               target?: T;
+              section?: T;
               url?: T;
               newTab?: T;
               background?: T;
@@ -1540,6 +2142,7 @@ export interface CatalogSelect<T extends boolean = true> {
     | {
         show?: T;
         background?: T;
+        category?: T;
       };
   heading?:
     | T
@@ -1687,6 +2290,127 @@ export interface WhereSectionSelect<T extends boolean = true> {
     | T
     | {
         show?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deliverySection_select".
+ */
+export interface DeliverySectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  pricing?:
+    | T
+    | {
+        price?: T;
+        freeFrom?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+        subtitle?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        subtitleColor?: T;
+      };
+  media?:
+    | T
+    | {
+        show?: T;
+        picture?:
+          | T
+          | {
+              image?: T;
+              crops?: T;
+              variants?: T;
+            };
+        background?: T;
+        side?: T;
+      };
+  steps?:
+    | T
+    | {
+        show?: T;
+        items?:
+          | T
+          | {
+              text?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              id?: T;
+            };
+        numberColor?: T;
+        color?: T;
+        font?: T;
+      };
+  terms?:
+    | T
+    | {
+        show?: T;
+        items?:
+          | T
+          | {
+              title?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              value?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              id?: T;
+            };
+        background?: T;
+        titleColor?: T;
+        valueColor?: T;
+        font?: T;
+        weight?: T;
+      };
+  button?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        target?: T;
+        section?: T;
+        url?: T;
+        newTab?: T;
+        background?: T;
+        color?: T;
+        font?: T;
       };
   updatedAt?: T;
   createdAt?: T;

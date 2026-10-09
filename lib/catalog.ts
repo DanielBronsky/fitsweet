@@ -52,12 +52,29 @@ function toMood(doc: MoodDoc): Mood | null {
   };
 }
 
+type CategoryInfo = { slug: string; inBox: boolean; inMoods: boolean; weightLabel?: { ru: string; ro: string } };
+
+const getCategoryMap = cache(async (): Promise<Map<number, CategoryInfo>> => {
+  const { docs } = await (await getCms()).find({ collection: "productCategories", depth: 0, limit: 0, pagination: false });
+  return new Map(
+    docs.map((d) => [
+      d.id,
+      {
+        slug: d.slug ?? String(d.id),
+        inBox: Boolean(d.inBox),
+        inMoods: Boolean(d.inMoods),
+        weightLabel: d.weightLabel?.ru ? { ru: d.weightLabel.ru, ro: d.weightLabel.ro || d.weightLabel.ru } : undefined,
+      },
+    ]),
+  );
+});
+
 const getMoodSlugs = cache(async (): Promise<Map<number, string>> => {
   const { docs } = await (await getCms()).find({ collection: "moods", depth: 0, limit: 0, pagination: false });
   return new Map(docs.filter((d) => d.slug).map((d) => [d.id, d.slug as string]));
 });
 
-function toProduct(doc: ProductDoc, moodSlugs: Map<number, string>): Product | null {
+function toProduct(doc: ProductDoc, moodSlugs: Map<number, string>, categories: Map<number, CategoryInfo>): Product | null {
   if (!doc.slug || !doc.name?.ru) return null;
   const card = imageFrame<ResponsiveVariant>(doc.picture, "card");
   const shortRu = doc.shortName?.ru?.trim();
@@ -75,6 +92,13 @@ function toProduct(doc: ProductDoc, moodSlugs: Map<number, string>): Product | n
     ingredients: { ru: doc.ingredients?.ru ?? "", ro: doc.ingredients?.ro ?? "" },
     image: card?.srcset[0]?.src ?? "",
     thumb: thumbOf(card),
+    ...(() => {
+      const id = typeof doc.category === "object" ? doc.category?.id : doc.category;
+      const info = id ? categories.get(id) : undefined;
+      return info
+        ? { category: info.slug, inBox: info.inBox, inMoods: info.inMoods, weightLabel: info.weightLabel }
+        : { inBox: true, inMoods: true };
+    })(),
   };
 }
 
@@ -92,8 +116,8 @@ export const getProducts = cache(async (): Promise<Product[]> => {
       const any = await (await getCms()).count({ collection: "products" });
       return any.totalDocs ? [] : fallbackProducts;
     }
-    const moodSlugs = await getMoodSlugs();
-    return docs.map((d) => toProduct(d, moodSlugs)).filter((p): p is Product => Boolean(p));
+    const [moodSlugs, categories] = await Promise.all([getMoodSlugs(), getCategoryMap()]);
+    return docs.map((d) => toProduct(d, moodSlugs, categories)).filter((p): p is Product => Boolean(p));
   } catch (err) {
     console.error("[cms] не удалось загрузить товары:", err);
     return fallbackProducts;
@@ -104,6 +128,7 @@ export type SectionTitleData = { text: string; color: string; leafColor: string;
 
 export type CatalogData = {
   background: string;
+  category?: string;
   title: SectionTitleData;
   cards: {
     background: string;
@@ -162,13 +187,15 @@ export function sectionTitle(
   };
 }
 
-function toCatalogData(doc: CatalogDoc, locale: Locale): CatalogData | null {
+async function toCatalogData(doc: CatalogDoc, locale: Locale): Promise<CatalogData | null> {
   if (doc.section?.show === false) return null;
   const d = getDictionary(locale).catalog;
   const c = doc.cards;
   const m = doc.more;
+  const categoryId = typeof doc.section?.category === "object" ? doc.section?.category?.id : doc.section?.category;
   return {
     background: css(doc.section?.background, "white"),
+    category: categoryId ? (await getCategoryMap()).get(categoryId)?.slug : undefined,
     title: sectionTitle(doc.heading, locale, d.title),
     cards: {
       background: css(c?.background, "card"),
@@ -201,7 +228,7 @@ export const getCatalogData = cache(async (locale: Locale): Promise<CatalogData 
   try {
     const doc = await (await getCms()).findGlobal({ slug: "catalog", depth: 0 });
     if (!doc.updatedAt) return fallbackCatalog(locale);
-    return toCatalogData(doc, locale);
+    return await toCatalogData(doc, locale);
   } catch (err) {
     console.error("[cms] не удалось загрузить каталог:", err);
     return fallbackCatalog(locale);
@@ -277,5 +304,16 @@ export const getMoodsData = cache(async (locale: Locale): Promise<MoodsData | nu
   } catch (err) {
     console.error("[cms] не удалось загрузить блок настроений:", err);
     return fallbackMoodsSection(locale);
+  }
+});
+
+export const getCardStyle = cache(async (locale: Locale): Promise<CatalogData["cards"]> => {
+  try {
+    const doc = await (await getCms()).findGlobal({ slug: "catalog", depth: 0 });
+    if (!doc.updatedAt) return fallbackCatalog(locale).cards;
+    const data = await toCatalogData({ ...doc, section: { ...doc.section, show: true } }, locale);
+    return data!.cards;
+  } catch {
+    return fallbackCatalog(locale).cards;
   }
 });

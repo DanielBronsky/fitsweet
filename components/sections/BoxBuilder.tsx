@@ -26,7 +26,8 @@ const assorted = (products: Product[], n: number) => {
 
 export function BoxBuilder() {
   const { locale, dict } = useI18n();
-  const { products } = useProducts();
+  const { products: all } = useProducts();
+  const products = useMemo(() => all.filter((p) => p.inBox !== false), [all]);
   const [size, setSize] = useState(8);
   const [picked, setPicked] = useState<Record<string, number>>(() => assorted(products, 8));
   const [manual, setManual] = useState(false);

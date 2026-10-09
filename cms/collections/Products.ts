@@ -37,8 +37,8 @@ export const Products: CollectionConfig = {
   admin: {
     group: false,
     useAsTitle: "title",
-    defaultColumns: ["title", "price", "weight", "active"],
-    description: "Десерты: каталог, корзина, конструктор коробки и форма заказа берут товары отсюда. Порядок — перетаскиванием.",
+    defaultColumns: ["title", "category", "price", "weight", "active"],
+    description: "Все товары сайта: десерты, выпечка… Разделы с карточками, корзина, коробка и форма заказа берут товары отсюда. Порядок — перетаскиванием.",
     listSearchableFields: ["title", "slug"],
   },
   access: {
@@ -87,6 +87,19 @@ export const Products: CollectionConfig = {
       frames: framePresets.productCard,
       description: "Лучше на светлом однотонном фоне, товар по центру.",
     }),
+    {
+      name: "categoryFromUrl",
+      type: "ui",
+      admin: { position: "sidebar", components: { Field: "/cms/admin/CategoryFromUrl#CategoryFromUrl" } },
+    },
+    {
+      name: "category",
+      type: "relationship",
+      relationTo: "productCategories",
+      label: "Категория",
+      required: true,
+      admin: { position: "sidebar", description: "«Десерты», «Выпечка»… Определяет, в каком разделе показывается товар." },
+    },
     {
       name: "active",
       type: "checkbox",

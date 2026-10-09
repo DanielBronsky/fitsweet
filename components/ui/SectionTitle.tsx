@@ -15,24 +15,21 @@ export function SectionTitle({
   as?: "h1" | "h2" | "h3";
   className?: string;
 }) {
+  const leaf = !data || data.leaf;
   return (
-    <div
-      className={`flex items-start gap-3 ${
-        align === "center" ? "justify-center text-center" : "justify-start text-left"
-      } ${className}`}
-    >
+    <div className={`${align === "center" ? "text-center" : "text-left"} ${className}`}>
       <Tag
         style={data ? { color: data.color, fontFamily: data.font, fontWeight: data.weight } : undefined}
-        className={`heading-caps text-[22px] sm:text-[26px] lg:text-[30px] ${data ? "" : "text-green-900"}`}
+        className={`heading-caps text-balance text-[22px] sm:text-[26px] lg:text-[30px] ${data ? "" : "text-green-900"}`}
       >
         {data ? data.text : children}
+        {leaf && (
+          <Leaf
+            className={`ml-3 inline-block w-4 -translate-y-[0.42em] align-middle sm:w-[18px] lg:w-5 ${data ? "" : "text-green-500"}`}
+            style={data ? { color: data.leafColor } : undefined}
+          />
+        )}
       </Tag>
-      {(!data || data.leaf) && (
-        <Leaf
-          className={`mt-0.5 w-4 shrink-0 sm:w-[18px] lg:mt-1 lg:w-5 ${data ? "" : "text-green-500"}`}
-          style={data ? { color: data.leafColor } : undefined}
-        />
-      )}
     </div>
   );
 }

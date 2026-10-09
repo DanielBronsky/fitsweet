@@ -69,6 +69,26 @@ export const framePresets = {
       output: { type: "responsive", widths: [300, 440, 660] },
     },
   ],
+  delivery: [
+    {
+      key: "desktop",
+      label: "Картинка",
+      hint: "Картинка блока «Доставка» на компьютере и телефоне.",
+      aspect: [13, 10],
+      minWidth: 1100,
+      output: { type: "responsive", widths: [480, 750, 1100] },
+    },
+  ],
+  galleryTile: [
+    {
+      key: "desktop",
+      label: "Фото",
+      hint: "Квадратная плитка галереи.",
+      aspect: [1, 1],
+      minWidth: 720,
+      output: { type: "responsive", widths: [360, 540, 720] },
+    },
+  ],
   og: [
     {
       key: "og",

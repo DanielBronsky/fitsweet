@@ -6,17 +6,16 @@ import { tileName } from "@/lib/products";
 import { useProducts } from "@/lib/products-context";
 import { ProductImage } from "@/components/ui/ProductImage";
 import { useI18n } from "@/lib/i18n/context";
-import { FREE_DELIVERY_FROM } from "@/lib/delivery";
 import { Button } from "@/components/ui/Button";
 import { CloseIcon } from "@/components/ui/Icons";
 
 export function CartDrawer() {
   const { locale, dict } = useI18n();
   const { lines, isOpen, close, setQty, remove, clear } = useCart();
-  const { byId: productById } = useProducts();
+  const { byId: productById, shipping } = useProducts();
   const total = cartTotal(lines, productById);
   const count = cartCount(lines);
-  const left = FREE_DELIVERY_FROM - total;
+  const left = shipping.freeFrom > 0 ? shipping.freeFrom - total : 0;
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";

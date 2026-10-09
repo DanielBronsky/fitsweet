@@ -58,7 +58,7 @@ export function LocaleSwitch({
   const switchTo = (next: string) => {
     rememberAnchor();
     const rest = pathname.split("/").slice(2).join("/");
-    router.push(`/${next}${rest ? `/${rest}` : ""}${window.location.hash}`, { scroll: false });
+    router.push(`/${next}${rest ? `/${rest}` : ""}`, { scroll: false });
   };
 
   const dark = tone === "dark";

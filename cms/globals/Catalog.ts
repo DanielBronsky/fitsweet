@@ -31,6 +31,18 @@ export const Catalog: GlobalConfig = {
           fields: [
             show("Показывать раздел"),
             whenShown(colorField({ name: "background", label: "Цвет фона раздела", defaultValue: "white" })),
+            whenShown({
+              name: "category",
+              type: "relationship",
+              relationTo: "productCategories",
+              label: "Какие товары показывать",
+              admin: { description: "Категория товаров для этого блока. Пусто — все товары." },
+            }),
+            whenShown({
+              name: "categoryProducts",
+              type: "ui",
+              admin: { components: { Field: "/cms/admin/CategoryProducts#CategoryProducts" } },
+            }),
           ],
         },
         {

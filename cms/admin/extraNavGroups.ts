@@ -18,6 +18,14 @@ export const extraNavGroups: { label: string; items: NavItem[] }[] = [
       { label: "Где купить", path: "/globals/whereSection", section: "where" },
       { label: "Точки продаж", path: "/collections/salePoints", sub: true, section: "where" },
       { label: "Категории точек", path: "/collections/pointCategories", sub: true, section: "where" },
+      { label: "Доставка", path: "/globals/deliverySection", section: "delivery" },
+    ],
+  },
+  {
+    label: "Товары",
+    items: [
+      { label: "Все товары", path: "/collections/products" },
+      { label: "Категории товаров", path: "/collections/productCategories" },
     ],
   },
   { label: "Медиатека", items: [{ label: "Медиатека", path: "/collections/media" }] },

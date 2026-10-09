@@ -22,6 +22,10 @@ export type Product = {
   ingredients: I18nString;
   image: string;
   thumb?: ProductThumb;
+  category?: string;
+  weightLabel?: I18nString;
+  inBox?: boolean;
+  inMoods?: boolean;
 };
 
 export type ProductThumb = { src: string; srcSet: string; width: number; height: number };

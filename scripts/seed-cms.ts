@@ -3,13 +3,24 @@ import config from "@payload-config";
 import { ru } from "../lib/i18n/ru";
 import { ro } from "../lib/i18n/ro";
 import { paletteTokens } from "../cms/palette";
+import { seedHeader } from "./seed/header";
+import { seedHero } from "./seed/hero";
+import { seedProductCategories } from "./seed/categories";
+import { seedCatalog } from "./seed/catalog";
+import { seedMoods } from "./seed/moods";
+import { seedWhere } from "./seed/where";
+import { seedDelivery } from "./seed/delivery";
+import { seedLayout } from "./seed/layout";
 
 const payload = await getPayload({ config });
+const step = async (name: string, fn: () => Promise<unknown>) => {
+  await fn();
+  payload.logger.info(`seed: ${name} — готово`);
+};
 
-const seo = await payload.findGlobal({ slug: "seo", depth: 0 });
-if (seo.title?.ru && seo.title?.ro) {
-  payload.logger.info("SEO уже заполнено — пропускаю");
-} else {
+await step("SEO", async () => {
+  const seo = await payload.findGlobal({ slug: "seo", depth: 0 });
+  if (seo.title?.ru && seo.title?.ro) return;
   await payload.updateGlobal({
     slug: "seo",
     data: {
@@ -21,27 +32,25 @@ if (seo.title?.ru && seo.title?.ro) {
       },
     },
   });
-  payload.logger.info("SEO заполнено из словарей");
-}
+});
 
-const theme = await payload.findGlobal({ slug: "theme", depth: 0 });
-const colors = (theme.colors ?? {}) as Record<string, string | null | undefined>;
-const missing = paletteTokens.filter((t) => !colors[t.key.replace("-", "_")]);
-if (missing.length) {
+await step("Палитра", async () => {
+  const theme = await payload.findGlobal({ slug: "theme", depth: 0 });
+  if (theme.updatedAt) return;
   await payload.updateGlobal({
     slug: "theme",
-    data: {
-      colors: Object.fromEntries(
-        paletteTokens.map((t) => {
-          const key = t.key.replace("-", "_");
-          return [key, colors[key] || t.hex];
-        }),
-      ) as never,
-    },
+    data: { colors: Object.fromEntries(paletteTokens.map((t) => [t.key.replace("-", "_"), t.hex])) as never },
   });
-  payload.logger.info(`Палитра: заполнено цветов — ${missing.length}`);
-} else {
-  payload.logger.info("Палитра уже заполнена — пропускаю");
-}
+});
+
+await step("Шапка", () => seedHeader(payload));
+await step("Баннер", () => seedHero(payload));
+const { desserts, bakery } = await seedProductCategories(payload);
+payload.logger.info("seed: Категории товаров — готово");
+await step("Товары и «Наши десерты»", () => seedCatalog(payload, desserts));
+await step("Настроения", () => seedMoods(payload));
+await step("Где купить", () => seedWhere(payload));
+await step("Доставка", () => seedDelivery(payload));
+await step("Порядок блоков", () => seedLayout(payload, bakery));
 
 process.exit(0);

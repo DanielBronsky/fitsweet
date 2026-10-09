@@ -1,4 +1,3 @@
-import path from "path"
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
@@ -82,73 +81,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`created_at\` text
   );
   `)
-  const oldLinks = (await db.all(
-    sql`SELECT parent_id AS product, value FROM products_moods ORDER BY parent_id, "order";`,
-  )) as { product: number; value: string }[]
   await db.run(sql`DROP TABLE \`products_moods\`;`)
   await db.run(sql`ALTER TABLE \`payload_locked_documents_rels\` ADD \`moods_id\` integer REFERENCES moods(id);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_moods_id_idx\` ON \`payload_locked_documents_rels\` (\`moods_id\`);`)
   await db.run(sql`ALTER TABLE \`catalog\` ADD \`more_initial_count\` numeric DEFAULT 8;`)
-
-  const moods = [
-    { slug: "chocolate", title: { ru: "Хочется шоколада", ro: "Poftă de ciocolată" } },
-    { slug: "caramel", title: { ru: "Любите карамель", ro: "Vă place caramelul" } },
-    { slug: "coconut", title: { ru: "Мечтаете о кокосе", ro: "Visați la cocos" } },
-    { slug: "fruity", title: { ru: "Хочется чего-то лёгкого и фруктового", ro: "Poftă de ceva ușor și fructat" } },
-    { slug: "nuts-berries", title: { ru: "Любите сочетание орехов и ягод", ro: "Vă place combinația de nuci și fructe de pădure" } },
-  ]
-  const moodIds: Record<string, number> = {}
-  for (const m of moods) {
-    const media = await payload.create({
-      collection: "media",
-      req,
-      filePath: path.resolve("public/images/moods", `${m.slug}.svg`),
-      data: { alt: { ru: m.title.ru, ro: m.title.ro } },
-    })
-    const doc = await payload.create({
-      collection: "moods",
-      req,
-      data: { slug: m.slug, title: m.title, active: true, picture: { image: media.id } } as never,
-    })
-    moodIds[m.slug] = doc.id
-  }
-
-  const byProduct = new Map<number, number[]>()
-  for (const link of oldLinks) {
-    const id = moodIds[link.value]
-    if (!id) continue
-    byProduct.set(link.product, [...(byProduct.get(link.product) ?? []), id])
-  }
-  for (const [product, ids] of byProduct) {
-    await payload.update({ collection: "products", id: product, req, data: { moods: ids } })
-  }
-
-  await payload.updateGlobal({
-    slug: "moodsSection",
-    req,
-    data: {
-      section: { show: true, background: "beige" },
-      heading: { text: { ru: "Выбирайте по настроению", ro: "Alege după dispoziție" }, color: "green-900", leafColor: "green-500", leaf: true },
-      cards: { background: "white", activeBorder: "green-700", titleColor: "green-900", listColor: "muted", showList: true },
-      more: {
-        show: true,
-        text: { ru: "Смотреть весь ассортимент", ro: "Vezi tot sortimentul" },
-        background: "white",
-        color: "green-900",
-        border: "green-200",
-      },
-    },
-  })
-
-  await payload.updateGlobal({
-    slug: "layout",
-    req,
-    data: {
-      blocks: ["hero", "moods", "catalog", "where", "delivery", "box", "reviews", "instagram", "order", "finalCta"].map(
-        (block) => ({ block }),
-      ),
-    } as never,
-  })
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {

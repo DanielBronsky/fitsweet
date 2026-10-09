@@ -4,6 +4,7 @@ import { getDictionary, locales, localeTags, isLocale, defaultLocale, type Local
 import { getPalette, getSeo, getTypographyCss, imageAlt, imageFrame, paletteCss } from "@/lib/cms";
 import { getHeaderData } from "@/lib/header";
 import { getMoods, getProducts } from "@/lib/catalog";
+import { getShippingRules } from "@/lib/delivery-data";
 import { ProductsProvider } from "@/lib/products-context";
 import type { FixedVariant } from "@/cms/media/frames";
 import { I18nProvider } from "@/lib/i18n/context";
@@ -11,6 +12,7 @@ import { siteConfig } from "@/lib/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/layout/CartDrawer";
+import { AnchorScroll } from "@/components/layout/AnchorScroll";
 import "../globals.css";
 import { fontVariables } from "../fonts";
 
@@ -90,7 +92,7 @@ export default async function LocaleLayout({
       <body className="antialiased">
         {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
         <I18nProvider locale={locale}>
-          <ProductsProvider products={await getProducts()} moods={await getMoods()}>
+          <ProductsProvider products={await getProducts()} moods={await getMoods()} shipping={await getShippingRules()}>
           <a
             href="#catalog"
             className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-green-700 focus:px-5 focus:py-3 focus:text-cream"
@@ -101,6 +103,7 @@ export default async function LocaleLayout({
           <main>{children}</main>
           <Footer />
           <CartDrawer />
+          <AnchorScroll />
           </ProductsProvider>
         </I18nProvider>
       </body>
