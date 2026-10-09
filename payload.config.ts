@@ -23,6 +23,7 @@ import { Layout } from "./cms/globals/Layout";
 import { MoodsSection } from "./cms/globals/MoodsSection";
 import { WhereSection } from "./cms/globals/WhereSection";
 import { DeliverySection } from "./cms/globals/DeliverySection";
+import { BoxSection } from "./cms/globals/BoxSection";
 import { Typography } from "./cms/globals/Typography";
 import { ruOverrides } from "./cms/i18n-ru";
 
@@ -44,6 +45,11 @@ export default buildConfig({
     },
     meta: {
       titleSuffix: " — FitSweet",
+      icons: [
+        { rel: "icon", type: "image/x-icon", url: "/site-icon/favicon.ico", sizes: "48x48" },
+        { rel: "icon", type: "image/png", url: "/site-icon/icon.png", sizes: "512x512" },
+        { rel: "apple-touch-icon", type: "image/png", url: "/site-icon/apple-icon.png", sizes: "180x180" },
+      ],
       robots: "noindex, nofollow",
     },
   },
@@ -53,7 +59,7 @@ export default buildConfig({
     translations: { ru: ruOverrides },
   },
   collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections],
-  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, Theme, Typography, Seo],
+  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, BoxSection, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

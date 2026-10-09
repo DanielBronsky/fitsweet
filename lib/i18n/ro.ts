@@ -90,7 +90,7 @@ export const ro: Dictionary = {
     freeSlot: "Loc liber",
     total: "Total:",
     checkout: "Plasează comanda",
-    addMore: (n: number) => `Mai adaugă ${n}`,
+    addMore: "Mai adaugă {n}",
     addOne: (name: string) => `Adaugă ${name}`,
     removeOne: (name: string) => `Scoate ${name}`,
   },

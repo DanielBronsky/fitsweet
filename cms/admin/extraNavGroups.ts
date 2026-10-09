@@ -19,6 +19,7 @@ export const extraNavGroups: { label: string; items: NavItem[] }[] = [
       { label: "Точки продаж", path: "/collections/salePoints", sub: true, section: "where" },
       { label: "Категории точек", path: "/collections/pointCategories", sub: true, section: "where" },
       { label: "Доставка", path: "/globals/deliverySection", section: "delivery" },
+      { label: "Соберите коробку", path: "/globals/boxSection", section: "box" },
     ],
   },
   {

@@ -88,7 +88,7 @@ export const ru = {
     freeSlot: "Свободное место",
     total: "Итого:",
     checkout: "Оформить заказ",
-    addMore: (n: number) => `Добавьте ещё ${n}`,
+    addMore: "Добавьте ещё {n}",
     addOne: (name: string) => `Добавить ${name}`,
     removeOne: (name: string) => `Убрать ${name}`,
   },

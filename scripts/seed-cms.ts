@@ -10,6 +10,7 @@ import { seedCatalog } from "./seed/catalog";
 import { seedMoods } from "./seed/moods";
 import { seedWhere } from "./seed/where";
 import { seedDelivery } from "./seed/delivery";
+import { seedBox } from "./seed/box";
 import { seedLayout } from "./seed/layout";
 
 const payload = await getPayload({ config });
@@ -51,6 +52,7 @@ await step("Товары и «Наши десерты»", () => seedCatalog(payl
 await step("Настроения", () => seedMoods(payload));
 await step("Где купить", () => seedWhere(payload));
 await step("Доставка", () => seedDelivery(payload));
+await step("Соберите коробку", () => seedBox(payload));
 await step("Порядок блоков", () => seedLayout(payload, bakery));
 
 process.exit(0);

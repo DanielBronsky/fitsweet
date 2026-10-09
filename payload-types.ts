@@ -107,6 +107,7 @@ export interface Config {
     catalog: Catalog;
     whereSection: WhereSection;
     deliverySection: DeliverySection;
+    boxSection: BoxSection;
     theme: Theme;
     typography: Typography;
     seo: Seo;
@@ -119,6 +120,7 @@ export interface Config {
     catalog: CatalogSelect<false> | CatalogSelect<true>;
     whereSection: WhereSectionSelect<false> | WhereSectionSelect<true>;
     deliverySection: DeliverySectionSelect<false> | DeliverySectionSelect<true>;
+    boxSection: BoxSectionSelect<false> | BoxSectionSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -1733,6 +1735,91 @@ export interface DeliverySection {
   createdAt?: string | null;
 }
 /**
+ * Конструктор коробки. В коробку попадают товары из категорий с галочкой «Можно класть в коробку» (Товары → Категории товаров).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "boxSection".
+ */
+export interface BoxSection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    leafColor?: string | null;
+    leaf?: boolean | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    subtitle?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    subtitleColor?: string | null;
+  };
+  sizes: {
+    /**
+     * Каждое число — кнопка размера. Например: 4, 6, 8, 12.
+     */
+    options: number[];
+    /**
+     * Должен быть одним из чисел выше.
+     */
+    initial: number;
+  };
+  texts: {
+    chooseQty: {
+      ru: string;
+      ro: string;
+    };
+    yourBox: {
+      ru: string;
+      ro: string;
+    };
+    manualPick: {
+      ru: string;
+      ro: string;
+    };
+    hideManual: {
+      ru: string;
+      ro: string;
+    };
+    total: {
+      ru: string;
+      ro: string;
+    };
+    checkout: {
+      ru: string;
+      ro: string;
+    };
+    /**
+     * {n} заменится на число недостающих десертов.
+     */
+    addMore: {
+      ru: string;
+      ro: string;
+    };
+  };
+  style?: {
+    panel?: string | null;
+    border?: string | null;
+    accent?: string | null;
+    accentText?: string | null;
+    text?: string | null;
+    muted?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Фирменные цвета сайта. В настройках разделов цвета выбираются из этого списка.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1832,6 +1919,22 @@ export interface Seo {
       | number
       | boolean
       | null;
+    variants?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  /**
+   * Значок во вкладке браузера, в поиске Google и на экране телефона. Из картинки автоматически делаются все размеры. Пусто — стандартная иконка FitSweet.
+   */
+  favicon?: {
+    image?: (number | null) | Media;
+    background?: string | null;
     variants?:
       | {
           [k: string]: unknown;
@@ -2418,6 +2521,105 @@ export interface DeliverySectionSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "boxSection_select".
+ */
+export interface BoxSectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        leafColor?: T;
+        leaf?: T;
+        font?: T;
+        weight?: T;
+        subtitle?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        subtitleColor?: T;
+      };
+  sizes?:
+    | T
+    | {
+        options?: T;
+        initial?: T;
+      };
+  texts?:
+    | T
+    | {
+        chooseQty?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        yourBox?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        manualPick?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        hideManual?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        total?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        checkout?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        addMore?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+      };
+  style?:
+    | T
+    | {
+        panel?: T;
+        border?: T;
+        accent?: T;
+        accentText?: T;
+        text?: T;
+        muted?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "theme_select".
  */
 export interface ThemeSelect<T extends boolean = true> {
@@ -2484,6 +2686,13 @@ export interface SeoSelect<T extends boolean = true> {
     | {
         image?: T;
         crops?: T;
+        variants?: T;
+      };
+  favicon?:
+    | T
+    | {
+        image?: T;
+        background?: T;
         variants?: T;
       };
   updatedAt?: T;

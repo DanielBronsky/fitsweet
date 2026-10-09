@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload";
 import { afterContentChange } from "../hooks/revalidateSite";
-import { imageField } from "../fields/image";
+import { iconField, imageField } from "../fields/image";
 import { bilingual } from "../fields/bilingual";
 import { framePresets } from "../media/frames";
 
@@ -44,6 +44,12 @@ export const Seo: GlobalConfig = {
       label: "Картинка для превью ссылок",
       frames: framePresets.og,
       description: "Показывается, когда ссылку на сайт отправляют в Telegram, Facebook, Viber. Отдаётся как JPG 1200×630.",
+    }),
+    iconField({
+      name: "favicon",
+      label: "Иконка сайта (фавиконка)",
+      description:
+        "Значок во вкладке браузера, в поиске Google и на экране телефона. Из картинки автоматически делаются все размеры. Пусто — стандартная иконка FitSweet.",
     }),
   ],
 };

@@ -14,6 +14,8 @@ import * as migration_20261008_162643_where_to_buy from './20261008_162643_where
 import * as migration_20261008_163556_delivery from './20261008_163556_delivery';
 import * as migration_20261008_165946_custom_sections from './20261008_165946_custom_sections';
 import * as migration_20261008_170133_category_weight_label from './20261008_170133_category_weight_label';
+import * as migration_20261009_101228_box from './20261009_101228_box';
+import * as migration_20261009_102254_favicon from './20261009_102254_favicon';
 
 export const migrations = [
   {
@@ -94,6 +96,16 @@ export const migrations = [
   {
     up: migration_20261008_170133_category_weight_label.up,
     down: migration_20261008_170133_category_weight_label.down,
-    name: '20261008_170133_category_weight_label'
+    name: '20261008_170133_category_weight_label',
+  },
+  {
+    up: migration_20261009_101228_box.up,
+    down: migration_20261009_101228_box.down,
+    name: '20261009_101228_box',
+  },
+  {
+    up: migration_20261009_102254_favicon.up,
+    down: migration_20261009_102254_favicon.down,
+    name: '20261009_102254_favicon'
   },
 ];

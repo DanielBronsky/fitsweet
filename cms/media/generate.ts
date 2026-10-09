@@ -188,3 +188,93 @@ export async function generateLogoVariants({
   );
   return { mediaId, source: filename, width, height, src: srcset[0].src, srcset };
 }
+
+export type IconVariants = {
+  mediaId: number;
+  source: string;
+  background: string | null;
+  icon: string;
+  apple: string;
+  ico: string;
+};
+
+async function iconTile(art: Buffer, size: number, scale: number, background: string | null, rounded: boolean) {
+  const inner = Math.max(1, Math.round(size * scale));
+  const fitted = await sharp(art)
+    .resize(inner, inner, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: "lanczos3" })
+    .png()
+    .toBuffer();
+  const r = rounded ? Math.round(size * 0.22) : 0;
+  const base = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${r}" ry="${r}" fill="${background ?? "none"}"/></svg>`,
+  );
+  return sharp(base).composite([{ input: fitted, gravity: "center" }]).png({ compressionLevel: 9 }).toBuffer();
+}
+
+export function buildIco(pngs: { size: number; data: Buffer }[]) {
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(pngs.length, 4);
+  let offset = 6 + 16 * pngs.length;
+  const entries = pngs.map(({ size, data }) => {
+    const e = Buffer.alloc(16);
+    e.writeUInt8(size >= 256 ? 0 : size, 0);
+    e.writeUInt8(size >= 256 ? 0 : size, 1);
+    e.writeUInt16LE(1, 4);
+    e.writeUInt16LE(32, 6);
+    e.writeUInt32LE(data.length, 8);
+    e.writeUInt32LE(offset, 12);
+    offset += data.length;
+    return e;
+  });
+  return Buffer.concat([header, ...entries, ...pngs.map((p) => p.data)]);
+}
+
+export async function generateIconVariants({
+  buffer,
+  mimeType,
+  mediaId,
+  filename,
+  background,
+}: {
+  buffer: Buffer;
+  mimeType?: string | null;
+  mediaId: number;
+  filename: string;
+  background: string | null;
+}): Promise<IconVariants> {
+  const { data } = await loadOriented(buffer, mimeType);
+  const art = await sharp(data).trim({ threshold: 1 }).png().toBuffer().catch(() => sharp(data).png().toBuffer());
+  const fill = background ? 0.78 : 1;
+
+  await fs.mkdir(VARIANTS_DIR, { recursive: true });
+  const hash = crypto.createHash("sha1").update(`${mediaId}|${filename}|icon|${background ?? ""}`).digest("hex").slice(0, 10);
+  const stem = `${stemOf(filename)}-${hash}-icon`;
+
+  const write = async (file: string, make: () => Promise<Buffer>) => {
+    const full = path.join(VARIANTS_DIR, file);
+    if (!(await exists(full))) await fs.writeFile(full, await make());
+    return `${VARIANTS_URL}/${file}`;
+  };
+
+  const icon = await write(`${stem}-512.png`, () => iconTile(art, 512, fill, background, true));
+  const apple = await write(`${stem}-180.png`, async () =>
+    sharp(await iconTile(art, 180, background ? 0.7 : 0.86, background ?? "#ffffff", false))
+      .flatten({ background: background ?? "#ffffff" })
+      .png()
+      .toBuffer(),
+  );
+  const ico = await write(`${stem}.ico`, async () =>
+    buildIco(
+      await Promise.all(
+        [16, 32, 48].map(async (size) => ({
+          size,
+          data: await iconTile(art, size, background ? (size <= 16 ? 0.86 : 0.8) : 1, background, true),
+        })),
+      ),
+    ),
+  );
+
+  return { mediaId, source: filename, background, icon, apple, ico };
+}

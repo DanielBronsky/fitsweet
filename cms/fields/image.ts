@@ -1,8 +1,18 @@
 import fs from "fs/promises";
 import path from "path";
-import type { FieldHook, GroupField } from "payload";
+import type { FieldHook, GroupField, PayloadRequest } from "payload";
 import { normalizeCrops, type Crops, type FrameSpec, type ImageVariants } from "../media/frames";
-import { MEDIA_DIR, generateImageVariants, generateLogoVariants, loadOriented, type LogoVariants } from "../media/generate";
+import {
+  MEDIA_DIR,
+  generateIconVariants,
+  generateImageVariants,
+  generateLogoVariants,
+  loadOriented,
+  type IconVariants,
+  type LogoVariants,
+} from "../media/generate";
+import { HEX_RE, defaultPalette, paletteTokens } from "../palette";
+import { colorField } from "./color";
 
 type ImageValue = {
   image?: number | { id: number } | null;
@@ -156,6 +166,59 @@ export function logoField({
     hooks: { beforeChange: [buildLogoVariants(height)] },
     fields: [
       { name: "image", type: "upload", relationTo: "media", label: "Файл логотипа" },
+      { name: "variants", type: "json", admin: { hidden: true } },
+    ],
+  };
+}
+
+type IconValue = { image?: number | { id: number } | null; background?: string | null; variants?: IconVariants | null };
+
+async function resolveHex(value: string | null | undefined, req: PayloadRequest): Promise<string | null> {
+  if (!value) return null;
+  if (HEX_RE.test(value)) return value;
+  const token = paletteTokens.find((t) => t.key === value);
+  if (!token) return null;
+  const theme = await req.payload.findGlobal({ slug: "theme", depth: 0, req }).catch(() => null);
+  const custom = ((theme?.colors ?? {}) as Record<string, string | undefined>)[token.key.replace("-", "_")];
+  return custom && HEX_RE.test(custom) ? custom : defaultPalette[token.key];
+}
+
+const buildIconVariants: FieldHook = async ({ value, previousValue, req, context }) => {
+  const current = (value ?? {}) as IconValue;
+  const previous = (previousValue ?? {}) as IconValue;
+  const mediaId = idOf(current.image);
+  if (!mediaId) return { ...current, image: null, variants: null };
+
+  const media = await req.payload.findByID({ collection: "media", id: mediaId, depth: 0, req }).catch(() => null);
+  if (!media?.filename) return { ...current, image: mediaId, variants: null };
+
+  const background = await resolveHex(current.background, req);
+  if (
+    !context.refreshImages &&
+    previous.variants?.mediaId === mediaId &&
+    previous.variants?.source === media.filename &&
+    previous.variants?.background === background
+  ) {
+    return { ...current, image: mediaId, variants: previous.variants };
+  }
+
+  const buffer = await fs.readFile(path.join(MEDIA_DIR, media.filename)).catch(() => null);
+  if (!buffer) return { ...current, image: mediaId, variants: null };
+
+  const variants = await generateIconVariants({ buffer, mimeType: media.mimeType, mediaId, filename: media.filename, background });
+  return { ...current, image: mediaId, variants };
+};
+
+export function iconField({ name, label, description }: { name: string; label: string; description?: string }): GroupField {
+  return {
+    name,
+    type: "group",
+    label,
+    admin: { description },
+    hooks: { beforeChange: [buildIconVariants] },
+    fields: [
+      { name: "image", type: "upload", relationTo: "media", label: "Картинка (квадратная, PNG или SVG, от 512×512)" },
+      colorField({ name: "background", label: "Подложка (пусто — без подложки, картинка как есть)" }),
       { name: "variants", type: "json", admin: { hidden: true } },
     ],
   };

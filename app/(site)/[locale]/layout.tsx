@@ -8,6 +8,7 @@ import { getShippingRules } from "@/lib/delivery-data";
 import { ProductsProvider } from "@/lib/products-context";
 import type { FixedVariant } from "@/cms/media/frames";
 import { I18nProvider } from "@/lib/i18n/context";
+import { siteIconVersion } from "@/lib/site-icon";
 import { siteConfig } from "@/lib/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -39,6 +40,7 @@ export async function generateMetadata({
     ? keywordsText.split(",").map((k) => k.trim()).filter(Boolean)
     : dict.meta.keywords;
   const og = imageFrame<FixedVariant>(seo?.ogImage, "og");
+  const iconVersion = await siteIconVersion();
 
   return {
     metadataBase: new URL(siteConfig.url),
@@ -71,6 +73,13 @@ export async function generateMetadata({
       ...(og && { images: [og.src] }),
     },
     robots: siteConfig.indexing ? { index: true, follow: true } : { index: false, follow: false },
+    icons: {
+      icon: [
+        { url: `/site-icon/favicon.ico?v=${iconVersion}`, sizes: "48x48", type: "image/x-icon" },
+        { url: `/site-icon/icon.png?v=${iconVersion}`, sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: `/site-icon/apple-icon.png?v=${iconVersion}`, sizes: "180x180", type: "image/png" }],
+    },
   };
 }
 
