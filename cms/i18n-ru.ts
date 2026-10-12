@@ -9,6 +9,8 @@ export const ruOverrides = {
     uploadNewLabel: "Загрузить: {{label}}",
   },
   general: {
+    searchBy: "Искать по {{label}}",
+    or: "или",
     aboutToDelete: "Удалить <1>{{title}}</1> ({{label}})? Действие нельзя отменить.",
     aboutToPermanentlyDelete: "Удалить навсегда <1>{{title}}</1> ({{label}})?",
     aboutToRestore: "Восстановить <1>{{title}}</1> ({{label}})?",

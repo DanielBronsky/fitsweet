@@ -2,17 +2,38 @@ import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, CollectionC
 import type { Order } from "../../payload-types";
 import { syncOrderMessages } from "../telegram/bot";
 
-const FIRST_NUMBER = 1001;
+const TZ = "Europe/Chisinau";
+
+function stampOf(date: Date) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: TZ,
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(date)
+      .map((p) => [p.type, p.value]),
+  );
+  return `${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}${parts.second}`;
+}
 
 const assignNumber: CollectionBeforeChangeHook = async ({ data, operation, req, originalDoc }) => {
   if (operation === "create") {
-    const last = await req.payload.find({ collection: "orders", sort: "-number", limit: 1, depth: 0, req });
-    data.number = Math.max(FIRST_NUMBER, (last.docs[0]?.number ?? FIRST_NUMBER - 1) + 1);
+    const base = stampOf(new Date());
+    const taken = await req.payload.find({ collection: "orders", where: { number: { like: base } }, depth: 0, limit: 100, req });
+    data.number = taken.totalDocs ? `${base}-${taken.totalDocs + 1}` : base;
     data.status = "new";
   }
   const number = data.number ?? originalDoc?.number;
   const name = data.customer?.name ?? originalDoc?.customer?.name ?? "";
   data.title = `№${number} · ${name}`.trim();
+  const phone = data.customer?.phone ?? originalDoc?.customer?.phone ?? "";
+  data.search = [number, name, phone, phone.replace(/\D/g, "")].filter(Boolean).join(" ");
 
   const prevStatus = originalDoc?.status;
   if (data.status && data.status !== prevStatus) {
@@ -39,14 +60,15 @@ export const Orders: CollectionConfig = {
     useAsTitle: "title",
     defaultColumns: ["title", "status", "total", "phone", "createdAt"],
     description: "Заказы с сайта. Статус меняют менеджеры в Telegram или здесь.",
-    listSearchableFields: ["title", "phone"],
+    listSearchableFields: ["search"],
   },
   defaultSort: "-number",
   access: { read: isAdmin, create: () => false, update: isAdmin, delete: isAdmin },
   hooks: { beforeChange: [assignNumber], afterChange: [syncTelegram] },
   fields: [
     { name: "title", type: "text", label: "Заказ", admin: { hidden: true } },
-    { name: "number", type: "number", label: "Номер", index: true, admin: { readOnly: true, position: "sidebar" } },
+    { name: "search", type: "text", label: "номеру, имени или телефону", index: true, admin: { readOnly: true, components: { Field: "/cms/admin/Nothing#Nothing" } } },
+    { name: "number", type: "text", label: "Номер", index: true, admin: { hidden: true } },
     {
       name: "status",
       type: "select",
@@ -59,12 +81,13 @@ export const Orders: CollectionConfig = {
         { value: "done", label: "✅ Выполнен" },
         { value: "cancelled", label: "✖️ Отменён" },
       ],
-      admin: { position: "sidebar" },
+      admin: { position: "sidebar", isClearable: false },
     },
-    { name: "acceptedBy", type: "relationship", relationTo: "managers", label: "Принял(а)", admin: { readOnly: true, position: "sidebar" } },
-    { name: "acceptedAt", type: "date", label: "Принят", admin: { readOnly: true, position: "sidebar", date: { pickerAppearance: "dayAndTime" } } },
-    { name: "closedBy", type: "relationship", relationTo: "managers", label: "Закрыл(а)", admin: { readOnly: true, position: "sidebar" } },
-    { name: "closedAt", type: "date", label: "Закрыт", admin: { readOnly: true, position: "sidebar", date: { pickerAppearance: "dayAndTime" } } },
+    { name: "meta", type: "ui", admin: { position: "sidebar", components: { Field: "/cms/admin/OrderMeta#OrderMeta" } } },
+    { name: "acceptedBy", type: "relationship", relationTo: "managers", label: "Принял(а)", admin: { hidden: true } },
+    { name: "acceptedAt", type: "date", label: "Принят", admin: { hidden: true } },
+    { name: "closedBy", type: "relationship", relationTo: "managers", label: "Закрыл(а)", admin: { hidden: true } },
+    { name: "closedAt", type: "date", label: "Закрыт", admin: { hidden: true } },
     {
       name: "locale",
       type: "select",
@@ -73,12 +96,14 @@ export const Orders: CollectionConfig = {
         { value: "ru", label: "Русский" },
         { value: "ro", label: "Română" },
       ],
-      admin: { readOnly: true, position: "sidebar" },
+      admin: { hidden: true },
     },
+    { name: "summary", type: "ui", admin: { components: { Field: "/cms/admin/OrderSummary#OrderSummary" } } },
     {
       name: "customer",
       type: "group",
       label: "Покупатель",
+      admin: { hidden: true },
       fields: [
         {
           type: "row",
@@ -91,13 +116,13 @@ export const Orders: CollectionConfig = {
         { name: "comment", type: "textarea", label: "Комментарий", admin: { readOnly: true } },
       ],
     },
-    { name: "phone", type: "text", admin: { hidden: true } },
+    { name: "phone", type: "text", label: "Телефон", admin: { readOnly: true, components: { Field: "/cms/admin/Nothing#Nothing" } } },
     {
       name: "items",
       type: "array",
       label: "Состав заказа",
       labels: { singular: "товар", plural: "товары" },
-      admin: { readOnly: true, initCollapsed: true, components: { RowLabel: "/cms/admin/OrderItemRowLabel#OrderItemRowLabel" } },
+      admin: { hidden: true },
       fields: [
         {
           type: "row",
@@ -111,14 +136,9 @@ export const Orders: CollectionConfig = {
         { name: "product", type: "relationship", relationTo: "products", admin: { hidden: true } },
       ],
     },
-    {
-      type: "row",
-      fields: [
-        { name: "subtotal", type: "number", label: "Товары, MDL", admin: { readOnly: true, width: "33%" } },
-        { name: "shipping", type: "number", label: "Доставка, MDL", admin: { readOnly: true, width: "33%" } },
-        { name: "total", type: "number", label: "Итого, MDL", admin: { readOnly: true, width: "34%" } },
-      ],
-    },
+    { name: "subtotal", type: "number", label: "Товары, MDL", admin: { hidden: true } },
+    { name: "shipping", type: "number", label: "Доставка, MDL", admin: { hidden: true } },
+    { name: "total", type: "number", label: "Итого, MDL", admin: { readOnly: true, components: { Field: "/cms/admin/Nothing#Nothing" } } },
     { name: "telegram", type: "json", admin: { hidden: true } },
     { name: "note", type: "textarea", label: "Заметка менеджера", admin: { description: "Видно только в админке." } },
   ],

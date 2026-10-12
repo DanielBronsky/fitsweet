@@ -69,6 +69,24 @@ export const framePresets = {
       output: { type: "responsive", widths: [300, 440, 660] },
     },
   ],
+  finalCta: [
+    {
+      key: "desktop",
+      label: "Компьютер",
+      hint: "Широкая полоса за текстом на компьютере.",
+      aspect: [3, 1],
+      minWidth: 1600,
+      output: { type: "responsive", widths: [1024, 1440, 1920] },
+    },
+    {
+      key: "mobile",
+      label: "Телефон",
+      hint: "Картинка за текстом на телефоне.",
+      aspect: [4, 3],
+      minWidth: 800,
+      output: { type: "responsive", widths: [480, 800] },
+    },
+  ],
   delivery: [
     {
       key: "desktop",

@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   try {
     const result = await placeOrder(body);
     if (!result.ok) {
-      if (result.error === "spam") return NextResponse.json({ ok: true, number: 0 });
+      if (result.error === "spam") return NextResponse.json({ ok: true, number: "" });
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
     return NextResponse.json({ ok: true, number: result.number });

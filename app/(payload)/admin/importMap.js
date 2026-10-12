@@ -10,13 +10,16 @@ import { IconField as IconField_5d678d23253d2966f66174444f1e6d2d } from '../../.
 import { FeatureCardRowLabel as FeatureCardRowLabel_7a4cec2399db86d02b15c864a1cbf2f2 } from '../../../cms/admin/FeatureCardRowLabel'
 import { FaqRowLabel as FaqRowLabel_19f1da618422d75a061ba795d8aded24 } from '../../../cms/admin/FaqRowLabel'
 import { InstagramUrlField as InstagramUrlField_b1b3de7aa15439e9214e9cdea163646b } from '../../../cms/admin/InstagramUrlField'
-import { OrderItemRowLabel as OrderItemRowLabel_12ae0d9948687aefbca5a2cf7162383c } from '../../../cms/admin/OrderItemRowLabel'
+import { Nothing as Nothing_7403903408de608c198bef9e649a1c6e } from '../../../cms/admin/Nothing'
+import { OrderMeta as OrderMeta_1f12cb70be9a7a6eb89ab6521fdfeecb } from '../../../cms/admin/OrderMeta'
+import { OrderSummary as OrderSummary_e41ef7b1f4067d63d136f2ee210e1eee } from '../../../cms/admin/OrderSummary'
 import { ManagerInvite as ManagerInvite_f16a3f94a4ff0e11e3851e90fc28b51f } from '../../../cms/admin/ManagerInvite'
 import { SectionRowLabel as SectionRowLabel_130c940f5978bc93c5a6785473a67515 } from '../../../cms/admin/SectionRowLabel'
 import { MenuRowLabel as MenuRowLabel_f36fb80b7abf4ee03dbf33abcd7d54bb } from '../../../cms/admin/MenuRowLabel'
 import { TextRowLabel as TextRowLabel_e38d75bb229b235a229373180715e3fa } from '../../../cms/admin/TextRowLabel'
 import { FeatureRowLabel as FeatureRowLabel_d0b825b75ba9e71dd2fd258f0fcc53b2 } from '../../../cms/admin/FeatureRowLabel'
 import { TermRowLabel as TermRowLabel_be8e924555c3d87a759847d2020e3d4c } from '../../../cms/admin/TermRowLabel'
+import { ContactRowLabel as ContactRowLabel_a0c702d9f22a95204e39403170360c6e } from '../../../cms/admin/ContactRowLabel'
 import { HexColorField as HexColorField_86bcdda32d57aaf67120892c3feea4bd } from '../../../cms/admin/HexColorField'
 import { SiteIconPreview as SiteIconPreview_9f1486533c297f26b50145fde3c34a4a } from '../../../cms/admin/SiteIconPreview'
 import { AdminIcon as AdminIcon_30ebd91e9e497d4885819d35d826364a } from '../../../cms/admin/Brand'
@@ -41,13 +44,16 @@ export const importMap = {
   "/cms/admin/FeatureCardRowLabel#FeatureCardRowLabel": FeatureCardRowLabel_7a4cec2399db86d02b15c864a1cbf2f2,
   "/cms/admin/FaqRowLabel#FaqRowLabel": FaqRowLabel_19f1da618422d75a061ba795d8aded24,
   "/cms/admin/InstagramUrlField#InstagramUrlField": InstagramUrlField_b1b3de7aa15439e9214e9cdea163646b,
-  "/cms/admin/OrderItemRowLabel#OrderItemRowLabel": OrderItemRowLabel_12ae0d9948687aefbca5a2cf7162383c,
+  "/cms/admin/Nothing#Nothing": Nothing_7403903408de608c198bef9e649a1c6e,
+  "/cms/admin/OrderMeta#OrderMeta": OrderMeta_1f12cb70be9a7a6eb89ab6521fdfeecb,
+  "/cms/admin/OrderSummary#OrderSummary": OrderSummary_e41ef7b1f4067d63d136f2ee210e1eee,
   "/cms/admin/ManagerInvite#ManagerInvite": ManagerInvite_f16a3f94a4ff0e11e3851e90fc28b51f,
   "/cms/admin/SectionRowLabel#SectionRowLabel": SectionRowLabel_130c940f5978bc93c5a6785473a67515,
   "/cms/admin/MenuRowLabel#MenuRowLabel": MenuRowLabel_f36fb80b7abf4ee03dbf33abcd7d54bb,
   "/cms/admin/TextRowLabel#TextRowLabel": TextRowLabel_e38d75bb229b235a229373180715e3fa,
   "/cms/admin/FeatureRowLabel#FeatureRowLabel": FeatureRowLabel_d0b825b75ba9e71dd2fd258f0fcc53b2,
   "/cms/admin/TermRowLabel#TermRowLabel": TermRowLabel_be8e924555c3d87a759847d2020e3d4c,
+  "/cms/admin/ContactRowLabel#ContactRowLabel": ContactRowLabel_a0c702d9f22a95204e39403170360c6e,
   "/cms/admin/HexColorField#HexColorField": HexColorField_86bcdda32d57aaf67120892c3feea4bd,
   "/cms/admin/SiteIconPreview#SiteIconPreview": SiteIconPreview_9f1486533c297f26b50145fde3c34a4a,
   "/cms/admin/Brand#AdminIcon": AdminIcon_30ebd91e9e497d4885819d35d826364a,

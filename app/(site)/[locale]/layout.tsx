@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary, locales, localeTags, isLocale, defaultLocale, type Locale } from "@/lib/i18n";
 import { getPalette, getSeo, getTypographyCss, imageAlt, imageFrame, paletteCss } from "@/lib/cms";
 import { getHeaderData } from "@/lib/header";
+import { getFooterData } from "@/lib/footer";
 import { getMoods, getProducts } from "@/lib/catalog";
 import { getShippingRules } from "@/lib/delivery-data";
 import { ProductsProvider } from "@/lib/products-context";
@@ -95,6 +96,7 @@ export default async function LocaleLayout({
 
   const dict = getDictionary(locale);
   const themeCss = paletteCss(await getPalette()) + (await getTypographyCss());
+  const header = await getHeaderData(locale);
 
   return (
     <html lang={localeTags[locale]} className={fontVariables}>
@@ -108,9 +110,9 @@ export default async function LocaleLayout({
           >
             {dict.header.skipToCatalog}
           </a>
-          <Header data={await getHeaderData(locale)} />
+          <Header data={header} />
           <main>{children}</main>
-          <Footer />
+          <Footer data={await getFooterData(locale)} header={header} navLabel={dict.nav.catalog} />
           <CartDrawer />
           <AnchorScroll />
           </ProductsProvider>

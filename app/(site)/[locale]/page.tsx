@@ -7,6 +7,8 @@ import { getDeliveryData } from "@/lib/delivery-data";
 import { getBoxData } from "@/lib/box";
 import { getReviewsData } from "@/lib/reviews";
 import { getInstagramData } from "@/lib/instagram-feed";
+import { getFinalCtaData } from "@/lib/final-cta";
+import { getBusinessContacts } from "@/lib/footer";
 import type { SectionKey } from "@/cms/sections";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
@@ -31,6 +33,7 @@ export default async function Home({
   const l = locale as Locale;
   const dict = getDictionary(locale);
   const products = await getProducts();
+  const business = await getBusinessContacts(l);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -40,9 +43,13 @@ export default async function Home({
     url: `${siteConfig.url}/${l}`,
     address: {
       "@type": "PostalAddress",
+      ...(business.address && { streetAddress: business.address }),
       addressLocality: siteConfig.city[l],
       addressCountry: "MD",
     },
+    ...(business.telephone && { telephone: business.telephone }),
+    ...(business.email && { email: business.email }),
+    ...(business.sameAs.length && { sameAs: business.sameAs }),
     makesOffer: products.map((p) => ({
       "@type": "Offer",
       itemOffered: {
@@ -69,7 +76,7 @@ export default async function Home({
     box: <BoxBuilder data={await getBoxData(l)} />,
     reviews: <Reviews data={await getReviewsData(l)} />,
     instagram: <InstagramFeed data={await getInstagramData(l)} />,
-    finalCta: <FinalCta />,
+    finalCta: <FinalCta data={await getFinalCtaData(l)} />,
   };
 
   return (

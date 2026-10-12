@@ -118,6 +118,8 @@ export interface Config {
     boxSection: BoxSection;
     reviewsSection: ReviewsSection;
     instagramSection: InstagramSection;
+    finalCtaSection: FinalCtaSection;
+    footer: Footer;
     theme: Theme;
     typography: Typography;
     seo: Seo;
@@ -133,6 +135,8 @@ export interface Config {
     boxSection: BoxSectionSelect<false> | BoxSectionSelect<true>;
     reviewsSection: ReviewsSectionSelect<false> | ReviewsSectionSelect<true>;
     instagramSection: InstagramSectionSelect<false> | InstagramSectionSelect<true>;
+    finalCtaSection: FinalCtaSectionSelect<false> | FinalCtaSectionSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
     theme: ThemeSelect<false> | ThemeSelect<true>;
     typography: TypographySelect<false> | TypographySelect<true>;
     seo: SeoSelect<false> | SeoSelect<true>;
@@ -716,7 +720,8 @@ export interface InstagramPost {
 export interface Order {
   id: number;
   title?: string | null;
-  number?: number | null;
+  search?: string | null;
+  number?: string | null;
   status: 'new' | 'accepted' | 'done' | 'cancelled';
   acceptedBy?: (number | null) | Manager;
   acceptedAt?: string | null;
@@ -1326,6 +1331,7 @@ export interface InstagramPostsSelect<T extends boolean = true> {
  */
 export interface OrdersSelect<T extends boolean = true> {
   title?: T;
+  search?: T;
   number?: T;
   status?: T;
   acceptedBy?: T;
@@ -2192,6 +2198,207 @@ export interface InstagramSection {
     };
     buttonBackground?: string | null;
     buttonColor?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Полоса в конце страницы: «Готовы выбрать свой любимый FitSweet?» и кнопка.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "finalCtaSection".
+ */
+export interface FinalCtaSection {
+  id: number;
+  section?: {
+    show?: boolean | null;
+    background?: string | null;
+  };
+  heading: {
+    /**
+     * Чтобы перенести строку — нажмите Enter.
+     */
+    text: {
+      ru: string;
+      ro: string;
+    };
+    color?: string | null;
+    subtitleColor?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+    subtitle?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    subtitleFont?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    subtitleWeight?: ('300' | '400' | '500' | '600' | '700') | null;
+    leaf?: boolean | null;
+    leafColor?: string | null;
+  };
+  media?: {
+    show?: boolean | null;
+    picture?: {
+      image?: (number | null) | Media;
+      crops?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+      variants?:
+        | {
+            [k: string]: unknown;
+          }
+        | unknown[]
+        | string
+        | number
+        | boolean
+        | null;
+    };
+    /**
+     * Меньше — картинка бледнее и текст читается лучше.
+     */
+    opacity?: number | null;
+    fade?: boolean | null;
+  };
+  primary: {
+    text: {
+      ru: string;
+      ro: string;
+    };
+    target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+    section?: (number | null) | CustomSection;
+    url?: string | null;
+    newTab?: boolean | null;
+    background?: string | null;
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  secondary: {
+    show?: boolean | null;
+    text?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    target: 'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+    section?: (number | null) | CustomSection;
+    url?: string | null;
+    newTab?: boolean | null;
+    color?: string | null;
+    font?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    weight?: ('300' | '400' | '500' | '600' | '700') | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Нижняя часть сайта: логотип, меню, контакты и соцсети, строка с копирайтом. Телефон и соцсети отсюда попадают и в данные для Google.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  style?: {
+    background?: string | null;
+    divider?: string | null;
+    color?: string | null;
+    hover?: string | null;
+    muted?: string | null;
+    menuFont?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    menuWeight?: ('300' | '400' | '500' | '600' | '700') | null;
+    contactsFont?: string | null;
+    /**
+     * Если у шрифта нет такой насыщенности, браузер возьмёт ближайшую.
+     */
+    contactsWeight?: ('300' | '400' | '500' | '600' | '700') | null;
+    copyrightFont?: string | null;
+  };
+  logo?: {
+    /**
+     * Тот же логотип и подпись, что в шапке. Меняются в «Шапке».
+     */
+    show?: boolean | null;
+  };
+  menu?: {
+    show?: boolean | null;
+    mode?: ('header' | 'own') | null;
+    items?:
+      | {
+          label: {
+            ru: string;
+            ro: string;
+          };
+          target:
+            'catalog' | 'about' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'order' | 'section' | 'url';
+          section?: (number | null) | CustomSection;
+          url?: string | null;
+          newTab?: boolean | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  contacts?: {
+    /**
+     * Порядок — перетаскиванием. Каждый контакт показывается с иконкой и ведёт куда нужно: телефон звонит, Telegram открывает чат.
+     */
+    items?:
+      | {
+          type:
+            | 'phone'
+            | 'email'
+            | 'instagram'
+            | 'telegram'
+            | 'whatsapp'
+            | 'viber'
+            | 'facebook'
+            | 'tiktok'
+            | 'address'
+            | 'hours'
+            | 'url';
+          /**
+           * Телефон: +373 69 000 000 · Почта: hello@fitsweet.md · Соцсети: имя аккаунта или ссылка · Адрес и часы: текст ниже.
+           */
+          value: string;
+          /**
+           * Для адреса и часов работы — обязательно. Для остальных можно оставить пустым: покажется значение.
+           */
+          text?: {
+            ru?: string | null;
+            ro?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    icons?: boolean | null;
+  };
+  bottom: {
+    /**
+     * {year} заменится на текущий год.
+     */
+    copyright: {
+      ru: string;
+      ro: string;
+    };
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3103,6 +3310,172 @@ export interface InstagramSectionSelect<T extends boolean = true> {
             };
         buttonBackground?: T;
         buttonColor?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "finalCtaSection_select".
+ */
+export interface FinalCtaSectionSelect<T extends boolean = true> {
+  section?:
+    | T
+    | {
+        show?: T;
+        background?: T;
+      };
+  heading?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        color?: T;
+        subtitleColor?: T;
+        font?: T;
+        weight?: T;
+        subtitle?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        subtitleFont?: T;
+        subtitleWeight?: T;
+        leaf?: T;
+        leafColor?: T;
+      };
+  media?:
+    | T
+    | {
+        show?: T;
+        picture?:
+          | T
+          | {
+              image?: T;
+              crops?: T;
+              variants?: T;
+            };
+        opacity?: T;
+        fade?: T;
+      };
+  primary?:
+    | T
+    | {
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        target?: T;
+        section?: T;
+        url?: T;
+        newTab?: T;
+        background?: T;
+        color?: T;
+        font?: T;
+        weight?: T;
+      };
+  secondary?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        target?: T;
+        section?: T;
+        url?: T;
+        newTab?: T;
+        color?: T;
+        font?: T;
+        weight?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  style?:
+    | T
+    | {
+        background?: T;
+        divider?: T;
+        color?: T;
+        hover?: T;
+        muted?: T;
+        menuFont?: T;
+        menuWeight?: T;
+        contactsFont?: T;
+        contactsWeight?: T;
+        copyrightFont?: T;
+      };
+  logo?:
+    | T
+    | {
+        show?: T;
+      };
+  menu?:
+    | T
+    | {
+        show?: T;
+        mode?: T;
+        items?:
+          | T
+          | {
+              label?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              target?: T;
+              section?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+      };
+  contacts?:
+    | T
+    | {
+        items?:
+          | T
+          | {
+              type?: T;
+              value?: T;
+              text?:
+                | T
+                | {
+                    ru?: T;
+                    ro?: T;
+                  };
+              id?: T;
+            };
+        icons?: T;
+      };
+  bottom?:
+    | T
+    | {
+        copyright?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

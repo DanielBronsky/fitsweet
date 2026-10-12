@@ -13,7 +13,7 @@ export type OrderInput = {
   items?: unknown;
 };
 
-export type OrderResult = { ok: true; number: number } | { ok: false; error: "invalid" | "empty" | "spam" };
+export type OrderResult = { ok: true; number: string } | { ok: false; error: "invalid" | "empty" | "spam" };
 
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().replace(/\s+/g, " ").slice(0, max) : "");
 
@@ -72,5 +72,5 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
     } as never,
   });
   void notifyNewOrder(cms, order).catch((err) => console.error("[telegram] уведомление о заказе:", err));
-  return { ok: true, number: order.number ?? 0 };
+  return { ok: true, number: order.number ?? "" };
 }

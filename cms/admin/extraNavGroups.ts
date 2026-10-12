@@ -31,8 +31,10 @@ export const extraNavGroups: { label: string; items: NavItem[] }[] = [
       { label: "Отзывы", path: "/collections/reviews", sub: true, section: "reviews" },
       { label: "Больше FitSweet каждый день", path: "/globals/instagramSection", section: "instagram" },
       { label: "Посты Instagram", path: "/collections/instagramPosts", sub: true, section: "instagram" },
+      { label: "Финальный призыв", path: "/globals/finalCtaSection", section: "finalCta" },
     ],
   },
+  { label: "Подвал сайта · Footer", items: [{ label: "Футер", path: "/globals/footer" }] },
   {
     label: "Товары",
     items: [

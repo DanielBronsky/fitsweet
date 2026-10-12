@@ -27,6 +27,8 @@ import { BoxSection } from "./cms/globals/BoxSection";
 import { ReviewsSection } from "./cms/globals/ReviewsSection";
 import { Reviews } from "./cms/collections/Reviews";
 import { InstagramSection } from "./cms/globals/InstagramSection";
+import { FinalCtaSection } from "./cms/globals/FinalCtaSection";
+import { FooterSection } from "./cms/globals/FooterSection";
 import { InstagramPosts } from "./cms/collections/InstagramPosts";
 import { Orders } from "./cms/collections/Orders";
 import { Managers } from "./cms/collections/Managers";
@@ -65,7 +67,7 @@ export default buildConfig({
     translations: { ru: ruOverrides },
   },
   collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections, Reviews, InstagramPosts, Orders, Managers],
-  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, BoxSection, ReviewsSection, InstagramSection, Theme, Typography, Seo],
+  globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, BoxSection, ReviewsSection, InstagramSection, FinalCtaSection, FooterSection, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

@@ -40,7 +40,7 @@ async function toView(payload: Payload, order: Order): Promise<OrderView> {
   const nameOf = (v: Order["acceptedBy"]) => managerName(v) ?? (idOf(v) ? (names.get(idOf(v)!) ?? null) : null);
   return {
     id: order.id,
-    number: order.number ?? 0,
+    number: order.number ?? "",
     status: (order.status ?? "new") as OrderStatus,
     createdAt: order.createdAt,
     customer: {

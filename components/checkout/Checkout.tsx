@@ -23,7 +23,7 @@ export function Checkout() {
   const { lines, clear, setQty } = useCart();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
-  const [number, setNumber] = useState(0);
+  const [number, setNumber] = useState("");
 
   const { byId: productById, shipping: rules } = useProducts();
   const subtotal = cartTotal(lines, productById);
@@ -58,9 +58,9 @@ export function Checkout() {
           items: lines.map((l) => ({ id: l.id, qty: l.qty })),
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { number?: number; error?: string };
+      const data = (await res.json().catch(() => ({}))) as { number?: string; error?: string };
       if (!res.ok) throw new Error(errors[data.error ?? ""] ?? dict.order.errorGeneric);
-      setNumber(data.number ?? 0);
+      setNumber(data.number ?? "");
       setStatus("done");
       clear();
       window.scrollTo({ top: 0 });

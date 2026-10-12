@@ -138,7 +138,7 @@ export const ro: Dictionary = {
     errorGeneric: "Comanda nu a putut fi trimisă",
     errorUnknown: "Eroare necunoscută",
     pageTitle: "Plasarea comenzii",
-    successTitle: (n: number) => (n ? `Mulțumim! Comanda nr. ${n} a fost primită` : "Mulțumim! Comanda a fost primită"),
+    successTitle: (n: string) => (n ? `Mulțumim! Comanda nr. ${n} a fost primită` : "Mulțumim! Comanda a fost primită"),
     successText: "Managerul vă va contacta în 15 minute pentru a confirma comanda și ora livrării.",
     backToShop: "Înapoi la deserturi",
     errorInvalid: "Verificați numele, telefonul și adresa.",

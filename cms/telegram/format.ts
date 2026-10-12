@@ -4,7 +4,7 @@ export type OrderStatus = "new" | "accepted" | "done" | "cancelled";
 
 export type OrderView = {
   id: number;
-  number: number;
+  number: string;
   status: OrderStatus;
   createdAt: string;
   customer: { name: string; phone: string; address: string; comment?: string | null };

@@ -22,6 +22,10 @@ import * as migration_20261009_111625_instagram_layout from './20261009_111625_i
 import * as migration_20261009_165312_orders from './20261009_165312_orders';
 import * as migration_20261009_165855_telegram_managers from './20261009_165855_telegram_managers';
 import * as migration_20261012_091653_manager_pause from './20261012_091653_manager_pause';
+import * as migration_20261012_210716_final_cta from './20261012_210716_final_cta';
+import * as migration_20261012_211426_footer from './20261012_211426_footer';
+import * as migration_20261012_211946_fonts_cta_footer from './20261012_211946_fonts_cta_footer';
+import * as migration_20261012_212425_order_number_search from './20261012_212425_order_number_search';
 
 export const migrations = [
   {
@@ -142,6 +146,26 @@ export const migrations = [
   {
     up: migration_20261012_091653_manager_pause.up,
     down: migration_20261012_091653_manager_pause.down,
-    name: '20261012_091653_manager_pause'
+    name: '20261012_091653_manager_pause',
+  },
+  {
+    up: migration_20261012_210716_final_cta.up,
+    down: migration_20261012_210716_final_cta.down,
+    name: '20261012_210716_final_cta',
+  },
+  {
+    up: migration_20261012_211426_footer.up,
+    down: migration_20261012_211426_footer.down,
+    name: '20261012_211426_footer',
+  },
+  {
+    up: migration_20261012_211946_fonts_cta_footer.up,
+    down: migration_20261012_211946_fonts_cta_footer.down,
+    name: '20261012_211946_fonts_cta_footer',
+  },
+  {
+    up: migration_20261012_212425_order_number_search.up,
+    down: migration_20261012_212425_order_number_search.down,
+    name: '20261012_212425_order_number_search'
   },
 ];
