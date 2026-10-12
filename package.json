@@ -7,12 +7,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "local": "pnpm migrate && pnpm seed && pnpm build && pnpm start",
+    "dev:full": "pnpm migrate && pnpm seed && pnpm dev",
     "lint": "eslint",
     "payload": "payload",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
     "migrate": "payload migrate",
-    "seed": "payload run scripts/seed-cms.ts"
+    "seed": "payload run scripts/seed-cms.ts",
+    "ship": "bash scripts/server.sh ship",
+    "ship:data": "bash scripts/server.sh data",
+    "server:setup": "bash scripts/server.sh setup",
+    "server:logs": "bash scripts/server.sh logs",
+    "server:status": "bash scripts/server.sh status",
+    "server:backup": "bash scripts/server.sh backup"
   },
   "dependencies": {
     "@maplibre/maplibre-gl-leaflet": "^0.1.4",

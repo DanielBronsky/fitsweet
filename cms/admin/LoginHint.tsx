@@ -1,7 +1,8 @@
+import { adminBotUsername } from "../telegram/api";
 import { LoginWaiting } from "./LoginWaiting";
 
 export function LoginHint() {
-  const bot = process.env.TELEGRAM_BOT_USERNAME;
+  const bot = adminBotUsername();
   if (!bot || process.env.ADMIN_2FA === "off") return null;
   return (
     <>

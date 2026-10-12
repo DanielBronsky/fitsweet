@@ -19,7 +19,7 @@ import "../globals.css";
 import { fontVariables } from "../fonts";
 
 export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
+  return [];
 }
 
 const ogLocale = (l: Locale) => localeTags[l].replace("-", "_");

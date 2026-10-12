@@ -1,7 +1,9 @@
 import crypto from "crypto";
-import { tg } from "./api";
+import { adminBotToken, botToken, tg } from "./api";
 
-type Pending = { resolve: (ok: boolean) => void; chatId: string; messageId?: number; text: string };
+type Pending = { resolve: (ok: boolean) => void; chatId: string; messageId?: number; text: string; token?: string };
+
+const tokens = () => [...new Set([adminBotToken(), botToken()].filter(Boolean))];
 
 const state = globalThis as unknown as { __fitsweetLogins?: Map<string, Pending> };
 const pending = (state.__fitsweetLogins ??= new Map());
@@ -34,23 +36,34 @@ export async function requestLoginApproval({ chatId, name, ip, userAgent }: { ch
     pending.set(id, { resolve, chatId, text });
   });
 
-  try {
-    const sent = await tg<{ message_id: number }>("sendMessage", {
-      chat_id: chatId,
-      text,
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: "✅ Да, это я", callback_data: `login:${id}:ok` },
-            { text: "🚫 Это не я", callback_data: `login:${id}:no` },
-          ],
-        ],
-      },
-    });
-    const entry = pending.get(id);
-    if (entry) entry.messageId = sent.message_id;
-  } catch {
+  let delivered = false;
+  for (const token of tokens()) {
+    try {
+      const sent = await tg<{ message_id: number }>(
+        "sendMessage",
+        {
+          chat_id: chatId,
+          text,
+          parse_mode: "HTML",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: "✅ Да, это я", callback_data: `login:${id}:ok` },
+                { text: "🚫 Это не я", callback_data: `login:${id}:no` },
+              ],
+            ],
+          },
+        },
+        15000,
+        token,
+      );
+      const entry = pending.get(id);
+      if (entry) Object.assign(entry, { messageId: sent.message_id, token });
+      delivered = true;
+      break;
+    } catch {}
+  }
+  if (!delivered) {
     pending.delete(id);
     return { ok: false as const, reason: "send" as const };
   }
@@ -68,7 +81,7 @@ function settle(id: string, ok: boolean, footer: string) {
   entry.resolve(ok);
   if (entry.messageId) {
     const body = entry.text.replace(/\n\nЭто вы\?.*$/, "");
-    void tg("editMessageText", { chat_id: entry.chatId, message_id: entry.messageId, text: `${body}\n\n${footer}`, parse_mode: "HTML" }).catch(() => {});
+    void tg("editMessageText", { chat_id: entry.chatId, message_id: entry.messageId, text: `${body}\n\n${footer}`, parse_mode: "HTML" }, 15000, entry.token).catch(() => {});
   }
   return true;
 }
@@ -85,7 +98,13 @@ export function answerLoginApproval(id: string, ok: boolean, fromChatId: string)
 
 export async function notifyOtherAdmins(chatIds: string[], text: string) {
   for (const chatId of chatIds) {
-    await tg("sendMessage", { chat_id: chatId, text, parse_mode: "HTML" }).catch(() => {});
+    for (const token of tokens()) {
+      const ok = await tg("sendMessage", { chat_id: chatId, text, parse_mode: "HTML" }, 15000, token).then(
+        () => true,
+        () => false,
+      );
+      if (ok) break;
+    }
   }
 }
 

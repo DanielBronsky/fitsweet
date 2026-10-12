@@ -3,12 +3,20 @@
 import { useEffect, useState } from "react";
 import { useConfig, useDocumentInfo, useFormFields } from "@payloadcms/ui";
 
-type Status = { chatId?: string | null; telegramUsername?: string | null; connectedAt?: string | null; inviteToken?: string | null };
+type Status = { chatId?: string | null; telegramUsername?: string | null; connectedAt?: string | null; inviteToken?: string | null; adminBotLinked?: boolean | null };
 
 const box = { border: "1px solid var(--theme-elevation-150)", borderRadius: 8, padding: 16, marginBottom: 24 } as const;
 const muted = { fontSize: 13, color: "var(--theme-elevation-500)", margin: 0 } as const;
 
-export function ManagerInvite({ bot, collection = "managers" }: { bot?: string; collection?: "managers" | "users" }) {
+export function ManagerInvite({
+  bot,
+  collection = "managers",
+  separateAdminBot = false,
+}: {
+  bot?: string;
+  collection?: "managers" | "users";
+  separateAdminBot?: boolean;
+}) {
   const admin = collection === "users";
   const { config } = useConfig();
   const { id } = useDocumentInfo();
@@ -17,6 +25,7 @@ export function ManagerInvite({ bot, collection = "managers" }: { bot?: string; 
     telegramUsername: f.telegramUsername?.value as string | null,
     connectedAt: f.connectedAt?.value as string | null,
     inviteToken: f.inviteToken?.value as string | null,
+    adminBotLinked: f.adminBotLinked?.value as boolean | null,
   }));
   const [live, setLive] = useState<Status | null>(null);
   const [copied, setCopied] = useState(false);
@@ -49,7 +58,9 @@ export function ManagerInvite({ bot, collection = "managers" }: { bot?: string; 
 
   const reset = async () => {
     const question = admin
-      ? "Отключить подтверждение входа через Telegram? Вход станет только по паролю, пока не подключите снова."
+      ? separateAdminBot && !status.adminBotLinked
+        ? `Получить новую ссылку на @${bot}? До подключения вход будет только по паролю.`
+        : "Отключить подтверждение входа через Telegram? Вход станет только по паролю, пока не подключите снова."
       : "Отключить этого человека от бота? Старая ссылка перестанет работать, появится новая.";
     if (!confirm(question)) return;
     setBusy(true);
@@ -58,6 +69,21 @@ export function ManagerInvite({ bot, collection = "managers" }: { bot?: string; 
     setLive(((await res?.json().catch(() => null)) as Status | null) ?? null);
     setBusy(false);
   };
+
+  if (connected && admin && separateAdminBot && !status.adminBotLinked) {
+    return (
+      <div style={box}>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>🔁 Переподключите к @{bot}</p>
+        <p style={{ ...muted, marginTop: 6 }}>
+          Сейчас вход подтверждается через бот заказов. Для админов теперь отдельный бот — нажмите кнопку ниже, затем откройте новую ссылку и нажмите
+          «Старт» в @{bot}.
+        </p>
+        <button type="button" className="btn btn--style-primary btn--size-small" style={{ margin: "12px 0 0" }} onClick={reset} disabled={busy}>
+          Получить ссылку на @{bot}
+        </button>
+      </div>
+    );
+  }
 
   if (connected) {
     const when = status.connectedAt ? new Date(status.connectedAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" }) : "";

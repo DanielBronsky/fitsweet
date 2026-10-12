@@ -7,10 +7,11 @@ import {
   type PayloadRequest,
 } from "payload";
 import { newInviteToken } from "./Managers";
-import { botIsPolling } from "../telegram/bot";
+import { approvalsAvailable } from "../telegram/bot";
+import { adminBotUsername, hasAdminBot } from "../telegram/api";
 import { describeBrowser, escapeHtml, loginWhen, notifyOtherAdmins, requestLoginApproval } from "../telegram/login-approval";
 
-const SYSTEM_FIELDS = ["inviteToken", "chatId", "telegramUsername", "connectedAt"] as const;
+const SYSTEM_FIELDS = ["inviteToken", "chatId", "telegramUsername", "connectedAt", "adminBotLinked"] as const;
 
 const protectSystemFields: CollectionBeforeChangeHook = ({ data, originalDoc, context }) => {
   if (!context.system && originalDoc) for (const key of SYSTEM_FIELDS) data[key] = originalDoc[key];
@@ -50,7 +51,7 @@ const announceLogin: CollectionAfterLoginHook = async ({ user, req }) => {
 
 const confirmInTelegram: CollectionBeforeLoginHook = async ({ user, req }) => {
   if (twoFactorOff() || !user?.chatId) return user;
-  if (!botIsPolling()) {
+  if (!approvalsAvailable()) {
     throw new APIError("Подтверждение входа через Telegram сейчас недоступно: бот не запущен на сервере.", 503, null, true);
   }
   const ip = ipOf(req);
@@ -106,7 +107,7 @@ export const Users: CollectionConfig = {
         await req.payload.update({
           collection: "users",
           id,
-          data: { inviteToken: newInviteToken("u_"), chatId: null, telegramUsername: null, connectedAt: null },
+          data: { inviteToken: newInviteToken("u_"), chatId: null, telegramUsername: null, connectedAt: null, adminBotLinked: false },
           context: { system: true },
           req,
         });
@@ -123,7 +124,7 @@ export const Users: CollectionConfig = {
         components: {
           Field: {
             path: "/cms/admin/ManagerInvite#ManagerInvite",
-            clientProps: { bot: process.env.TELEGRAM_BOT_USERNAME ?? "", collection: "users" },
+            clientProps: { bot: adminBotUsername(), collection: "users", separateAdminBot: hasAdminBot() },
           },
         },
       },
@@ -132,5 +133,6 @@ export const Users: CollectionConfig = {
     { name: "chatId", type: "text", admin: { hidden: true } },
     { name: "telegramUsername", type: "text", admin: { hidden: true } },
     { name: "connectedAt", type: "date", admin: { hidden: true } },
+    { name: "adminBotLinked", type: "checkbox", admin: { hidden: true } },
   ],
 };

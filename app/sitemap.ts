@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+
+export const revalidate = 3600;
 import { defaultLocale, locales, localeTags } from "@/lib/i18n";
 import { getCms } from "@/lib/cms";
 import { siteConfig } from "@/lib/site";

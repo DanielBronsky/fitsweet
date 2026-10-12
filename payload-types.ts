@@ -180,6 +180,7 @@ export interface User {
   chatId?: string | null;
   telegramUsername?: string | null;
   connectedAt?: string | null;
+  adminBotLinked?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -924,6 +925,7 @@ export interface UsersSelect<T extends boolean = true> {
   chatId?: T;
   telegramUsername?: T;
   connectedAt?: T;
+  adminBotLinked?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

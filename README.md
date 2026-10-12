@@ -1,6 +1,6 @@
 # FitSweet
 
-Лендинг ПП-десертов FitSweet — Next.js 15 (App Router) + TypeScript + Tailwind CSS v4.
+Лендинг ПП-десертов FitSweet — Next.js 16 (App Router) + Payload CMS 3 + TypeScript + Tailwind CSS v4.
 Двуязычный: русский (`/ru`) и румынский (`/ro`).
 
 ## Требования
@@ -22,6 +22,54 @@ pnpm build     # production-сборка
 pnpm start     # запуск собранного приложения
 pnpm lint      # ESLint
 pnpm exec tsc --noEmit   # проверка типов
+pnpm local     # всё сразу, как на сервере: миграции → наполнение → сборка → запуск (http://localhost:3000)
+pnpm dev:full  # то же для разработки: миграции → наполнение → дев-сервер
+```
+
+Сайт, админка (`/admin`) и API — одно приложение: одна команда запускает всё сразу.
+
+## Docker на Mac (Colima)
+
+Docker работает через Colima — маленькую виртуальную машину с Linux, без Docker Desktop.
+Установлено: `brew install colima docker docker-compose docker-buildx`.
+
+```bash
+colima start     # запустить Docker (после перезагрузки Mac сам не стартует)
+colima stop      # остановить и освободить память (держит до 6 ГБ)
+colima status    # работает ли сейчас
+```
+
+Автозапуск вместе с Mac: `brew services start colima` (выключить: `brew services stop colima`).
+Если `docker` пишет «Cannot connect to the Docker daemon» — Colima не запущена, выполните `colima start`.
+
+## Выкладка на сервер
+
+Сервер описан в `.deploy.env` (не попадает в git):
+
+```bash
+DEPLOY_HOST=root@1.2.3.4
+DEPLOY_DIR=/srv/fitsweet
+```
+
+```bash
+pnpm server:setup   # один раз: Docker, файрвол, swap, папки на сервере
+pnpm ship:data      # один раз: перенести локальную базу и картинки на сервер
+pnpm ship           # выложить текущий код (сборка → переключение → проверка → 🚀 в Telegram)
+pnpm server:status  # контейнеры и /api/health
+pnpm server:logs    # живые логи сайта (или: pnpm server:logs watchdog / caddy)
+pnpm server:backup  # бэкап базы прямо сейчас
+```
+
+На сервере работают три контейнера (`docker-compose.yml`): сайт, Caddy (HTTPS, домены `SITE_DOMAIN` и `ADMIN_DOMAIN`)
+и сторож (`docker/watchdog.mjs`): тревоги в Telegram администраторам, ночной бэкап базы с хранением 14 дней,
+утренняя сводка, пинг Healthchecks. Настройки — в `.env` на сервере, образец — `.env.example`.
+
+Проверить связку локально (копия базы в `.docker-data/`, домены `fitsweet.localhost` и `admin.fitsweet.localhost`):
+
+```bash
+docker compose --env-file .docker-data/compose.env up -d --build
+open https://fitsweet.localhost:8443/ru
+docker compose --env-file .docker-data/compose.env down
 ```
 
 ## Структура

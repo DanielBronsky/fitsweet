@@ -29,6 +29,7 @@ import * as migration_20261012_212425_order_number_search from './20261012_21242
 import * as migration_20261012_214356_admin_2fa from './20261012_214356_admin_2fa';
 import * as migration_20261012_221150_local_seo from './20261012_221150_local_seo';
 import * as migration_20261012_221929_review_request from './20261012_221929_review_request';
+import * as migration_20261012_223840_admin_bot from './20261012_223840_admin_bot';
 
 export const migrations = [
   {
@@ -184,6 +185,11 @@ export const migrations = [
   {
     up: migration_20261012_221929_review_request.up,
     down: migration_20261012_221929_review_request.down,
-    name: '20261012_221929_review_request'
+    name: '20261012_221929_review_request',
+  },
+  {
+    up: migration_20261012_223840_admin_bot.up,
+    down: migration_20261012_223840_admin_bot.down,
+    name: '20261012_223840_admin_bot'
   },
 ];

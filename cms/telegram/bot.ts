@@ -1,7 +1,7 @@
 import type { Payload } from "payload";
 import type { Manager, Order } from "../../payload-types";
 import { newInviteToken } from "../collections/Managers";
-import { botToken, tg, TelegramError } from "./api";
+import { adminBotToken, botToken, hasAdminBot, tg, TelegramError } from "./api";
 import { orderKeyboard, orderText, type OrderStatus, type OrderView } from "./format";
 import { answerLoginApproval } from "./login-approval";
 import { sendReviewRequest } from "./review-request";
@@ -185,26 +185,7 @@ async function handleMessage(payload: Payload, msg: TgMessage) {
   const [command, token] = msg.text.trim().split(/\s+/, 2);
   const chatId = msg.chat.id;
 
-  const adminInvite = token?.startsWith("u_")
-    ? (await payload.find({ collection: "users", where: { inviteToken: { equals: token } }, depth: 0, limit: 1, overrideAccess: true })).docs[0]
-    : undefined;
-  if (command === "/start" && adminInvite) {
-    const user = adminInvite;
-    if (user.chatId && user.chatId !== String(chatId)) {
-      await reply(chatId, "Ссылка недействительна или уже использована. Получите новую в своём профиле в админке.");
-      return;
-    }
-    await payload.update({
-      collection: "users",
-      id: user.id,
-      data: { chatId: String(chatId), telegramUsername: msg.from?.username ?? null, connectedAt: new Date().toISOString(), inviteToken: newInviteToken("u_") },
-      context: { system: true },
-      overrideAccess: true,
-    });
-    await reply(chatId, `Готово, ${user.name || user.email}! 🔐\n\nТеперь каждый вход в админку FitSweet нужно подтвердить здесь кнопкой «✅ Да, это я».`);
-    log(`администратор «${user.email}» подключил подтверждение входа`);
-    return;
-  }
+  if (command === "/start" && token?.startsWith("u_") && (await linkAdmin(payload, token, msg, botToken()))) return;
 
   if (command === "/start" && token) {
     const { docs } = await payload.find({ collection: "managers", where: { inviteToken: { equals: token } }, depth: 0, limit: 1, overrideAccess: true });
@@ -274,13 +255,78 @@ async function handleMessage(payload: Payload, msg: TgMessage) {
   }
 }
 
+async function answerLogin(cq: TgCallback, token: string) {
+  const login = cq.data?.match(/^login:([\w-]+):(ok|no)$/);
+  if (!login) return false;
+  const done = answerLoginApproval(login[1], login[2] === "ok", String(cq.from.id));
+  await tg(
+    "answerCallbackQuery",
+    { callback_query_id: cq.id, text: done ? (login[2] === "ok" ? "Вход подтверждён" : "Вход отклонён") : "Запрос уже неактуален", show_alert: !done },
+    15000,
+    token,
+  );
+  return true;
+}
+
+async function linkAdmin(payload: Payload, invite: string, msg: TgMessage, token: string) {
+  const { docs } = await payload.find({ collection: "users", where: { inviteToken: { equals: invite } }, depth: 0, limit: 1, overrideAccess: true });
+  const user = docs[0];
+  if (!user) return false;
+  const chatId = msg.chat.id;
+  const send = (text: string) => tg("sendMessage", { chat_id: chatId, text, parse_mode: "HTML" }, 15000, token);
+  if (user.chatId && user.chatId !== String(chatId)) {
+    await send("Ссылка недействительна или уже использована. Получите новую в своём профиле в админке.");
+    return true;
+  }
+  await payload.update({
+    collection: "users",
+    id: user.id,
+    data: {
+      chatId: String(chatId),
+      telegramUsername: msg.from?.username ?? null,
+      connectedAt: new Date().toISOString(),
+      inviteToken: newInviteToken("u_"),
+      adminBotLinked: token === adminBotToken() && hasAdminBot(),
+    },
+    context: { system: true },
+    overrideAccess: true,
+  });
+  await send(
+    `Готово, ${user.name || user.email}! 🔐\n\nТеперь каждый вход в админку FitSweet нужно подтвердить здесь кнопкой «✅ Да, это я». Сюда же приходят уведомления о входах других админов, тревоги сервера и утренняя сводка.`,
+  );
+  log(`администратор «${user.email}» подключил подтверждение входа`);
+  return true;
+}
+
+async function handleAdminUpdate(payload: Payload, u: TgUpdate) {
+  const token = adminBotToken();
+  if (u.callback_query) {
+    if (!(await answerLogin(u.callback_query, token)))
+      await tg("answerCallbackQuery", { callback_query_id: u.callback_query.id, text: "Неизвестное действие" }, 15000, token);
+    return;
+  }
+  const msg = u.message;
+  if (!msg || msg.chat.type !== "private" || !msg.text) return;
+  const [command, invite] = msg.text.trim().split(/\s+/, 2);
+  if (command === "/start" && invite && (await linkAdmin(payload, invite, msg, token))) return;
+  const { docs } = await payload.find({ collection: "users", where: { chatId: { equals: String(msg.chat.id) } }, depth: 0, limit: 1, overrideAccess: true });
+  await tg(
+    "sendMessage",
+    {
+      chat_id: msg.chat.id,
+      parse_mode: "HTML",
+      text: docs[0]
+        ? `Вы подключены как администратор 🔐\n\nЗдесь подтверждается вход в админку FitSweet, приходят уведомления о входах, тревоги сервера и утренняя сводка.`
+        : "Это служебный бот FitSweet для администраторов. Подключение — по ссылке из своего профиля в админке.",
+    },
+    15000,
+    token,
+  );
+}
+
 async function handleCallback(payload: Payload, cq: TgCallback) {
   const answer = (text: string, alert = false) => tg("answerCallbackQuery", { callback_query_id: cq.id, text, show_alert: alert });
-  const login = cq.data?.match(/^login:([\w-]+):(ok|no)$/);
-  if (login) {
-    const done = answerLoginApproval(login[1], login[2] === "ok", String(cq.from.id));
-    return answer(done ? (login[2] === "ok" ? "Вход подтверждён" : "Вход отклонён") : "Запрос уже неактуален", !done);
-  }
+  if (await answerLogin(cq, botToken())) return;
   const m = cq.data?.match(/^o:(\d+):(accept|done|cancel)$/);
   if (!m) return answer("Неизвестное действие");
 
@@ -327,33 +373,39 @@ async function handleUpdate(payload: Payload, u: TgUpdate) {
   else if (u.callback_query) await handleCallback(payload, u.callback_query);
 }
 
-const state = globalThis as unknown as { __fitsweetBot?: boolean; __fitsweetBotPolling?: boolean };
+type BotState = { started?: boolean; polling?: boolean; lastPoll?: number };
+const state = globalThis as unknown as { __fitsweetBots?: Record<string, BotState> };
+const bots = (state.__fitsweetBots ??= {});
 
-export const botIsPolling = () => Boolean(state.__fitsweetBotPolling);
+export const botIsPolling = () => Boolean(bots.orders?.polling);
+export const botLastPollAt = () => bots.orders?.lastPoll ?? 0;
+export const adminBotIsPolling = () => Boolean(bots.admin?.polling);
+export const adminBotLastPollAt = () => bots.admin?.lastPoll ?? 0;
+export const approvalsAvailable = () => botIsPolling() || adminBotIsPolling();
 
-export function startBot(getPayload: () => Promise<Payload>) {
-  if (!botToken() || state.__fitsweetBot) return;
-  state.__fitsweetBot = true;
-
+function poll(name: string, token: string, payload: Payload, commands: { command: string; description: string }[], onUpdate: (payload: Payload, u: TgUpdate) => Promise<void>) {
+  const bot = (bots[name] ??= {});
+  if (bot.started) return;
+  bot.started = true;
   (async () => {
-    const payload = await getPayload();
-    await tg("deleteWebhook").catch(() => {});
-    await tg("setMyCommands", { commands: COMMANDS }).catch(() => {});
-    log("бот запущен, жду обновления");
-    state.__fitsweetBotPolling = true;
+    await tg("deleteWebhook", {}, 15000, token).catch(() => {});
+    await tg("setMyCommands", { commands }, 15000, token).catch(() => {});
+    log(`${name === "admin" ? "админ-бот" : "бот заказов"} запущен, жду обновления`);
+    bot.polling = true;
     let offset = 0;
     let conflictLogged = false;
     for (;;) {
       try {
-        const updates = await tg<TgUpdate[]>("getUpdates", { offset, timeout: 50, allowed_updates: ["message", "callback_query"] }, 65000);
+        const updates = await tg<TgUpdate[]>("getUpdates", { offset, timeout: 50, allowed_updates: ["message", "callback_query"] }, 65000, token);
         conflictLogged = false;
+        bot.lastPoll = Date.now();
         for (const u of updates) {
           offset = u.update_id + 1;
-          await handleUpdate(payload, u).catch((err) => log("ошибка обработки:", (err as Error).message));
+          await onUpdate(payload, u).catch((err) => log("ошибка обработки:", (err as Error).message));
         }
       } catch (err) {
         if (err instanceof TelegramError && err.code === 409) {
-          if (!conflictLogged) log("бота уже слушает другой запущенный сервер — жду");
+          if (!conflictLogged) log(`${name}: бота уже слушает другой запущенный сервер — жду`);
           conflictLogged = true;
           await new Promise((r) => setTimeout(r, 30000));
         } else {
@@ -362,8 +414,16 @@ export function startBot(getPayload: () => Promise<Payload>) {
       }
     }
   })().catch((err) => {
-    state.__fitsweetBot = false;
-    state.__fitsweetBotPolling = false;
-    log("бот остановлен:", (err as Error).message);
+    bot.started = false;
+    bot.polling = false;
+    log(`${name}: бот остановлен:`, (err as Error).message);
+  });
+}
+
+export function startBot(getPayload: () => Promise<Payload>) {
+  if (!botToken()) return;
+  void getPayload().then((payload) => {
+    poll("orders", botToken(), payload, COMMANDS, handleUpdate);
+    if (hasAdminBot()) poll("admin", adminBotToken(), payload, [{ command: "start", description: "Статус подключения" }], handleAdminUpdate);
   });
 }

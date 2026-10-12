@@ -38,6 +38,7 @@ import { ruOverrides } from "./cms/i18n-ru";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default buildConfig({
+  csrf: process.env.ADMIN_URL ? [process.env.ADMIN_URL] : [],
   admin: {
     user: Users.slug,
     dashboard: { widgets: [], defaultLayout: [] },

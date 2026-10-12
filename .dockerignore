@@ -1,0 +1,14 @@
+.git
+.next
+node_modules
+data
+media
+backups
+.docker-data
+.env*
+!.env.example
+*.log
+.DS_Store
+.vscode
+.idea
+coverage

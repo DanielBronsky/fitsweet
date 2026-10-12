@@ -44,3 +44,8 @@ next-env.d.ts
 # payload: база и загруженные файлы живут на сервере, не в git
 /data/
 /media/
+
+# docker
+/.deploy.env
+/.docker-data/
+/backups/

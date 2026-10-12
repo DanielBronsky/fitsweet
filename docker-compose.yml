@@ -1,0 +1,72 @@
+name: fitsweet
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${SITE_URL:-https://fitsweet.md}
+    image: fitsweet-app:latest
+    container_name: fitsweet-app
+    env_file: ${APP_ENV_FILE:-.env}
+    environment:
+      DATABASE_URL: file:/data/fitsweet.db
+      MEDIA_DIR: /data/media
+      NEXT_PUBLIC_SITE_URL: ${SITE_URL:-https://fitsweet.md}
+      ADMIN_URL: ${ADMIN_URL:-https://admin.fitsweet.md}
+      ADMIN_COOKIE_SECURE: "true"
+    volumes:
+      - ${DATA_DIR:-./data}:/data
+    restart: unless-stopped
+    expose:
+      - "3000"
+    logging:
+      options: { max-size: "10m", max-file: "5" }
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: fitsweet-caddy
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:-fitsweet.md}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:-admin.fitsweet.md}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@fitsweet.md}
+      CADDY_GLOBAL: ${CADDY_GLOBAL:-}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    restart: unless-stopped
+    logging:
+      options: { max-size: "10m", max-file: "3" }
+
+  watchdog:
+    image: fitsweet-app:latest
+    container_name: fitsweet-watchdog
+    command: ["node", "docker/watchdog.mjs"]
+    healthcheck:
+      disable: true
+    user: root
+    env_file: ${APP_ENV_FILE:-.env}
+    environment:
+      DATABASE_FILE: /data/fitsweet.db
+      BACKUP_DIR: /data/backups
+      HEALTH_URL: http://app:3000/api/health
+      APP_CONTAINER: fitsweet-app
+    volumes:
+      - ${DATA_DIR:-./data}:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    logging:
+      options: { max-size: "5m", max-file: "3" }
+
+volumes:
+  caddy_data:
+  caddy_config:
