@@ -40,11 +40,13 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 export default buildConfig({
   admin: {
     user: Users.slug,
+    dashboard: { widgets: [], defaultLayout: [] },
     importMap: { baseDir: dirname },
     components: {
       afterNavLinks: ["/cms/admin/NavExtra#NavExtra"],
       actions: ["/cms/admin/BackButton#BackButton"],
-      providers: ["/cms/admin/PasswordEye#PasswordEye"],
+      providers: ["/cms/admin/PasswordEye#PasswordEye", "/cms/admin/ActivityKeeper#ActivityKeeper"],
+      afterLogin: ["/cms/admin/LoginHint#LoginHint"],
       graphics: {
         Logo: "/cms/admin/Brand#AdminLogo",
         Icon: "/cms/admin/Brand#AdminIcon",

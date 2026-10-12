@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
-export const newInviteToken = () => crypto.randomBytes(18).toString("base64url");
+export const newInviteToken = (prefix = "") => prefix + crypto.randomBytes(18).toString("base64url");
 
 const SYSTEM_FIELDS = ["inviteToken", "chatId", "telegramUsername", "connectedAt"] as const;
 

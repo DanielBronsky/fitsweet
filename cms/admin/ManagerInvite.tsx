@@ -8,7 +8,8 @@ type Status = { chatId?: string | null; telegramUsername?: string | null; connec
 const box = { border: "1px solid var(--theme-elevation-150)", borderRadius: 8, padding: 16, marginBottom: 24 } as const;
 const muted = { fontSize: 13, color: "var(--theme-elevation-500)", margin: 0 } as const;
 
-export function ManagerInvite({ bot }: { bot?: string }) {
+export function ManagerInvite({ bot, collection = "managers" }: { bot?: string; collection?: "managers" | "users" }) {
+  const admin = collection === "users";
   const { config } = useConfig();
   const { id } = useDocumentInfo();
   const form = useFormFields(([f]) => ({
@@ -22,7 +23,7 @@ export function ManagerInvite({ bot }: { bot?: string }) {
   const [busy, setBusy] = useState(false);
   const status = live ?? form;
   const connected = Boolean(status.chatId);
-  const api = `${config.serverURL}${config.routes.api}/managers/${id}`;
+  const api = `${config.serverURL}${config.routes.api}/${collection}/${id}`;
 
   useEffect(() => {
     if (!id || connected) return;
@@ -35,14 +36,24 @@ export function ManagerInvite({ bot }: { bot?: string }) {
   }, [id, connected, api]);
 
   if (!bot) return <div style={box}><p style={muted}>Бот не настроен: на сервере не задан TELEGRAM_BOT_USERNAME.</p></div>;
-  if (!id) return <div style={box}><p style={muted}>Сохраните менеджера — здесь появится личная ссылка-приглашение в бота.</p></div>;
+  if (!id)
+    return (
+      <div style={box}>
+        <p style={muted}>
+          {admin ? "Сохраните администратора — здесь появится ссылка для подключения подтверждения входа." : "Сохраните менеджера — здесь появится личная ссылка-приглашение в бота."}
+        </p>
+      </div>
+    );
 
   const link = status.inviteToken ? `https://t.me/${bot}?start=${status.inviteToken}` : "";
 
   const reset = async () => {
-    if (!confirm("Отключить этого человека от бота? Старая ссылка перестанет работать, появится новая.")) return;
+    const question = admin
+      ? "Отключить подтверждение входа через Telegram? Вход станет только по паролю, пока не подключите снова."
+      : "Отключить этого человека от бота? Старая ссылка перестанет работать, появится новая.";
+    if (!confirm(question)) return;
     setBusy(true);
-    await fetch(`${api}/reset`, { method: "POST", credentials: "include" }).catch(() => null);
+    await fetch(`${api}/${admin ? "telegram-reset" : "reset"}`, { method: "POST", credentials: "include" }).catch(() => null);
     const res = await fetch(`${api}?depth=0`, { credentials: "include" }).catch(() => null);
     setLive(((await res?.json().catch(() => null)) as Status | null) ?? null);
     setBusy(false);
@@ -52,13 +63,13 @@ export function ManagerInvite({ bot }: { bot?: string }) {
     const when = status.connectedAt ? new Date(status.connectedAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" }) : "";
     return (
       <div style={box}>
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>✅ Подключён к боту</p>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>{admin ? "🔐 Вход подтверждается в Telegram" : "✅ Подключён к боту"}</p>
         <p style={{ ...muted, marginTop: 6 }}>
           {status.telegramUsername ? `@${status.telegramUsername} · ` : ""}
-          {when}. Заказы приходят ему в @{bot}.
+          {when}. {admin ? `После ввода пароля в @${bot} придёт запрос «Это вы?».` : `Заказы приходят ему в @${bot}.`}
         </p>
         <button type="button" className="btn btn--style-secondary btn--size-small" style={{ margin: "12px 0 0" }} onClick={reset} disabled={busy}>
-          Отключить и выдать новую ссылку
+          {admin ? "Отключить подтверждение" : "Отключить и выдать новую ссылку"}
         </button>
       </div>
     );
@@ -66,9 +77,11 @@ export function ManagerInvite({ bot }: { bot?: string }) {
 
   return (
     <div style={box}>
-      <p style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>⏳ Ещё не подключён</p>
+      <p style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>{admin ? "⚠️ Вход только по паролю" : "⏳ Ещё не подключён"}</p>
       <p style={{ ...muted, marginTop: 6 }}>
-        Отправьте эту ссылку человеку. Он откроет её в Telegram и нажмёт «Старт» — статус здесь сменится сам. Ссылка одноразовая.
+        {admin
+          ? "Подключите Telegram: откройте ссылку на своём телефоне и нажмите «Старт». После этого каждый вход нужно будет подтверждать в боте."
+          : "Отправьте эту ссылку человеку. Он откроет её в Telegram и нажмёт «Старт» — статус здесь сменится сам. Ссылка одноразовая."}
       </p>
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <input

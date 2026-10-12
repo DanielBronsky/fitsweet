@@ -242,3 +242,15 @@
   margin-bottom: 18px;
   font-weight: 600;
 }
+
+.modular-dashboard {
+  display: none !important;
+}
+
+.dashboard-breadcrumb-select .rs__indicators {
+  display: none !important;
+}
+
+.dashboard-breadcrumb-select {
+  pointer-events: none;
+}

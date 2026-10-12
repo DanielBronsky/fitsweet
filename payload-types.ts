@@ -176,6 +176,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
+  inviteToken?: string | null;
+  chatId?: string | null;
+  telegramUsername?: string | null;
+  connectedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -916,6 +920,10 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  inviteToken?: T;
+  chatId?: T;
+  telegramUsername?: T;
+  connectedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

@@ -3,6 +3,7 @@ import type { Manager, Order } from "../../payload-types";
 import { newInviteToken } from "../collections/Managers";
 import { botToken, tg, TelegramError } from "./api";
 import { orderKeyboard, orderText, type OrderStatus, type OrderView } from "./format";
+import { answerLoginApproval } from "./login-approval";
 
 type MessageRef = { chatId: string; messageId: number };
 type TgUser = { id: number; username?: string; first_name?: string };
@@ -183,6 +184,27 @@ async function handleMessage(payload: Payload, msg: TgMessage) {
   const [command, token] = msg.text.trim().split(/\s+/, 2);
   const chatId = msg.chat.id;
 
+  const adminInvite = token?.startsWith("u_")
+    ? (await payload.find({ collection: "users", where: { inviteToken: { equals: token } }, depth: 0, limit: 1, overrideAccess: true })).docs[0]
+    : undefined;
+  if (command === "/start" && adminInvite) {
+    const user = adminInvite;
+    if (user.chatId && user.chatId !== String(chatId)) {
+      await reply(chatId, "Ссылка недействительна или уже использована. Получите новую в своём профиле в админке.");
+      return;
+    }
+    await payload.update({
+      collection: "users",
+      id: user.id,
+      data: { chatId: String(chatId), telegramUsername: msg.from?.username ?? null, connectedAt: new Date().toISOString(), inviteToken: newInviteToken("u_") },
+      context: { system: true },
+      overrideAccess: true,
+    });
+    await reply(chatId, `Готово, ${user.name || user.email}! 🔐\n\nТеперь каждый вход в админку FitSweet нужно подтвердить здесь кнопкой «✅ Да, это я».`);
+    log(`администратор «${user.email}» подключил подтверждение входа`);
+    return;
+  }
+
   if (command === "/start" && token) {
     const { docs } = await payload.find({ collection: "managers", where: { inviteToken: { equals: token } }, depth: 0, limit: 1, overrideAccess: true });
     const manager = docs[0];
@@ -207,7 +229,13 @@ async function handleMessage(payload: Payload, msg: TgMessage) {
 
   const manager = await findManagerByChat(payload, chatId);
   if (!manager) {
-    await reply(chatId, "Это бот заказов FitSweet. Подключиться можно только по личной ссылке из админки сайта.");
+    const admin = await payload.find({ collection: "users", where: { chatId: { equals: String(chatId) } }, depth: 0, limit: 1, overrideAccess: true });
+    await reply(
+      chatId,
+      admin.docs[0]
+        ? "Вы подключены как администратор 🔐 Здесь подтверждается вход в админку FitSweet."
+        : "Это бот заказов FitSweet. Подключиться можно только по личной ссылке из админки сайта.",
+    );
     return;
   }
   if (manager.active === false) {
@@ -247,6 +275,11 @@ async function handleMessage(payload: Payload, msg: TgMessage) {
 
 async function handleCallback(payload: Payload, cq: TgCallback) {
   const answer = (text: string, alert = false) => tg("answerCallbackQuery", { callback_query_id: cq.id, text, show_alert: alert });
+  const login = cq.data?.match(/^login:([\w-]+):(ok|no)$/);
+  if (login) {
+    const done = answerLoginApproval(login[1], login[2] === "ok", String(cq.from.id));
+    return answer(done ? (login[2] === "ok" ? "Вход подтверждён" : "Вход отклонён") : "Запрос уже неактуален", !done);
+  }
   const m = cq.data?.match(/^o:(\d+):(accept|done|cancel)$/);
   if (!m) return answer("Неизвестное действие");
 
@@ -292,7 +325,9 @@ async function handleUpdate(payload: Payload, u: TgUpdate) {
   else if (u.callback_query) await handleCallback(payload, u.callback_query);
 }
 
-const state = globalThis as unknown as { __fitsweetBot?: boolean };
+const state = globalThis as unknown as { __fitsweetBot?: boolean; __fitsweetBotPolling?: boolean };
+
+export const botIsPolling = () => Boolean(state.__fitsweetBotPolling);
 
 export function startBot(getPayload: () => Promise<Payload>) {
   if (!botToken() || state.__fitsweetBot) return;
@@ -303,6 +338,7 @@ export function startBot(getPayload: () => Promise<Payload>) {
     await tg("deleteWebhook").catch(() => {});
     await tg("setMyCommands", { commands: COMMANDS }).catch(() => {});
     log("бот запущен, жду обновления");
+    state.__fitsweetBotPolling = true;
     let offset = 0;
     let conflictLogged = false;
     for (;;) {
@@ -325,6 +361,7 @@ export function startBot(getPayload: () => Promise<Payload>) {
     }
   })().catch((err) => {
     state.__fitsweetBot = false;
+    state.__fitsweetBotPolling = false;
     log("бот остановлен:", (err as Error).message);
   });
 }

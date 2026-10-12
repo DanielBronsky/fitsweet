@@ -17,6 +17,7 @@ import { refreshInstagramCovers, seedInstagram } from "./seed/instagram";
 import { seedFinalCta } from "./seed/final-cta";
 import { seedFooter } from "./seed/footer";
 import { refreshOrderSearch } from "./seed/orders";
+import { ensureAdminInvites } from "./seed/users";
 import { seedLayout } from "./seed/layout";
 
 const payload = await getPayload({ config });
@@ -69,6 +70,7 @@ await step("Instagram", async () => {
 await step("Финальный призыв", () => seedFinalCta(payload));
 await step("Футер", () => seedFooter(payload));
 await step("Поиск по заказам", () => refreshOrderSearch(payload));
+await step("Подтверждение входа админов", () => ensureAdminInvites(payload));
 await step("Порядок блоков", () => seedLayout(payload, bakery));
 
 process.exit(0);
