@@ -19,6 +19,9 @@ import * as migration_20261009_102254_favicon from './20261009_102254_favicon';
 import * as migration_20261009_103243_reviews from './20261009_103243_reviews';
 import * as migration_20261009_104704_instagram from './20261009_104704_instagram';
 import * as migration_20261009_111625_instagram_layout from './20261009_111625_instagram_layout';
+import * as migration_20261009_165312_orders from './20261009_165312_orders';
+import * as migration_20261009_165855_telegram_managers from './20261009_165855_telegram_managers';
+import * as migration_20261012_091653_manager_pause from './20261012_091653_manager_pause';
 
 export const migrations = [
   {
@@ -124,6 +127,21 @@ export const migrations = [
   {
     up: migration_20261009_111625_instagram_layout.up,
     down: migration_20261009_111625_instagram_layout.down,
-    name: '20261009_111625_instagram_layout'
+    name: '20261009_111625_instagram_layout',
+  },
+  {
+    up: migration_20261009_165312_orders.up,
+    down: migration_20261009_165312_orders.down,
+    name: '20261009_165312_orders',
+  },
+  {
+    up: migration_20261009_165855_telegram_managers.up,
+    down: migration_20261009_165855_telegram_managers.down,
+    name: '20261009_165855_telegram_managers',
+  },
+  {
+    up: migration_20261012_091653_manager_pause.up,
+    down: migration_20261012_091653_manager_pause.down,
+    name: '20261012_091653_manager_pause'
   },
 ];

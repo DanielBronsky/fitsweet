@@ -28,6 +28,8 @@ import { ReviewsSection } from "./cms/globals/ReviewsSection";
 import { Reviews } from "./cms/collections/Reviews";
 import { InstagramSection } from "./cms/globals/InstagramSection";
 import { InstagramPosts } from "./cms/collections/InstagramPosts";
+import { Orders } from "./cms/collections/Orders";
+import { Managers } from "./cms/collections/Managers";
 import { Typography } from "./cms/globals/Typography";
 import { ruOverrides } from "./cms/i18n-ru";
 
@@ -62,7 +64,7 @@ export default buildConfig({
     fallbackLanguage: "ru",
     translations: { ru: ruOverrides },
   },
-  collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections, Reviews, InstagramPosts],
+  collections: [Users, Media, Products, ProductCategories, Moods, SalePoints, PointCategories, CustomSections, Reviews, InstagramPosts, Orders, Managers],
   globals: [Layout, Header, Hero, MoodsSection, Catalog, WhereSection, DeliverySection, BoxSection, ReviewsSection, InstagramSection, Theme, Typography, Seo],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

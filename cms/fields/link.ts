@@ -9,7 +9,7 @@ export const sectionAnchors = [
   { value: "box", label: ru.box.title },
   { value: "reviews", label: ru.reviews.title },
   { value: "instagram", label: ru.instagram.title },
-  { value: "order", label: ru.order.title },
+  { value: "order", label: "Оформление заказа (страница с корзиной)" },
 ] as const;
 
 export type LinkValue = {

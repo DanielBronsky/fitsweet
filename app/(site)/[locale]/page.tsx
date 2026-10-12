@@ -18,7 +18,6 @@ import { Delivery } from "@/components/sections/Delivery";
 import { BoxBuilder } from "@/components/sections/BoxBuilder";
 import { Reviews } from "@/components/sections/Reviews";
 import { InstagramFeed } from "@/components/sections/InstagramFeed";
-import { OrderForm } from "@/components/sections/OrderForm";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { getCardStyle, getCatalogData, getMoodsData, getProducts } from "@/lib/catalog";
 import { siteConfig } from "@/lib/site";
@@ -70,7 +69,6 @@ export default async function Home({
     box: <BoxBuilder data={await getBoxData(l)} />,
     reviews: <Reviews data={await getReviewsData(l)} />,
     instagram: <InstagramFeed data={await getInstagramData(l)} />,
-    order: <OrderForm />,
     finalCta: <FinalCta />,
   };
 

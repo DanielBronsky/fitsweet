@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { useCart, cartTotal, cartCount } from "@/lib/cart";
 import { tileName } from "@/lib/products";
 import { useProducts } from "@/lib/products-context";
@@ -139,7 +140,7 @@ export function CartDrawer() {
                 <span className="text-[14px] text-muted">{dict.cart.total}</span>
                 <span className="text-[26px] font-bold text-green-900">{dict.common.price(total)}</span>
               </div>
-              <Button as="a" href="#order" size="lg" className="w-full" onClick={close}>
+              <Button as={Link} href={`/${locale}/checkout`} size="lg" className="w-full" onClick={close}>
                 {dict.cart.checkout}
               </Button>
               <button

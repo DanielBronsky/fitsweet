@@ -7,7 +7,6 @@ export const pageSections = [
   { key: "box", label: "Соберите коробку" },
   { key: "reviews", label: "Отзывы" },
   { key: "instagram", label: "Instagram" },
-  { key: "order", label: "Оформить заказ" },
   { key: "finalCta", label: "Финальный призыв" },
 ] as const;
 

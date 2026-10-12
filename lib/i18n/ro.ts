@@ -137,6 +137,13 @@ export const ro: Dictionary = {
     total: "Total",
     errorGeneric: "Comanda nu a putut fi trimisă",
     errorUnknown: "Eroare necunoscută",
+    pageTitle: "Plasarea comenzii",
+    successTitle: (n: number) => (n ? `Mulțumim! Comanda nr. ${n} a fost primită` : "Mulțumim! Comanda a fost primită"),
+    successText: "Managerul vă va contacta în 15 minute pentru a confirma comanda și ora livrării.",
+    backToShop: "Înapoi la deserturi",
+    errorInvalid: "Verificați numele, telefonul și adresa.",
+    errorEmpty: "Coșul este gol sau produsele nu mai sunt disponibile.",
+    errorRate: "Prea multe comenzi la rând. Încercați peste câteva minute sau sunați-ne.",
   },
   cart: {
     title: "Coș",

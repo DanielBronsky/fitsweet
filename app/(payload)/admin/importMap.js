@@ -10,6 +10,8 @@ import { IconField as IconField_5d678d23253d2966f66174444f1e6d2d } from '../../.
 import { FeatureCardRowLabel as FeatureCardRowLabel_7a4cec2399db86d02b15c864a1cbf2f2 } from '../../../cms/admin/FeatureCardRowLabel'
 import { FaqRowLabel as FaqRowLabel_19f1da618422d75a061ba795d8aded24 } from '../../../cms/admin/FaqRowLabel'
 import { InstagramUrlField as InstagramUrlField_b1b3de7aa15439e9214e9cdea163646b } from '../../../cms/admin/InstagramUrlField'
+import { OrderItemRowLabel as OrderItemRowLabel_12ae0d9948687aefbca5a2cf7162383c } from '../../../cms/admin/OrderItemRowLabel'
+import { ManagerInvite as ManagerInvite_f16a3f94a4ff0e11e3851e90fc28b51f } from '../../../cms/admin/ManagerInvite'
 import { SectionRowLabel as SectionRowLabel_130c940f5978bc93c5a6785473a67515 } from '../../../cms/admin/SectionRowLabel'
 import { MenuRowLabel as MenuRowLabel_f36fb80b7abf4ee03dbf33abcd7d54bb } from '../../../cms/admin/MenuRowLabel'
 import { TextRowLabel as TextRowLabel_e38d75bb229b235a229373180715e3fa } from '../../../cms/admin/TextRowLabel'
@@ -39,6 +41,8 @@ export const importMap = {
   "/cms/admin/FeatureCardRowLabel#FeatureCardRowLabel": FeatureCardRowLabel_7a4cec2399db86d02b15c864a1cbf2f2,
   "/cms/admin/FaqRowLabel#FaqRowLabel": FaqRowLabel_19f1da618422d75a061ba795d8aded24,
   "/cms/admin/InstagramUrlField#InstagramUrlField": InstagramUrlField_b1b3de7aa15439e9214e9cdea163646b,
+  "/cms/admin/OrderItemRowLabel#OrderItemRowLabel": OrderItemRowLabel_12ae0d9948687aefbca5a2cf7162383c,
+  "/cms/admin/ManagerInvite#ManagerInvite": ManagerInvite_f16a3f94a4ff0e11e3851e90fc28b51f,
   "/cms/admin/SectionRowLabel#SectionRowLabel": SectionRowLabel_130c940f5978bc93c5a6785473a67515,
   "/cms/admin/MenuRowLabel#MenuRowLabel": MenuRowLabel_f36fb80b7abf4ee03dbf33abcd7d54bb,
   "/cms/admin/TextRowLabel#TextRowLabel": TextRowLabel_e38d75bb229b235a229373180715e3fa,

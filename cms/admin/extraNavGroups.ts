@@ -5,6 +5,13 @@ export type NavItem = { label: string; path: string; sub?: boolean; section?: Se
 export const BODY_GROUP = "Основное содержимое · Body";
 
 export const extraNavGroups: { label: string; items: NavItem[] }[] = [
+  {
+    label: "Заказы",
+    items: [
+      { label: "Заказы", path: "/collections/orders" },
+      { label: "Менеджеры", path: "/collections/managers", sub: true },
+    ],
+  },
   { label: "Шапка сайта · Header", items: [{ label: "Шапка", path: "/globals/header" }] },
   {
     label: BODY_GROUP,

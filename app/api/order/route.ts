@@ -1,45 +1,35 @@
 import { NextResponse } from "next/server";
-import { getDictionary } from "@/lib/i18n";
+import { placeOrder } from "@/lib/orders";
 
-type OrderItem = { id: string; name: string; qty: number; price: number };
-type OrderPayload = {
-  name: string;
-  phone: string;
-  address: string;
-  comment?: string;
-  items: OrderItem[];
-  subtotal: number;
-  shipping: number;
-  total: number;
-  locale?: string;
-};
+const WINDOW_MS = 10 * 60 * 1000;
+const LIMIT = 5;
+const hits = new Map<string, number[]>();
+
+function tooMany(ip: string) {
+  const now = Date.now();
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) for (const [k, v] of hits) if (v.every((t) => now - t >= WINDOW_MS)) hits.delete(k);
+  return recent.length > LIMIT;
+}
 
 export async function POST(req: Request) {
-  let body: OrderPayload;
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "local";
+  if (tooMany(ip)) return NextResponse.json({ error: "rate" }, { status: 429 });
+
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body !== "object") return NextResponse.json({ error: "invalid" }, { status: 400 });
 
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Bad request" }, { status: 400 });
+    const result = await placeOrder(body);
+    if (!result.ok) {
+      if (result.error === "spam") return NextResponse.json({ ok: true, number: 0 });
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    }
+    return NextResponse.json({ ok: true, number: result.number });
+  } catch (err) {
+    console.error("[order] не удалось сохранить заказ:", err);
+    return NextResponse.json({ error: "server" }, { status: 500 });
   }
-
-  const dict = getDictionary(body.locale ?? "ru");
-
-  if (!body.name?.trim() || !body.phone?.trim() || !body.address?.trim()) {
-    return NextResponse.json(
-      { error: `${dict.order.name} / ${dict.order.phone} / ${dict.order.address}` },
-      { status: 400 },
-    );
-  }
-
-  if (!Array.isArray(body.items) || body.items.length === 0) {
-    return NextResponse.json({ error: dict.order.emptyCart }, { status: 400 });
-  }
-
-  console.log("[FitSweet] Новый заказ:", {
-    ...body,
-    items: body.items.map((i) => `${i.name} × ${i.qty}`),
-  });
-
-  return NextResponse.json({ ok: true });
 }

@@ -6,10 +6,13 @@ type Row = { block: string; custom?: number };
 export async function seedLayout(payload: Payload, bakeryCategory: number) {
   const readRows = async (): Promise<Row[]> => {
     const layout = await payload.findGlobal({ slug: "layout", depth: 0 });
-    const rows = (layout.blocks ?? []).map((b) => ({
-      block: b.block,
-      custom: (typeof b.custom === "object" ? b.custom?.id : b.custom) ?? undefined,
-    }));
+    const known = new Set<string>(defaultSectionOrder);
+    const rows = (layout.blocks ?? [])
+      .map((b) => ({
+        block: b.block,
+        custom: (typeof b.custom === "object" ? b.custom?.id : b.custom) ?? undefined,
+      }))
+      .filter((r) => r.block === "custom" || known.has(r.block));
     return rows.length ? rows : defaultSectionOrder.map((block) => ({ block }));
   };
 

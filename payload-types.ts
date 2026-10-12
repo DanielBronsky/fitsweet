@@ -77,6 +77,8 @@ export interface Config {
     customSections: CustomSection;
     reviews: Review;
     instagramPosts: InstagramPost;
+    orders: Order;
+    managers: Manager;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +96,8 @@ export interface Config {
     customSections: CustomSectionsSelect<false> | CustomSectionsSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     instagramPosts: InstagramPostsSelect<false> | InstagramPostsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    managers: ManagersSelect<false> | ManagersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -704,6 +708,90 @@ export interface InstagramPost {
   createdAt: string;
 }
 /**
+ * Заказы с сайта. Статус меняют менеджеры в Telegram или здесь.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  title?: string | null;
+  number?: number | null;
+  status: 'new' | 'accepted' | 'done' | 'cancelled';
+  acceptedBy?: (number | null) | Manager;
+  acceptedAt?: string | null;
+  closedBy?: (number | null) | Manager;
+  closedAt?: string | null;
+  locale?: ('ru' | 'ro') | null;
+  customer: {
+    name: string;
+    phone: string;
+    address: string;
+    comment?: string | null;
+  };
+  phone?: string | null;
+  items?:
+    | {
+        name?: string | null;
+        qty?: number | null;
+        price?: number | null;
+        sum?: number | null;
+        product?: (number | null) | Product;
+        id?: string | null;
+      }[]
+    | null;
+  subtotal?: number | null;
+  shipping?: number | null;
+  total?: number | null;
+  telegram?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Видно только в админке.
+   */
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Кто получает заказы в Telegram-боте и нажимает «Принять». Добавьте человека и отправьте ему ссылку-приглашение.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "managers".
+ */
+export interface Manager {
+  id: number;
+  /**
+   * Так будет подписано «Принял(а): …» в боте и в заказах.
+   */
+  name: string;
+  /**
+   * Для себя — бот по номеру не ищет.
+   */
+  phone?: string | null;
+  /**
+   * Для себя.
+   */
+  username?: string | null;
+  active?: boolean | null;
+  /**
+   * Менеджер сам ставит паузу командой /pause в боте и снимает /resume.
+   */
+  paused?: boolean | null;
+  inviteToken?: string | null;
+  chatId?: string | null;
+  telegramUsername?: string | null;
+  connectedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -766,6 +854,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'instagramPosts';
         value: number | InstagramPost;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'managers';
+        value: number | Manager;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1226,6 +1322,63 @@ export interface InstagramPostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  title?: T;
+  number?: T;
+  status?: T;
+  acceptedBy?: T;
+  acceptedAt?: T;
+  closedBy?: T;
+  closedAt?: T;
+  locale?: T;
+  customer?:
+    | T
+    | {
+        name?: T;
+        phone?: T;
+        address?: T;
+        comment?: T;
+      };
+  phone?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        qty?: T;
+        price?: T;
+        sum?: T;
+        product?: T;
+        id?: T;
+      };
+  subtotal?: T;
+  shipping?: T;
+  total?: T;
+  telegram?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "managers_select".
+ */
+export interface ManagersSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  username?: T;
+  active?: T;
+  paused?: T;
+  inviteToken?: T;
+  chatId?: T;
+  telegramUsername?: T;
+  connectedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1275,17 +1428,7 @@ export interface Layout {
   blocks?:
     | {
         block:
-          | 'hero'
-          | 'moods'
-          | 'catalog'
-          | 'where'
-          | 'delivery'
-          | 'box'
-          | 'reviews'
-          | 'instagram'
-          | 'order'
-          | 'finalCta'
-          | 'custom';
+          'hero' | 'moods' | 'catalog' | 'where' | 'delivery' | 'box' | 'reviews' | 'instagram' | 'finalCta' | 'custom';
         custom?: (number | null) | CustomSection;
         id?: string | null;
       }[]
