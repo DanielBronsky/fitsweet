@@ -4,6 +4,7 @@ import { newInviteToken } from "../collections/Managers";
 import { botToken, tg, TelegramError } from "./api";
 import { orderKeyboard, orderText, type OrderStatus, type OrderView } from "./format";
 import { answerLoginApproval } from "./login-approval";
+import { sendReviewRequest } from "./review-request";
 
 type MessageRef = { chatId: string; messageId: number };
 type TgUser = { id: number; username?: string; first_name?: string };
@@ -318,6 +319,7 @@ async function handleCallback(payload: Payload, cq: TgCallback) {
   }
   await answer(action === "accept" ? "Заказ ваш 👌" : action === "done" ? "Отмечен как выполненный ✅" : "Заказ отменён");
   if (result.order) await syncOrderMessages(payload, result.order);
+  if (action === "done" && result.order) await sendReviewRequest(payload, result.order, manager.chatId);
 }
 
 async function handleUpdate(payload: Payload, u: TgUpdate) {

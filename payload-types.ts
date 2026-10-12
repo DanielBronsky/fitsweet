@@ -2163,6 +2163,11 @@ export interface ReviewsSection {
     };
     background?: string | null;
     color?: string | null;
+    askAfterDone?: boolean | null;
+    askText?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3324,6 +3329,13 @@ export interface ReviewsSectionSelect<T extends boolean = true> {
             };
         background?: T;
         color?: T;
+        askAfterDone?: T;
+        askText?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

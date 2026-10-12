@@ -28,6 +28,7 @@ import * as migration_20261012_211946_fonts_cta_footer from './20261012_211946_f
 import * as migration_20261012_212425_order_number_search from './20261012_212425_order_number_search';
 import * as migration_20261012_214356_admin_2fa from './20261012_214356_admin_2fa';
 import * as migration_20261012_221150_local_seo from './20261012_221150_local_seo';
+import * as migration_20261012_221929_review_request from './20261012_221929_review_request';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20261012_221150_local_seo.up,
     down: migration_20261012_221150_local_seo.down,
-    name: '20261012_221150_local_seo'
+    name: '20261012_221150_local_seo',
+  },
+  {
+    up: migration_20261012_221929_review_request.up,
+    down: migration_20261012_221929_review_request.down,
+    name: '20261012_221929_review_request'
   },
 ];

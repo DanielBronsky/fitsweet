@@ -73,6 +73,22 @@ export const ReviewsSection: GlobalConfig = {
                 colorField({ name: "color", label: "Цвет текста", defaultValue: "cream" }),
               ]),
             ),
+            {
+              name: "askAfterDone",
+              type: "checkbox",
+              label: "После «Выполнен» присылать менеджеру в бот готовое сообщение покупателю со ссылкой на отзыв",
+              defaultValue: true,
+            },
+            {
+              ...bilingual({
+                name: "askText",
+                label: "Сообщение покупателю",
+                multiline: true,
+                maxLength: 400,
+                description: "{name} — имя покупателя, {link} — ссылка на отзыв. Пусто — стандартный текст. Язык выбирается по языку, на котором оформлен заказ.",
+              }),
+              admin: { condition: (_: unknown, s: { askAfterDone?: boolean }) => s?.askAfterDone !== false },
+            } as Field,
           ],
         },
       ],

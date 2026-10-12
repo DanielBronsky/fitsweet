@@ -1,6 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, CollectionConfig } from "payload";
 import type { Order } from "../../payload-types";
 import { syncOrderMessages } from "../telegram/bot";
+import { sendReviewRequest } from "../telegram/review-request";
 
 const TZ = "Europe/Chisinau";
 
@@ -47,6 +48,15 @@ const assignNumber: CollectionBeforeChangeHook = async ({ data, operation, req, 
 const syncTelegram: CollectionAfterChangeHook<Order> = ({ doc, previousDoc, operation, context, req }) => {
   if (operation !== "update" || context.fromBot || doc.status === previousDoc?.status) return doc;
   void syncOrderMessages(req.payload, doc).catch(() => {});
+  if (doc.status === "done") {
+    const acceptor = doc.acceptedBy;
+    const id = acceptor && typeof acceptor === "object" ? acceptor.id : acceptor;
+    if (id)
+      void req.payload
+        .findByID({ collection: "managers", id, depth: 0, overrideAccess: true })
+        .then((m) => sendReviewRequest(req.payload, doc, m?.chatId))
+        .catch(() => {});
+  }
   return doc;
 };
 

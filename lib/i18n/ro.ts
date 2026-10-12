@@ -98,6 +98,7 @@ export const ro: Dictionary = {
     title: "Ce spun clienții",
     googleButton: "Lasă o recenzie pe Google",
     googleHint: "Ți-a plăcut? Spune și altora — ne ajută mult să creștem.",
+    askText: "Bună, {name}! Mulțumim că ai ales FitSweet 💚 Dacă ți-au plăcut deserturile, te rugăm să ne lași câteva cuvinte pe Google — ne ajută mult să creștem: {link}",
   },
   instagram: {
     title: "Mai mult FitSweet în fiecare zi",
