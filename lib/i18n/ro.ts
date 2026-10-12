@@ -96,6 +96,8 @@ export const ro: Dictionary = {
   },
   reviews: {
     title: "Ce spun clienții",
+    googleButton: "Lasă o recenzie pe Google",
+    googleHint: "Ți-a plăcut? Spune și altora — ne ajută mult să creștem.",
   },
   instagram: {
     title: "Mai mult FitSweet în fiecare zi",

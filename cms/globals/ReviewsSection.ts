@@ -58,6 +58,23 @@ export const ReviewsSection: GlobalConfig = {
             ]),
           ],
         },
+        {
+          name: "google",
+          label: "Отзыв в Google",
+          description:
+            "Кнопка под отзывами и на экране «Спасибо за заказ». Ведёт на ссылку из «SEO → Компания для Google → Ссылка «Оставить отзыв в Google»». Пока ссылки нет — кнопка не показывается.",
+          fields: [
+            show("Показывать кнопку"),
+            whenShown(bilingual({ name: "text", label: "Текст кнопки", maxLength: 40, description: "Пусто — «Оставить отзыв в Google»." })),
+            whenShown(bilingual({ name: "hint", label: "Текст рядом с кнопкой", maxLength: 120 })),
+            whenShown(
+              row([
+                colorField({ name: "background", label: "Цвет кнопки", defaultValue: "green-700" }),
+                colorField({ name: "color", label: "Цвет текста", defaultValue: "cream" }),
+              ]),
+            ),
+          ],
+        },
       ],
     },
   ],

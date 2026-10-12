@@ -9,6 +9,7 @@ import { useI18n } from "@/lib/i18n/context";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ProductImage } from "@/components/ui/ProductImage";
+import { GoogleReviewButton } from "@/components/ui/GoogleReviewButton";
 
 type Status = "idle" | "sending" | "done" | "error";
 
@@ -18,7 +19,7 @@ const field =
   "h-12 w-full rounded-full border border-green-200 bg-white px-5 text-[14px] text-green-900 " +
   "placeholder:text-muted/70 transition-colors focus:border-green-700 focus:outline-none";
 
-export function Checkout() {
+export function Checkout({ googleReview }: { googleReview: React.ComponentProps<typeof GoogleReviewButton>["data"] | null }) {
   const { locale, dict } = useI18n();
   const { lines, clear, setQty } = useCart();
   const [status, setStatus] = useState<Status>("idle");
@@ -81,6 +82,7 @@ export function Checkout() {
             <Button as={Link} href={home} size="lg" className="mt-7">
               {dict.order.backToShop}
             </Button>
+            {googleReview && <GoogleReviewButton data={googleReview} className="mt-8 border-t border-green-200/60 pt-7" />}
           </div>
         </Container>
       </section>

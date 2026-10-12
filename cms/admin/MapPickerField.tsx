@@ -10,9 +10,9 @@ const CHISINAU: [number, number] = [47.0245, 28.8322];
 
 type Found = { label: string; lat: number; lng: number };
 
-export function MapPickerField() {
-  const lat = useField<number>({ path: "lat" });
-  const lng = useField<number>({ path: "lng" });
+export function MapPickerField({ path = "map" }: { path?: string }) {
+  const lat = useField<number>({ path: path.replace(/[^.]+$/, "lat") });
+  const lng = useField<number>({ path: path.replace(/[^.]+$/, "lng") });
   const holder = useRef<HTMLDivElement>(null);
   const map = useRef<LeafletMap | null>(null);
   const marker = useRef<Marker | null>(null);

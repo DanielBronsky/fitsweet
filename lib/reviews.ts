@@ -2,7 +2,7 @@ import { cache } from "react";
 import { colorToCss } from "@/cms/palette";
 import { fontToCss } from "@/cms/fonts";
 import { reviews } from "./reviews-fallback";
-import { getCms } from "./cms";
+import { getCms, getSeo } from "./cms";
 import { getProducts, sectionTitle, type SectionTitleData } from "./catalog";
 import { tileName } from "./products";
 import { getDictionary, type Locale } from "./i18n";
@@ -12,6 +12,7 @@ export type ReviewsData = {
   title: SectionTitleData;
   subtitle: { text: string; color: string } | null;
   items: { id: string; author: string; text: string; product: string | null }[];
+  google: { text: string; hint: string | null; href: string; background: string; color: string } | null;
   cards: {
     background: string;
     quoteColor: string;
@@ -27,12 +28,13 @@ const css = (value: string | null | undefined, fallback: string) => colorToCss(v
 
 export const getReviewsData = cache(async (locale: Locale): Promise<ReviewsData | null> => {
   const cms = await getCms();
-  const [doc, list, products] = await Promise.all([
+  const [doc, list, products, seo] = await Promise.all([
     cms.findGlobal({ slug: "reviewsSection", depth: 0 }).catch(() => null),
     cms
       .find({ collection: "reviews", depth: 1, limit: 100, sort: "_order", where: { show: { not_equals: false } } })
       .catch(() => null),
     getProducts(),
+    getSeo(),
   ]);
   if (doc?.section?.show === false) return null;
 
@@ -60,6 +62,7 @@ export const getReviewsData = cache(async (locale: Locale): Promise<ReviewsData 
       ? { text: doc.heading.subtitle[locale]!, color: css(doc.heading?.subtitleColor, "muted") }
       : null,
     items: showProduct ? items : items.map((r) => ({ ...r, product: null })),
+    google: googleReviewButton(doc?.google, seo?.business?.reviewUrl, locale),
     cards: {
       background: css(c?.background, "card"),
       quoteColor: css(c?.quoteColor, "green-200"),
@@ -70,4 +73,30 @@ export const getReviewsData = cache(async (locale: Locale): Promise<ReviewsData 
       chipColor: css(c?.chipColor, "green-900"),
     },
   };
+});
+
+type GoogleDoc = {
+  show?: boolean | null;
+  text?: { ru?: string | null; ro?: string | null } | null;
+  hint?: { ru?: string | null; ro?: string | null } | null;
+  background?: string | null;
+  color?: string | null;
+} | null | undefined;
+
+export function googleReviewButton(g: GoogleDoc, href: string | null | undefined, locale: Locale) {
+  if (!href || g?.show === false) return null;
+  const d = getDictionary(locale).reviews;
+  return {
+    text: g?.text?.[locale] || d.googleButton,
+    hint: g ? g.hint?.[locale] || null : d.googleHint,
+    href,
+    background: css(g?.background, "green-700"),
+    color: css(g?.color, "cream"),
+  };
+}
+
+export const getGoogleReview = cache(async (locale: Locale) => {
+  const cms = await getCms();
+  const [doc, seo] = await Promise.all([cms.findGlobal({ slug: "reviewsSection", depth: 0 }).catch(() => null), getSeo()]);
+  return googleReviewButton(doc?.google, seo?.business?.reviewUrl, locale);
 });

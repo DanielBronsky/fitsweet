@@ -22,6 +22,7 @@ import { TermRowLabel as TermRowLabel_be8e924555c3d87a759847d2020e3d4c } from '.
 import { ContactRowLabel as ContactRowLabel_a0c702d9f22a95204e39403170360c6e } from '../../../cms/admin/ContactRowLabel'
 import { HexColorField as HexColorField_86bcdda32d57aaf67120892c3feea4bd } from '../../../cms/admin/HexColorField'
 import { SiteIconPreview as SiteIconPreview_9f1486533c297f26b50145fde3c34a4a } from '../../../cms/admin/SiteIconPreview'
+import { HoursRowLabel as HoursRowLabel_e62a0c19d481cd2d291dc4da5e413231 } from '../../../cms/admin/HoursRowLabel'
 import { AdminIcon as AdminIcon_30ebd91e9e497d4885819d35d826364a } from '../../../cms/admin/Brand'
 import { AdminLogo as AdminLogo_30ebd91e9e497d4885819d35d826364a } from '../../../cms/admin/Brand'
 import { BackButton as BackButton_fed02b0875223a39233e3800e4409fe0 } from '../../../cms/admin/BackButton'
@@ -58,6 +59,7 @@ export const importMap = {
   "/cms/admin/ContactRowLabel#ContactRowLabel": ContactRowLabel_a0c702d9f22a95204e39403170360c6e,
   "/cms/admin/HexColorField#HexColorField": HexColorField_86bcdda32d57aaf67120892c3feea4bd,
   "/cms/admin/SiteIconPreview#SiteIconPreview": SiteIconPreview_9f1486533c297f26b50145fde3c34a4a,
+  "/cms/admin/HoursRowLabel#HoursRowLabel": HoursRowLabel_e62a0c19d481cd2d291dc4da5e413231,
   "/cms/admin/Brand#AdminIcon": AdminIcon_30ebd91e9e497d4885819d35d826364a,
   "/cms/admin/Brand#AdminLogo": AdminLogo_30ebd91e9e497d4885819d35d826364a,
   "/cms/admin/BackButton#BackButton": BackButton_fed02b0875223a39233e3800e4409fe0,

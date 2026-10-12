@@ -8,9 +8,9 @@ import { getBoxData } from "@/lib/box";
 import { getReviewsData } from "@/lib/reviews";
 import { getInstagramData } from "@/lib/instagram-feed";
 import { getFinalCtaData } from "@/lib/final-cta";
-import { getBusinessContacts } from "@/lib/footer";
+import { getLocalBusinessJsonLd } from "@/lib/local-business";
 import type { SectionKey } from "@/cms/sections";
-import { getDictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { Hero } from "@/components/sections/Hero";
 import { getHeroData } from "@/lib/hero";
 import { Catalog } from "@/components/sections/Catalog";
@@ -22,7 +22,6 @@ import { Reviews } from "@/components/sections/Reviews";
 import { InstagramFeed } from "@/components/sections/InstagramFeed";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { getCardStyle, getCatalogData, getMoodsData, getProducts } from "@/lib/catalog";
-import { siteConfig } from "@/lib/site";
 
 export default async function Home({
   params,
@@ -31,36 +30,9 @@ export default async function Home({
 }) {
   const { locale } = await params;
   const l = locale as Locale;
-  const dict = getDictionary(locale);
   const products = await getProducts();
-  const business = await getBusinessContacts(l);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Store",
-    name: siteConfig.name,
-    description: dict.meta.description,
-    url: `${siteConfig.url}/${l}`,
-    address: {
-      "@type": "PostalAddress",
-      ...(business.address && { streetAddress: business.address }),
-      addressLocality: siteConfig.city[l],
-      addressCountry: "MD",
-    },
-    ...(business.telephone && { telephone: business.telephone }),
-    ...(business.email && { email: business.email }),
-    ...(business.sameAs.length && { sameAs: business.sameAs }),
-    makesOffer: products.map((p) => ({
-      "@type": "Offer",
-      itemOffered: {
-        "@type": "Product",
-        name: p.name[l],
-        description: `${dict.common.ingredients}: ${p.ingredients[l]}`,
-      },
-      price: p.price,
-      priceCurrency: "MDL",
-    })),
-  };
+  const jsonLd = await getLocalBusinessJsonLd(l, products);
 
   const layout = await getLayout();
   const cardStyle = await getCardStyle(l);

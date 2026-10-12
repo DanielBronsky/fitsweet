@@ -1,6 +1,7 @@
 import type { ReviewsData } from "@/lib/reviews";
 import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { GoogleReviewButton } from "@/components/ui/GoogleReviewButton";
 
 export function Reviews({ data }: { data: ReviewsData | null }) {
   if (!data) return null;
@@ -51,6 +52,8 @@ export function Reviews({ data }: { data: ReviewsData | null }) {
             </li>
           ))}
         </ul>
+
+        {data.google && <GoogleReviewButton data={data.google} className="mt-9 lg:mt-11" />}
       </Container>
     </section>
   );

@@ -94,6 +94,8 @@ export const ru = {
   },
   reviews: {
     title: "Что говорят о нас",
+    googleButton: "Оставить отзыв в Google",
+    googleHint: "Понравилось? Расскажите другим — это очень помогает нам расти.",
   },
   instagram: {
     title: "Больше FitSweet каждый день",

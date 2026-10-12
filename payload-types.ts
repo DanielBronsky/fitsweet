@@ -2148,6 +2148,22 @@ export interface ReviewsSection {
     chipBackground?: string | null;
     chipColor?: string | null;
   };
+  google?: {
+    show?: boolean | null;
+    /**
+     * Пусто — «Оставить отзыв в Google».
+     */
+    text?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    hint?: {
+      ru?: string | null;
+      ro?: string | null;
+    };
+    background?: string | null;
+    color?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2536,6 +2552,41 @@ export interface Seo {
       | number
       | boolean
       | null;
+  };
+  /**
+   * Из этих данных сайт собирает разметку для Google: адрес, точка на карте, часы, зона доставки. Указывайте те же данные, что в профиле Google Business — название, адрес и телефон должны совпадать везде. Телефон и соцсети берутся из футера.
+   */
+  business?: {
+    type?: ('Bakery' | 'Store' | 'FoodEstablishment') | null;
+    street?: string | null;
+    city?: string | null;
+    postalCode?: string | null;
+    lat?: number | null;
+    lng?: number | null;
+    /**
+     * Например: Пн–Пт 09:00–20:00, Сб–Вс 10:00–18:00. Выходной день просто не добавляйте.
+     */
+    hours?:
+      | {
+          days: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday')[];
+          opens: string;
+          closes: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Через запятую: Chișinău, Durlești, Codru, Stăuceni
+     */
+    areaServed?: string | null;
+    priceRange?: ('$' | '$$' | '$$$') | null;
+    /**
+     * Откройте свою компанию в Google Картах → «Поделиться» → скопируйте ссылку.
+     */
+    googleProfile?: string | null;
+    /**
+     * В профиле Google Business → «Попросить отзывы» / «Get more reviews» → скопируйте ссылку. Пока пусто — кнопка отзыва на сайте не показывается.
+     */
+    reviewUrl?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3255,6 +3306,25 @@ export interface ReviewsSectionSelect<T extends boolean = true> {
         chipBackground?: T;
         chipColor?: T;
       };
+  google?:
+    | T
+    | {
+        show?: T;
+        text?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        hint?:
+          | T
+          | {
+              ru?: T;
+              ro?: T;
+            };
+        background?: T;
+        color?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3565,6 +3635,28 @@ export interface SeoSelect<T extends boolean = true> {
         image?: T;
         background?: T;
         variants?: T;
+      };
+  business?:
+    | T
+    | {
+        type?: T;
+        street?: T;
+        city?: T;
+        postalCode?: T;
+        lat?: T;
+        lng?: T;
+        hours?:
+          | T
+          | {
+              days?: T;
+              opens?: T;
+              closes?: T;
+              id?: T;
+            };
+        areaServed?: T;
+        priceRange?: T;
+        googleProfile?: T;
+        reviewUrl?: T;
       };
   updatedAt?: T;
   createdAt?: T;
