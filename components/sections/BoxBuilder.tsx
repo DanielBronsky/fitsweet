@@ -11,6 +11,8 @@ import { Container } from "@/components/ui/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import type { BoxData } from "@/lib/box";
 
+const MAX_ITEMS = 99;
+
 const assorted = (products: Product[], n: number) => {
   const next: Record<string, number> = {};
   if (!products.length) return next;
@@ -42,7 +44,9 @@ export function BoxBuilder({ data }: { data: BoxData | null }) {
     [picked, products],
   );
 
-  const left = size - chosen;
+  const left = Math.max(0, size - chosen);
+  const boxSize = Math.max(size, chosen);
+  const wide = boxSize > 8;
 
   const changeSize = (next: number) => {
     setSize(next);
@@ -50,7 +54,7 @@ export function BoxBuilder({ data }: { data: BoxData | null }) {
   };
 
   const inc = (id: string) => {
-    if (left <= 0) return;
+    if (chosen >= MAX_ITEMS) return;
     setPicked((p) => ({ ...p, [id]: (p[id] ?? 0) + 1 }));
   };
 
@@ -101,7 +105,7 @@ export function BoxBuilder({ data }: { data: BoxData | null }) {
 
             <div className="mt-4 grid grid-cols-2 gap-2">
               {data.sizes.map((s) => {
-                const on = size === s;
+                const on = chosen > size ? chosen === s : size === s;
                 return (
                   <button
                     key={s}
@@ -134,13 +138,17 @@ export function BoxBuilder({ data }: { data: BoxData | null }) {
           </div>
 
           <div className="flex min-w-0 flex-col justify-center rounded-card bg-[var(--box-panel)] p-5 lg:p-6">
-            <div className="scroll-snap-x flex w-full items-center gap-2.5 overflow-x-auto pb-1 lg:justify-center lg:overflow-visible lg:pb-0">
-              {Array.from({ length: size }, (_, i) => {
+            <div
+              className={`scroll-snap-x flex w-full items-center gap-2.5 overflow-x-auto pb-1 lg:justify-center lg:overflow-visible lg:pb-0 ${wide ? "lg:flex-wrap" : ""}`}
+            >
+              {Array.from({ length: boxSize }, (_, i) => {
                 const p = slots[i];
                 return (
                   <div
                     key={i}
-                    className={`snap-item relative aspect-square w-[68px] shrink-0 overflow-hidden rounded-tile lg:w-auto lg:max-w-[92px] lg:flex-1 ${
+                    className={`snap-item relative aspect-square w-[68px] shrink-0 overflow-hidden rounded-tile ${
+                      wide ? "lg:w-[calc((100%-70px)/8)]" : "lg:w-auto lg:max-w-[92px] lg:flex-1"
+                    } ${
                       p ? "bg-card" : "border border-dashed border-[var(--box-border)]"
                     }`}
                     title={p ? tileName(p, locale) : dict.box.freeSlot}
@@ -180,7 +188,7 @@ export function BoxBuilder({ data }: { data: BoxData | null }) {
                         <button
                           type="button"
                           onClick={() => inc(p.id)}
-                          disabled={left <= 0}
+                          disabled={chosen >= MAX_ITEMS}
                           className="grid h-6 w-6 place-items-center rounded-full text-[var(--box-text)] hover:bg-[color-mix(in_srgb,var(--box-accent)_8%,transparent)] disabled:opacity-30"
                           aria-label={dict.box.addOne(tileName(p, locale))}
                         >
