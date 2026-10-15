@@ -30,17 +30,56 @@ pnpm dev:full  # то же для разработки: миграции → н�
 
 ## Docker на Mac (Colima)
 
-Docker работает через Colima — маленькую виртуальную машину с Linux, без Docker Desktop.
-Установлено: `brew install colima docker docker-compose docker-buildx`.
+Docker работает только на Linux, поэтому на Mac он запускается внутри маленькой виртуальной машины.
+Её создаёт и запускает **Colima** — бесплатная консольная замена Docker Desktop (без окна, всё из терминала).
+На сервере с Ubuntu Colima не нужна — там Docker работает напрямую.
+
+### Установка с нуля
 
 ```bash
-colima start     # запустить Docker (после перезагрузки Mac сам не стартует)
-colima stop      # остановить и освободить память (держит до 6 ГБ)
+# 1. Homebrew (если ещё нет)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2. Colima и консольный Docker
+brew install colima docker docker-compose docker-buildx
+
+# 3. Научить docker находить плагины compose и buildx
+#    (если ~/.docker/config.json уже есть — не затирайте, а добавьте строку cliPluginsExtraDirs)
+mkdir -p ~/.docker
+cat > ~/.docker/config.json <<'JSON'
+{
+  "cliPluginsExtraDirs": ["/opt/homebrew/lib/docker/cli-plugins"]
+}
+JSON
+
+# 4. Первый запуск машины: 4 ядра, 6 ГБ памяти, 40 ГБ диска, встроенная виртуализация macOS
+colima start --cpu 4 --memory 6 --disk 40 --vm-type vz
+
+# 5. Проверка
+docker version                 # должны быть Client и Server
+docker compose version
+docker run --rm hello-world    # «Hello from Docker!» — всё работает
+```
+
+### Каждый день
+
+```bash
+colima start     # запустить Docker (после перезагрузки Mac сам не стартует; параметры запомнены)
+colima stop      # остановить и освободить память
 colima status    # работает ли сейчас
 ```
 
 Автозапуск вместе с Mac: `brew services start colima` (выключить: `brew services stop colima`).
 Если `docker` пишет «Cannot connect to the Docker daemon» — Colima не запущена, выполните `colima start`.
+
+Поменять память или ядра: `colima stop`, затем `colima start --cpu 4 --memory 8`.
+
+Удалить всё начисто (вместе со всеми образами и контейнерами):
+
+```bash
+colima delete
+brew uninstall colima docker docker-compose docker-buildx
+```
 
 ## Выкладка на сервер
 
